@@ -5,7 +5,7 @@ import {Button, Row, Col, Card} from 'react-materialize'
 import M from 'materialize-css';
 import axios from 'axios';
 import {GoogleChart} from './GoogleChart.js'
-import {PruebaTabsMat} from './QueryTabs.js'
+import {PruebaTabsMat} from './SelectQueryTabs.js'
 
 var _ = require('lodash');
 
@@ -26,6 +26,10 @@ export class SensorsInfo extends React.Component {
 			allChartData: null
 		};
 	}
+
+  pruebaAlert(greeting, where){
+    alert(greeting + "!!, estoy en " + where);
+  }
 
 	toggleSelectedSensor(sensor){
 		const selectedSensors = this.state.selectedSensors.slice();
@@ -166,7 +170,6 @@ export class SensorsInfo extends React.Component {
 	}
 
 	getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate){
-
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -219,10 +222,8 @@ export class SensorsInfo extends React.Component {
 	}
 
 	prepareResponseData(response, info){
-
 		// info: (sensors, groupBy, filter, orderBy, type)
-
-  		const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  	const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 		const results = response["results"]["bindings"];
 
 		let selectValues = [];
@@ -362,18 +363,13 @@ export class SensorsInfo extends React.Component {
 		});
 	}
 
-
 	// makeQueryResume(){
 	// 	if (info['type'] === 'infor'){
-
 	// 	}
 	// 	else if (info['type'] === 'otro'){
-
 	// 	}
-
 	// 	return (
 	// 		<Card title='Resumen de la pregunta'>
-
 	// 		</Card>
 	// 	);
 	// }
@@ -392,6 +388,7 @@ export class SensorsInfo extends React.Component {
           moreThanOneSensor={moreThanOneSensor}
           getInformationQuery={(s,g,f,o) => {this.getInformationQuery(s,g,f,o);}}
           getOtherSensorQuery={(k,a,q,o) => {this.getOtherSensorQuery(k,a,q,o);}}
+          pruebaAlert={(g,w) => {this.pruebaAlert(g,w);}}
         />)
 			: (null);
 
