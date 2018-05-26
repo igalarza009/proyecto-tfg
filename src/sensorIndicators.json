@@ -1,0 +1,10 @@
+[
+	{"indicatorId":"2F1KT7","sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "1"},
+    {"indicatorId":"VMTKD6","sensorType":"MeltingTemperatureSensor", "observationType":"MeltingTemperatureObservation", "ResultType":"DoubleValueResult", "zone": ""},
+    {"indicatorId":"649NNJ","sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "2"},
+    {"indicatorId":"REMSDB","sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "3"},
+    {"indicatorId":"XYY72L","sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "4"},
+    {"indicatorId":"T4C3B9","sensorType":"EngineRPMSensor", "observationType":"EngineRPMObservation", "resultType":"DoubleValueResult", "zone": ""},
+    {"indicatorId":"79PWN7","sensorType":"EngineConsumptionSensor", "observationType":"EngineConsumptionObservation", "resultType":"DoubleValueResult", "zone": ""},
+    {"indicatorId":"84RATS","sensorType":"PressureSensor", "observationType":"PressureObservation", "resultType":"DoubleValueResult", "zone": ""},
+]

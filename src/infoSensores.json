@@ -1,0 +1,19 @@
+[
+	{"indicatorId":"2F1KT7", "name":"Temperatura Zona 1", "class":"temp1", "sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "1"},
+    {"indicatorId":"649NNJ", "name":"Temperatura Zona 2", "class":"temp2", "sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "2"},
+    {"indicatorId":"REMSDB", "name":"Temperatura Zona 3", "class":"temp3", "sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "3"},
+    {"indicatorId":"XYY72L", "name":"Temperatura Zona 4", "class":"temp4", "sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "4"},
+    {"indicatorId":"VMTKD6", "name":"Temperatura de fundido", "class":"tempFundido", "sensorType":"MeltingTemperatureSensor", "observationType":"MeltingTemperatureObservation", "resultType":"DoubleValueResult", "zone": ""},
+    {"indicatorId":"T4C3B9", "name":"Revoluciones por minuto", "class":"rpm", "sensorType":"EngineRPMSensor", "observationType":"EngineRPMObservation", "resultType":"DoubleValueResult", "zone": ""},
+    {"indicatorId":"79PWN7", "name":"Consumo del motor", "class":"consumo", "sensorType":"EngineConsumptionSensor", "observationType":"EngineConsumptionObservation", "resultType":"DoubleValueResult", "zone": ""},
+    {"indicatorId":"84RATS", "name":"Presión", "class":"presion", "sensorType":"PressureSensor", "observationType":"PressureObservation", "resultType":"DoubleValueResult", "zone": ""},
+
+    {"indicatorId":"UnknownResist1", "name":"Resistencia Zona 1", "class":"resist1", "sensorType":"ResistanceSensor", "observationType":"ResistanceObservation", "resultType":"BooleanResult", "zone": "1"},
+    {"indicatorId":"UnknownResist2", "name":"Resistencia Zona 2", "class":"resist2", "sensorType":"ResistanceSensor", "observationType":"ResistanceObservation", "resultType":"BooleanResult", "zone": "2"},
+    {"indicatorId":"UnknownResist3", "name":"Resistencia Zona 3", "class":"resist3", "sensorType":"ResistanceSensor", "observationType":"ResistanceObservation", "resultType":"BooleanResult", "zone": "3"},
+    {"indicatorId":"UnknownResist4", "name":"Resistencia Zona 4", "class":"resist4", "sensorType":"ResistanceSensor", "observationType":"ResistanceObservation", "resultType":"BooleanResult", "zone": "4"},
+    {"indicatorId":"UnknownVent1", "name":"Ventilación Zona 1", "class":"vent1", "sensorType":"VentilationSensor", "observationType":"VentilationObservation", "resultType":"BooleanResult", "zone": "1"},
+    {"indicatorId":"UnknownVent2", "name":"Ventilación Zona 2", "class":"vent2", "sensorType":"VentilationSensor", "observationType":"VentilationObservation", "resultType":"BooleanResult", "zone": "2"},
+    {"indicatorId":"UnknownVent3", "name":"Ventilación Zona 3", "class":"vent3", "sensorType":"VentilationSensor", "observationType":"VentilationObservation", "resultType":"BooleanResult", "zone": "3"},
+    {"indicatorId":"UnknownVent4", "name":"Ventilación Zona 4", "class":"vent4", "sensorType":"VentilationSensor", "observationType":"VentilationObservation", "resultType":"BooleanResult", "zone": "4"}
+]
