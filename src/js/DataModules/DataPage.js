@@ -5,6 +5,7 @@ import {Row, Col, Card, Icon} from 'react-materialize'
 import Papa from 'papaparse';
 import M from 'materialize-css';
 import axios from 'axios';
+import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
 
 export class ParseData extends React.Component {
 	constructor(props) {
@@ -78,6 +79,7 @@ export class ParseData extends React.Component {
 			: (null);
 
 		return(
+			<div>
 			<Row>
 				<Col s={12} m={8}>
 					<Card>
@@ -106,6 +108,10 @@ export class ParseData extends React.Component {
 					{loading}
 				</Col>
 			</Row>
+			<Row>
+				<HTTPPrueba />
+			</Row>
+		</div>
 		)
 	}
 }

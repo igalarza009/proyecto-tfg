@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p id="respuesta"></p>
+
+
+<script>
+function preguntar(query,baseURL){
+
+	var queryURL=baseURL + '?query=' + encodeURIComponent(query);
+	alert(queryURL);
+
+	if (window.XMLHttpRequest) {
+  		xmlhttp=new XMLHttpRequest();
+  	}
+  	else {
+  		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  	}
+  	xmlhttp.open("GET",queryURL,false);
+	alert("enviando...");
+  	xmlhttp.send();
+	alert("enviado");
+	return JSON.parse(xmlhttp.responseText);
+
+}
+
+
+var query="SELECT * from <prueba01> WHERE {?s <#price> ?o}"; 
+
+
+var data=preguntar(query, "http://localhost:8080/VirtuosoPrueba03/rest/extrusion/query");
+
+for(i=0;i<data.results.bindings.length;i++)
+document.getElementById("respuesta").innerHTML+=data.results.bindings[i].s.value+"<br>";
+</script>
+
+</body>
+</html>
