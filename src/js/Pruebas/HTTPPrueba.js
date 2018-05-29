@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import '../../index.css';
 import * as Queries from '../QueriesModules/SPARQLQueries.js';
-import {Button, Card} from 'react-materialize'
+import {Row, Col, Button, Card} from 'react-materialize'
 import M from 'materialize-css';
 import axios from 'axios';
 
@@ -13,10 +13,22 @@ export class HTTPPrueba extends React.Component {
 			httpRespuesta: '',
 		};
 
-		this.handleClick = this.handleClick.bind(this);
+		this.handleClickQuery = this.handleClickQuery.bind(this);
+		this.handleClickHello = this.handleClickHello.bind(this);
 	}
 
-	handleClick(){
+	handleClickHello(){
+		const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello";
+		axios.get(getURL)
+		.then((response) => {
+			console.log(response);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+	}
+
+	handleClickQuery(){
 
 		let sensors = ['VMTKD6', '2F1KT7'];
 		let groupBy = {
@@ -67,96 +79,34 @@ export class HTTPPrueba extends React.Component {
 		const query = Queries.getInformationQuery(sensors, groupBy, filter, orderBy);
 		// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
 
-		// var query = "select ?sensorName ?resultDate (AVG(?resultValue) as ?mediaResultados) " +
-		// 							"from <http://www.sensores.com/ontology/prueba03/extrusoras#> " +
-		// 							"where { " +
-		// 	    					"{ ?sensorType rdfs:subClassOf :DoubleValueSensor . } " +
-		// 	     						"union " +
-		// 	    					"{ ?sensorType rdfs:subClassOf :BooleanSensor . } " +
-		// 	    					"?sensorName rdf:type ?sensorType . " +
-		// 	    					"?sensorName rdf:type owl:NamedIndividual . " +
-		// 	    					"?sensorName sosa:madeObservation ?obsName . " +
-		// 	    					"?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue . " +
-		// 	    					"?obsName sosa:resultTime ?resultTime . " +
-		// 	    					"bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate) " +
-		// 							"} " +
-		// 							"group by ?sensorName ?resultDate " +
-		// 							"order by desc(?resultDate) ";
-
-		// console.log(query);
-
 
 		const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query?";
 		axios.get(getURL + encodeURIComponent(query))
 		.then((response) => {
 			console.log(response);
-			// var file = new Blob([response.data], {type: 'text/html'});
-			// var outputFileName = 'queryPruebaResults.html'
-			//
-			// if (window.navigator.msSaveOrOpenBlob) // IE10+
-		  //       window.navigator.msSaveOrOpenBlob(file, outputFileName);
-		  //   else { // Others
-		  //       var a = document.createElement("a"),
-		  //               url = URL.createObjectURL(file);
-		  //       a.href = url;
-		  //       a.download = outputFileName;
-		  //       document.body.appendChild(a);
-		  //       a.click();
-		  //       setTimeout(function() {
-		  //           document.body.removeChild(a);
-		  //           window.URL.revokeObjectURL(url);
-		  //       }, 0);
-		  //   }
 		})
 		.catch((error) => {
 			console.log(error);
 		});
 
-		// const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello";
-		// axios.get(getURL)
-		// .then((response) => {
-		// 	console.log(response);
-		// })
-		// .catch((error) => {
-		// 	console.log(error);
-		// });
-
 	}
-
-	// handleClickSelect(){
-	// 	const getURL = "http://localhost:8080/VirtuosoService/rest/extrusion/query?query=";
-	//
-	// 	axios.get(getURL + encodeURIComponent(query))
-	// 	.then((response) => {
-	// 		console.log(response);
-	// 		// var file = new Blob([JSON.stringify(response.data)], {type: 'application/jsons'});
-	// 		// var outputFileName = 'queryPruebaResults.json'
-	// 		//
-	// 		// if (window.navigator.msSaveOrOpenBlob) // IE10+
-	// 	  //       window.navigator.msSaveOrOpenBlob(file, outputFileName);
-	// 	  //   else { // Others
-	// 	  //       var a = document.createElement("a"),
-	// 	  //               url = URL.createObjectURL(file);
-	// 	  //       a.href = url;
-	// 	  //       a.download = outputFileName;
-	// 	  //       document.body.appendChild(a);
-	// 	  //       a.click();
-	// 	  //       setTimeout(function() {
-	// 	  //           document.body.removeChild(a);
-	// 	  //           window.URL.revokeObjectURL(url);
-	// 	  //       }, 0);
-	// 	  //   }
-	// 	})
-	// 	.catch((error) => {
-	// 		console.log(error);
-	// 	});
-	// }
-
 	render(){
 
 		return(
 			<Card className='center blue-text darken-3'>
-				<Button className='blue darken-3' onClick={this.handleClick}>Query de prueba</Button>
+				<Row>
+					<Col s={12} l={6}>
+						<Button className='pink lighten-1' onClick={this.handleClickQuery}>
+							Prueba Query
+						</Button>
+					</Col>
+					<Col s={12} l={6}>
+						<Button className='purple lighten-1' onClick={this.handleClickHello}>
+							Prueba Hello
+						</Button>
+					</Col>
+				</Row>
+
 			</Card>
 		)
 	}

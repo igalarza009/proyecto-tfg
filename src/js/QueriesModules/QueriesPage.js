@@ -23,7 +23,8 @@ export class SensorsInfo extends React.Component {
 			moreThanOneSensor: false,
 			loadingQuery: false,
 			showChart: false,
-			allChartData: null
+			allChartData: null,
+			chartType: "ColumnChart"
 		};
 	}
 
@@ -126,6 +127,8 @@ export class SensorsInfo extends React.Component {
 			loadingQuery: true,
 		});
 
+		let chartType = "ColumnChart";
+
 		const query = Queries.getInformationQuery(sensors, groupBy, filter, orderBy);
 
 		// console.log(query);
@@ -142,6 +145,7 @@ export class SensorsInfo extends React.Component {
 			this.setState({
 				showChart: true,
 				allChartData: allChartData,
+				chartType: chartType,
 			});
 			// var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
 			// var outputFileName = 'queryPruebaResults.json'
@@ -174,6 +178,8 @@ export class SensorsInfo extends React.Component {
 			showQueries: false,
 			loadingQuery: true,
 		});
+
+		let chartType = "ColumnChart";
 
 		const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
 
@@ -381,6 +387,7 @@ export class SensorsInfo extends React.Component {
 		const loadingQuery = this.state.loadingQuery;
 		const showChart = this.state.showChart;
 		const allChartData = this.state.allChartData;
+		const chartType = this.state.chartType;
 
 		const queriesCardMat = (showQueries)
 			? (<PruebaTabsMat
@@ -406,10 +413,17 @@ export class SensorsInfo extends React.Component {
 
 		let chartCard = null;
 		if (loadingQuery){
-			chartCard = <Card className='center'> <img className='loading' alt='Cargando...' src={require('../../img/loading_bars.gif')}/> </Card>;
+			chartCard = <Card className='center'>
+							<img className='loading' alt='Cargando...'
+								src={require('../../img/loading_bars.gif')}
+							/>
+						</Card>;
 		}
 		if (showChart){
-			chartCard = <GoogleChart allChartData={allChartData}/>;
+			chartCard = <GoogleChart
+							allChartData={allChartData}
+							chartType={chartType}
+						/>;
 		}
 
 		return(

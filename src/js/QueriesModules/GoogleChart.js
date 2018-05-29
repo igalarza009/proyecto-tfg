@@ -38,7 +38,7 @@ export class GoogleChart extends React.Component{
 			// <div className={'chartContainer'}>
 			<Card>
 		       <Chart
-			        chartType="ColumnChart"
+			        chartType={this.props.chartType}
 			        data={data}
 			        options={this.state.options}
 			        graph_id="ScatterChart"
