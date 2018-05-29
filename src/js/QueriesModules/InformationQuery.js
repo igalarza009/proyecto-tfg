@@ -158,15 +158,15 @@ export class InformationQueryForm extends React.Component{
 					<Row s={12}>
 						<p className='blue-text text-darken-3'>Filtrar resultados por horas: </p>
 					</Row>
-					<Row>
+					<Row className='grey-text center'>
 						<Col s={12} l={6}>
-							Desde las...
+							Desde las... (HH:mm:ss)
 						</Col>
 						<Col s={12} l={6}>
-							Hasta las...
+							Hasta las... (HH:mm:ss)
 						</Col>
 					</Row>
-					<Row>
+					<Row className='center'>
 						<Col s={12} l={6}>
 							<input id="number" type="number" min="0" max="23"
 								onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
