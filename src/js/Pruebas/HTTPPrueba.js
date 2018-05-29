@@ -15,10 +15,11 @@ export class HTTPPrueba extends React.Component {
 
 		this.handleClickQuery = this.handleClickQuery.bind(this);
 		this.handleClickHello = this.handleClickHello.bind(this);
+		// this.handleQuerySinAxios = this.handleQuerySinAxios.bind(this);
 	}
 
 	handleClickHello(){
-		const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello";
+		const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello?name=irati";
 		axios.get(getURL)
 		.then((response) => {
 			console.log(response);
@@ -27,6 +28,56 @@ export class HTTPPrueba extends React.Component {
 			console.log(error);
 		});
 	}
+
+	// handleQuerySinAxios(){
+	//
+	//
+	// 			let sensors = ['VMTKD6', '2F1KT7'];
+	// 			let groupBy = {
+	// 			 	'groupBy': true,
+	// 				'groupByDate': false,
+	// 				'groupByHour': true,
+	// 				'avg': true,
+	// 				'min': false,
+	// 				'max': false
+	// 			};
+	//
+	// 			let filter = {
+	// 				'filter': true,
+	// 				'filterDate': true,
+	// 				'startDate': '2018-03-01',
+	// 				'endDate': '2018-03-31',
+	// 				'filterTime': true,
+	// 				'startTime': '12:00:00',
+	// 				'endTime': '16:59:59'
+	// 			};
+	//
+	// 			let orderBy = {
+	// 				'orderBy': true,
+	// 				'order': 'desc',
+	// 				'orderField': 'dateTime'
+	// 			};
+	//
+	//
+	// 			const query = Queries.getInformationQuery(sensors, groupBy, filter, orderBy);
+	// 			// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
+	//
+	//
+	// 	const baseURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query";
+	// 	var queryURL=baseURL + '?query=' + encodeURIComponent(query);
+	//
+	// 	if (window.XMLHttpRequest) {
+	//   		xmlhttp=new XMLHttpRequest();
+	//   	}
+	//   	else {
+	//   		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	//   	}
+	//   	xmlhttp.open("GET",queryURL,false);
+	// 	alert("enviando...");
+	//   	xmlhttp.send();
+	// 	alert("enviado");
+	// 	return JSON.parse(xmlhttp.responseText);
+	// }
 
 	handleClickQuery(){
 
@@ -79,9 +130,11 @@ export class HTTPPrueba extends React.Component {
 		const query = Queries.getInformationQuery(sensors, groupBy, filter, orderBy);
 		// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
 
-
-		const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query?";
-		axios.get(getURL + encodeURIComponent(query))
+		// const query="select distinct ?Concept where {[] a ?Concept} LIMIT 100";
+		const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query?query=";
+		const encodedQuery = getURL + encodeURIComponent(query);
+		alert(encodedQuery);
+		axios.get(encodedQuery)
 		.then((response) => {
 			console.log(response);
 		})

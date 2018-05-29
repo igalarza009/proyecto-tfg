@@ -11,8 +11,8 @@ export class InformationQueryForm extends React.Component{
 		this.state = {
 			fechaInicio: '',
 			fechaFin: '',
-			horaInicio: '',
-			horaFin: '',
+			horaInicio: {hor:null, min:null, seg:null},
+			horaFin: {hor:null, min:null, seg:null},
 			selectAggregates: {'avg':false, 'min':false, 'max':false},
 			groupBy: 'day'
 		};
@@ -30,15 +30,21 @@ export class InformationQueryForm extends React.Component{
 		});
 	}
 
-	handleHoraInicio(event,value){
+	handleTimeChange(event,  timeName, timeType){
+		let value = event.target.value;
+		let newValue = value;
+		if (value.length === 1){
+			newValue = '0' + value;
+			event.target.value = newValue;
+		}
+		else if (value.length === 3){
+			newValue = value.substr(1);
+			event.target.value = newValue;
+		}
+		let time = this.state[timeName];
+		time[timeType] = newValue;
 		this.setState({
-			horaInicio: value,
-		});
-	}
-
-	handleHoraFin(event,value){
-		this.setState({
-			horaFin: value,
+			[timeName]: time,
 		});
 	}
 
@@ -86,11 +92,18 @@ export class InformationQueryForm extends React.Component{
 			filter['endDate'] = fechaFin;
 		}
 
-		if (horaInicio !== ''){
+		let filterTime = true;
+		_.forEach(horaInicio, (value, key) => {
+			if (value === null){
+				filterTime = false;
+			}
+		});
+
+		if (filterTime){
 			filter['filter'] = true;
 			filter['filterTime'] = true;
-			filter['startTime'] = horaInicio;
-			filter['endTime'] = horaFin;
+			filter['startTime'] = horaInicio['hor'] + ':' + horaInicio['min'] + ':' + horaInicio['seg'];
+			filter['endTime'] = horaFin['hor'] + ':' + horaFin['min'] + ':' + horaFin['seg'];
 		}
 
 		if (_.includes(selectAggregates, true)){
@@ -109,6 +122,8 @@ export class InformationQueryForm extends React.Component{
 			}
 		}
 
+		console.log(filter);
+
 		this.props.getInformationQuery(sensors, groupBy, filter, orderBy);
 	}
 
@@ -122,17 +137,22 @@ export class InformationQueryForm extends React.Component{
 			<Card>
 				<div className='form'>
 					<Row>
-						<p className='grey-text'> Obtener una gráfica sobre los valores que toman los sensores selecionados. Completa solo los campos deseados para aplicar filtros a la respuesta. </p>
+						<p className='grey-text'>
+							Obtener una gráfica sobre los valores que toman los sensores selecionados.
+							Completa solo los campos deseados para aplicar filtros a la respuesta.
+						</p>
 					</Row>
 					<Row s={12}>
 						<p className='blue-text text-darken-3'>Filtrar resultados por fechas: </p>
 					</Row>
 					<Row>
 						<Col s={12} l={6}>
-							<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}} onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+							<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
+								onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
 						</Col>
 						<Col s={12} l={6}>
-							<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}} onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+							<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}}
+								onChange={(e, value) => {this.handleFechaFin(e, value);}} />
 						</Col>
 					</Row>
 					<Row s={12}>
@@ -140,10 +160,34 @@ export class InformationQueryForm extends React.Component{
 					</Row>
 					<Row>
 						<Col s={12} l={6}>
-							<Input name='hora1' type='text'  label="Desde las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraInicio(e, value);}}/>
+							Desde las...
 						</Col>
 						<Col s={12} l={6}>
-							<Input name='hora2' type='text'  label="Hasta las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraFin(e, value);}}/>
+							Hasta las...
+						</Col>
+					</Row>
+					<Row>
+						<Col s={12} l={6}>
+							<input id="number" type="number" min="0" max="23"
+								onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
+							:
+							<input id="number" type="number" min="0" max="59"
+								onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
+							:
+							<input id="number" type="number" min="0" max="59"
+								onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
+							{/* <Input name='hora1' type='text'  label="Desde las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraInicio(e, value);}}/> */}
+						</Col>
+						<Col s={12} l={6}>
+							{/* <Input name='hora2' type='text'  label="Hasta las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraFin(e, value);}}/> */}
+							<input id="number" type="number" min="0" max="23"
+								onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
+							:
+							<input id="number" type="number" min="0" max="59"
+								onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
+							:
+							<input id="number" type="number" min="0" max="59"
+								onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
 						</Col>
 					</Row>
 					<Row s={12}>

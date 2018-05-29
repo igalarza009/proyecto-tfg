@@ -25,10 +25,10 @@ function preguntar(query,baseURL){
 }
 
 
-var query="SELECT * from <prueba01> WHERE {?s <#price> ?o}"; 
+var query="select distinct ?Concept where {[] a ?Concept} LIMIT 100";
 
 
-var data=preguntar(query, "http://localhost:8080/VirtuosoPrueba03/rest/extrusion/query");
+var data=preguntar(query, "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query");
 
 for(i=0;i<data.results.bindings.length;i++)
 document.getElementById("respuesta").innerHTML+=data.results.bindings[i].s.value+"<br>";
