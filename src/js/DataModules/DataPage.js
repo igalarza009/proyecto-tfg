@@ -6,6 +6,7 @@ import Papa from 'papaparse';
 import M from 'materialize-css';
 import axios from 'axios';
 import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
+import $ from 'jquery';
 
 export class ParseData extends React.Component {
 	constructor(props) {
@@ -15,6 +16,12 @@ export class ParseData extends React.Component {
 	    	parsingElement: false,
 	    }
  	}
+
+	componentDidMount(){
+		$(document).ready(function(){
+		    $('.collapsible').collapsible();
+		});
+	}
 
 	handleSubmit(event){
 		const selectedFile = this.fileInput.files;
@@ -110,6 +117,22 @@ export class ParseData extends React.Component {
 			</Row>
 			<Row>
 				<HTTPPrueba />
+			</Row>
+			<Row>
+				<ul className="collapsible" data-collapsible="expandable">
+				   <li>
+					 <div className="collapsible-header no-pointer"><i className="material-icons">filter_drama</i>No se abre</div>
+					 {/* <div className="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div> */}
+				   </li>
+				   <li>
+					 <div className="collapsible-header">Second<i className="material-icons">keyboard_arrow_down</i></div>
+					 <div className="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+				   </li>
+				   <li>
+					 <div className="collapsible-header"><i className="material-icons">whatshot</i>Third</div>
+					 <div className="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+				   </li>
+				 </ul>
 			</Row>
 		</div>
 		)

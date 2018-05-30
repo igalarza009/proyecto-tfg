@@ -26,7 +26,8 @@ export function getInformationQuery(sensors, groupBy, filter, orderBy){
 
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
-		'prefix sosa: <http://www.w3.org/ns/sosa/> ';
+		'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
+		'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ';
 
 	const select = getSelect(groupBy);
 
@@ -88,7 +89,8 @@ export function getInformationQuery(sensors, groupBy, filter, orderBy){
 export function getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate){
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
-		'prefix sosa: <http://www.w3.org/ns/sosa/> ';
+		'prefix sosa: <http://www.w3.org/ns/sosa/> '+
+		'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ';;
 
 	let select = 'select ?sensorName ?resultValue ?resultTime ';
 

@@ -42,6 +42,14 @@
   width: 2.5em;
 }
 
+.infoTabs{
+	padding:5px;
+}
+
+.no-pointer{
+	cursor: context-menu;
+}
+
 /*--------------- DATE PICKER -------------*/
 
 .picker__year-display{

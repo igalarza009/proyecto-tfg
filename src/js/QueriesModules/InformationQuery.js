@@ -145,7 +145,7 @@ export class InformationQueryForm extends React.Component{
 					<Row s={12}>
 						<p className='blue-text text-darken-3'>Filtrar resultados por fechas: </p>
 					</Row>
-					<Row>
+					<Row className="center">
 						<Col s={12} l={6}>
 							<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
 								onChange={(e, value) => {this.handleFechaInicio(e, value);}} />

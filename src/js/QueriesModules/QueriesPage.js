@@ -13,6 +13,9 @@ const infoSensores = require('../../infoSensores.json');
 const sensorIconNames = ['tempIcon', 'resistIcon', 'ventIcon', 'rpmIcon', 'consumoIcon', 'presionIcon', 'tempFundidoIcon'];
 const sensorIconTooltips = {'tempIcon':'Temperatura', 'resistIcon':'Resistencia', 'ventIcon':'Ventilación', 'rpmIcon':'R.P.M. del motor', 'consumoIcon':'Consumo del motor', 'presionIcon':'Presión', 'tempFundidoIcon':'Temperatura de fundido'};
 
+const virtuosoURL = 'http://localhost:8890/sparql';
+const RESTfulURL = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
+
 export class SensorsInfo extends React.Component {
 	constructor(props){
 		super(props);
@@ -28,10 +31,6 @@ export class SensorsInfo extends React.Component {
 		};
 	}
 
-  pruebaAlert(greeting, where){
-    alert(greeting + "!!, estoy en " + where);
-  }
-
 	toggleSelectedSensor(sensor){
 		const selectedSensors = this.state.selectedSensors.slice();
 		const sensorIndex = selectedSensors.indexOf(sensor);
@@ -40,12 +39,11 @@ export class SensorsInfo extends React.Component {
 		const loadingQuery = this.state.loadingQuery;
 		const showChart = this.state.showChart;
 
-		if (sensorIndex < 0){
+		if (sensorIndex < 0)
 			selectedSensors.push(sensor);
-		}
-		else{
+		else
 			selectedSensors.splice(sensorIndex, 1);
-		}
+
 		this.setState({
 			selectedSensors: selectedSensors,
 		});
@@ -73,12 +71,11 @@ export class SensorsInfo extends React.Component {
 			const sensorClass = value.class;
 			const sensorIndex = selectedSensors.indexOf(sensorId);
 			let classes;
-			if (sensorIndex < 0){
+			if (sensorIndex < 0)
 				classes = 'sensorDiv z-depth-1 ' + sensorClass;
-			}
-			else{
+			else
 				classes = 'sensorDivSelected z-depth-1 ' + sensorClass;
-			}
+
 			return(
 				<div key={sensorId} className={classes} onClick={() => this.toggleSelectedSensor(sensorId)}> </div>
 			);
@@ -121,7 +118,6 @@ export class SensorsInfo extends React.Component {
 	}
 
 	getInformationQuery(sensors, groupBy, filter, orderBy){
-
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -135,9 +131,9 @@ export class SensorsInfo extends React.Component {
 
 		const querystring = require('querystring');
 		// console.log(querystring.stringify({'query': query}));
-		axios.post('http://localhost:8890/sparql', querystring.stringify({'query': query}),{
-			headers: {'Accept': 'application/json'},
-		})
+		axios.post(RESTfulURL,
+			querystring.stringify({'query': query})
+		)
 		.then((response) => {
 			console.log(response);
 			let allChartData = this.prepareResponseData(response.data, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
@@ -148,22 +144,22 @@ export class SensorsInfo extends React.Component {
 				chartType: chartType,
 			});
 			// var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
-			// var outputFileName = 'queryPruebaResults.json'
-
+			// var outputFileName = 'queryResultsVirtuoso.json'
+			//
 			// if (window.navigator.msSaveOrOpenBlob) // IE10+
-		 //        window.navigator.msSaveOrOpenBlob(file, outputFileName);
-		 //    else { // Others
-		 //        var a = document.createElement("a"),
-		 //                url = URL.createObjectURL(file);
-		 //        a.href = url;
-		 //        a.download = outputFileName;
-		 //        document.body.appendChild(a);
-		 //        a.click();
-		 //        setTimeout(function() {
-		 //            document.body.removeChild(a);
-		 //            window.URL.revokeObjectURL(url);
-		 //        }, 0);
-		 //    }
+		    //     window.navigator.msSaveOrOpenBlob(file, outputFileName);
+		    // else { // Others
+		    //     var a = document.createElement("a"),
+		    //             url = URL.createObjectURL(file);
+		    //     a.href = url;
+		    //     a.download = outputFileName;
+		    //     document.body.appendChild(a);
+		    //     a.click();
+		    //     setTimeout(function() {
+		    //         document.body.removeChild(a);
+		    //         window.URL.revokeObjectURL(url);
+		    //     }, 0);
+		    // }
 		})
 		.catch((error) => {
 			console.log(error);
@@ -187,9 +183,9 @@ export class SensorsInfo extends React.Component {
 
 		const querystring = require('querystring');
 		// console.log(querystring.stringify({'query': query}));
-		axios.post('http://localhost:8890/sparql', querystring.stringify({'query': query}),{
-			headers: {'Accept': 'application/json'},
-		})
+		axios.post(RESTfulURL,
+			querystring.stringify({'query': query})
+		)
 		.then((response) => {
 			// console.log(response);
 			let allChartData = this.prepareResponseData(response.data, {'sensors': askedSensors, 'type': 'otro'});
@@ -229,7 +225,7 @@ export class SensorsInfo extends React.Component {
 
 	prepareResponseData(response, info){
 		// info: (sensors, groupBy, filter, orderBy, type)
-  	const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  		const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 		const results = response["results"]["bindings"];
 
 		let selectValues = [];
@@ -257,12 +253,12 @@ export class SensorsInfo extends React.Component {
 						selectValues.push('avgValue');
 						console.log('push in select values' + selectValues);
 					}
-					if (info['groupBy']['min']){
+
+					if (info['groupBy']['min'])
 						selectValues.push('minValue');
-					}
-					if (info['groupBy']['max']){
+						
+					if (info['groupBy']['max'])
 						selectValues.push('maxValue');
-					}
 				}
 				else {
 					selectValues.push('resultValue');
@@ -391,12 +387,11 @@ export class SensorsInfo extends React.Component {
 
 		const queriesCardMat = (showQueries)
 			? (<PruebaTabsMat
-          selectedSensors={selectedSensors}
-          moreThanOneSensor={moreThanOneSensor}
-          getInformationQuery={(s,g,f,o) => {this.getInformationQuery(s,g,f,o);}}
-          getOtherSensorQuery={(k,a,q,o) => {this.getOtherSensorQuery(k,a,q,o);}}
-          pruebaAlert={(g,w) => {this.pruebaAlert(g,w);}}
-        />)
+		      		selectedSensors={selectedSensors}
+		          	moreThanOneSensor={moreThanOneSensor}
+		          	getInformationQuery={(s,g,f,o) => {this.getInformationQuery(s,g,f,o);}}
+		          	getOtherSensorQuery={(k,a,q,o) => {this.getOtherSensorQuery(k,a,q,o);}}
+		        />)
 			: (null);
 
 		const newQueryButton = (showChart)

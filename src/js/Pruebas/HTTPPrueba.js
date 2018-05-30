@@ -19,8 +19,11 @@ export class HTTPPrueba extends React.Component {
 	}
 
 	handleClickHello(){
-		const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello?name=irati";
-		axios.get(getURL)
+		let name = 'Irati Galarza Burguete';
+		const querystring = require('querystring');
+		axios.post('http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello',
+			querystring.stringify({'name': name})
+		)
 		.then((response) => {
 			console.log(response);
 		})
@@ -29,58 +32,7 @@ export class HTTPPrueba extends React.Component {
 		});
 	}
 
-	// handleQuerySinAxios(){
-	//
-	//
-	// 			let sensors = ['VMTKD6', '2F1KT7'];
-	// 			let groupBy = {
-	// 			 	'groupBy': true,
-	// 				'groupByDate': false,
-	// 				'groupByHour': true,
-	// 				'avg': true,
-	// 				'min': false,
-	// 				'max': false
-	// 			};
-	//
-	// 			let filter = {
-	// 				'filter': true,
-	// 				'filterDate': true,
-	// 				'startDate': '2018-03-01',
-	// 				'endDate': '2018-03-31',
-	// 				'filterTime': true,
-	// 				'startTime': '12:00:00',
-	// 				'endTime': '16:59:59'
-	// 			};
-	//
-	// 			let orderBy = {
-	// 				'orderBy': true,
-	// 				'order': 'desc',
-	// 				'orderField': 'dateTime'
-	// 			};
-	//
-	//
-	// 			const query = Queries.getInformationQuery(sensors, groupBy, filter, orderBy);
-	// 			// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
-	//
-	//
-	// 	const baseURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query";
-	// 	var queryURL=baseURL + '?query=' + encodeURIComponent(query);
-	//
-	// 	if (window.XMLHttpRequest) {
-	//   		xmlhttp=new XMLHttpRequest();
-	//   	}
-	//   	else {
-	//   		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	//   	}
-	//   	xmlhttp.open("GET",queryURL,false);
-	// 	alert("enviando...");
-	//   	xmlhttp.send();
-	// 	alert("enviado");
-	// 	return JSON.parse(xmlhttp.responseText);
-	// }
-
 	handleClickQuery(){
-
 		let sensors = ['VMTKD6', '2F1KT7'];
 		let groupBy = {
 		 	'groupBy': true,
