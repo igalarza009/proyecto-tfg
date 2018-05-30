@@ -1,6 +1,6 @@
 ================================= INSERT DE PRUEBA ==========================
 
-prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix sosa: <http://www.w3.org/ns/sosa/>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -8,32 +8,32 @@ prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 insert data
 {
-	graph <http://www.sensores.com/ontology/prueba02/extrusoras#>
+	graph <http://www.sensores.com/ontology/prueba03/extrusoras#>
 	{
-		:sensor2F1KT7obs1prueba rdf:type owl:NamedIndividual , 
-										:TemperatureObservation . 
-		:sensor2F1KT7obs1pruebaResult rdf:type owl:NamedIndividual , 
+		:sensor2F1KT7obs1prueba rdf:type owl:NamedIndividual ,
+										:TemperatureObservation .
+		:sensor2F1KT7obs1pruebaResult rdf:type owl:NamedIndividual ,
 										:DoubleValueResult .
 		:sensor2F1KT7obs1pruebaResult sosa:hasSimpleResult "5555"^^xsd:double .
 		:sensor2F1KT7obs1prueba sosa:hasResult :sensor2F1KT7obs1pruebaResult .
 		:sensor2F1KT7obs1prueba sosa:resultTime "2018-05-15T23:05:55.555Z" .
-		:sensor2F1KT7 sosa:madeObservation :sensor2F1KT7obs1prueba . 
+		:sensor2F1KT7 sosa:madeObservation :sensor2F1KT7obs1prueba .
 	}
 }
 
 ========================== QUERY PARA EL INSERT ========================
 
-prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
 
 select *
-from <http://www.sensores.com/ontology/prueba02/extrusoras#>
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
 where {
 	:sensor2F1KT7obs1prueba ?property ?result .
 }
 
 ======================== INSERT DE PRUEBA , VERSION 2 ==========================
 
-prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix sosa: <http://www.w3.org/ns/sosa/>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -41,25 +41,25 @@ prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 insert data
 {
-	graph <http://www.sensores.com/ontology/prueba02/extrusoras#>
+	graph <http://www.sensores.com/ontology/prueba03/extrusoras#>
 	{
-		:sensor2F1KT7obs1prueba2 rdf:type owl:NamedIndividual , 
-										:TemperatureObservation . 
-		:sensor2F1KT7obs1prueba2Result rdf:type owl:NamedIndividual , 
+		:sensor2F1KT7obs1prueba2 rdf:type owl:NamedIndividual ,
+										:TemperatureObservation .
+		:sensor2F1KT7obs1prueba2Result rdf:type owl:NamedIndividual ,
 										:DoubleValueResult .
 		:sensor2F1KT7obs1prueba2Result sosa:hasSimpleResult "5555"^^xsd:double .
 		:sensor2F1KT7obs1prueba2 sosa:hasResult :sensor2F1KT7obs1prueba2Result .
 		:sensor2F1KT7obs1prueba2 sosa:resultTime "2018-05-15T23:05:55.555Z" .
-		:sensor2F1KT7 sosa:madeObservation :sensor2F1KT7obs1prueba2 . 
+		:sensor2F1KT7 sosa:madeObservation :sensor2F1KT7obs1prueba2 .
 	}
 }
 
 ========================== QUERY PARA EL INSERT ========================
 
-prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
 
 select *
-from <http://www.sensores.com/ontology/prueba02/extrusoras#>
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
 where {
 	:sensor2F1KT7obs1prueba2 ?property ?result .
 }

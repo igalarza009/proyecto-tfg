@@ -1,5 +1,5 @@
 const infoSensores = require('../../infoSensores.json');
-const graphURI = "<http://www.sensores.com/ontology/prueba03/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/prueba04/extrusoras#>";
 
 export function parseDataToRDF(filename, data){
 
@@ -53,22 +53,23 @@ export function parseDataToRDF(filename, data){
 
 	// console.log(finalResult);
 	var file = new Blob([finalResult], {type: "text/plain"});
-	var outputFileName = sensorName + '.ttl'
-
-	if (window.navigator.msSaveOrOpenBlob) // IE10+
-        window.navigator.msSaveOrOpenBlob(file, outputFileName);
-    else { // Others
-        var a = document.createElement("a"),
-                url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = outputFileName;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function() {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 0);
-    }
+	// var outputFileName = sensorName + '.ttl'
+	//
+	// if (window.navigator.msSaveOrOpenBlob) // IE10+
+    //     window.navigator.msSaveOrOpenBlob(file, outputFileName);
+    // else { // Others
+    //     var a = document.createElement("a"),
+    //             url = URL.createObjectURL(file);
+    //     a.href = url;
+    //     a.download = outputFileName;
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     setTimeout(function() {
+    //         document.body.removeChild(a);
+    //         window.URL.revokeObjectURL(url);
+    //     }, 0);
+    // }
+	return file;
 
 }
 

@@ -9,7 +9,7 @@ import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
 import $ from 'jquery';
 
 const virtuosoURL = 'http://localhost:8890/sparql';
-const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insert';
+const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insertfile';
 
 export class ParseData extends React.Component {
 	constructor(props) {
@@ -38,47 +38,77 @@ export class ParseData extends React.Component {
 				parsedData.push(row.data[0]);
 			},
 			complete: function() {
-				console.log("All done!");
-				Parser.parseDataToRDF(fileName, parsedData);
+				console.log("CSV file parsed to JSON");
+				var file = Parser.parseDataToRDF(fileName, parsedData);
+				console.log("TTL file created")
+				var formData = new FormData();
+				formData.append("file", file);
+				axios.post(RESTfulURLInsert, formData, {
+					headers: {
+						 'Content-Type': 'multipart/form-data'
+					}
+				})
+				.then((response) => {
+					console.log(response);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
 			}
 		});
 
 	}
 
-	handleInsert(){
-		const pruebaInsert = ':sensor2F1KT7obs1prueba2 rdf:type owl:NamedIndividual , ' +
-								':TemperatureObservation . ' +
-								':sensor2F1KT7obs1prueba2Result rdf:type owl:NamedIndividual , ' +
-								':DoubleValueResult . ' +
-								':sensor2F1KT7obs1prueba2Result sosa:hasSimpleResult "5555"^^xsd:double . ' +
-								':sensor2F1KT7obs1prueba2 sosa:hasResult :sensor2F1KT7obs1prueba2Result . ' +
-								':sensor2F1KT7obs1prueba2 sosa:resultTime "2018-05-15T23:05:55.555Z" . ' + //Añadir ^^xsd:dateTime
-								':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7obs1prueba2 . ';
-
-		const pruebaInsertQuery = 'prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#> ' +
-								'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
-								'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
-								'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
-								'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
-								'insert data ' +
-								'{ ' +
-								'graph <http://www.sensores.com/ontology/prueba02/extrusoras#> ' +
-									'{ ' + pruebaInsert + '} ' +
-								'} ';
-
-		const querystring = require('querystring');
-
-		axios.post(RESTfulURLInsert,
-			querystring.stringify({'query': pruebaInsertQuery})
-		)
+	sendFile(file){
+		var formData = new FormData();
+		formData.append("file", file);
+		axios.post(RESTfulURLInsert, formData, {
+			headers: {
+				 'Content-Type': 'multipart/form-data'
+			}
+		})
 		.then((response) => {
 			console.log(response);
 		})
 		.catch((error) => {
 			console.log(error);
 		});
-
 	}
+
+	// handleInsert(){
+	// 	const pruebaInsert = ':sensor2F1KT7obs1prueba2 rdf:type owl:NamedIndividual , ' +
+	// 							':TemperatureObservation . ' +
+	// 							':sensor2F1KT7obs1prueba2Result rdf:type owl:NamedIndividual , ' +
+	// 							':DoubleValueResult . ' +
+	// 							':sensor2F1KT7obs1prueba2Result sosa:hasSimpleResult "5555"^^xsd:double . ' +
+	// 							':sensor2F1KT7obs1prueba2 sosa:hasResult :sensor2F1KT7obs1prueba2Result . ' +
+	// 							':sensor2F1KT7obs1prueba2 sosa:resultTime "2018-05-15T23:05:55.555Z" . ' + //Añadir ^^xsd:dateTime
+	// 							':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7obs1prueba2 . ';
+	//
+	// 	const pruebaInsertQuery = 'prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#> ' +
+	// 							'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
+	// 							'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
+	// 							'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
+	// 							'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
+	// 							'insert data ' +
+	// 							'{ ' +
+	// 							'graph <http://www.sensores.com/ontology/prueba02/extrusoras#> ' +
+	// 								'{ ' + pruebaInsert + '} ' +
+	// 							'} ';
+	//
+	// 	const querystring = require('querystring');
+	//
+	// 	axios.post(RESTfulURLInsert,
+	// 		querystring.stringify({'query': pruebaInsertQuery})
+	// 	)
+	// 	.then((response) => {
+	// 		console.log(response);
+	// 	})
+	// 	.catch((error) => {
+	// 		console.log(error);
+	// 	});
+	//
+	// }
 
 	render(){
 		const loading = this.state.parsingElement
@@ -94,20 +124,23 @@ export class ParseData extends React.Component {
 						    <div className="file-field input-field">
 						    	<div className="btn blue darken-3">
 						    		<span>File</span>
-						    		<input type="file" ref={input => {this.fileInput = input;}} />
+						    		<input type="file"
+										ref={input => {this.fileInput = input;}} />
 						    	</div>
 						    	<div className="file-path-wrapper">
-						    		<input className="file-path validate" type="text" placeholder="Upload the files to parse"/>
+						    		<input className="file-path validate"
+										type="text"
+										placeholder="Upload the files to parse"/>
 						    	</div>
 							</div>
 						</form>
-						<a href='#' className="blue-text darken-3 valign-wrapper" onClick={() => this.handleSubmit()}>
+						{/* <a href='#' className="blue-text darken-3 valign-wrapper" onClick={() => this.handleSubmit()}>
 							<Icon className='blue-text darken-3'>file_download</Icon>
 							Descargar archivo en RDF
-						</a>
-						<a href='#' className="blue-text darken-3 valign-wrapper" onClick={() => this.handleInsert()}>
+						</a> */}
+						<a href='#' className="blue-text darken-3 valign-wrapper" onClick={() => this.handleSubmit()}>
 							<Icon className='blue-text darken-3'>arrow_upward</Icon>
-							Insertar tuplas de prueba
+							Insertar datos en Virtuoso
 						</a>
 					</Card>
 				</Col>
@@ -115,14 +148,13 @@ export class ParseData extends React.Component {
 					{loading}
 				</Col>
 			</Row>
-			<Row>
+			{/* <Row>
 				<PruebaInsert />
-			</Row>
-			<Row>
+			</Row> */}
+			{/* <Row>
 				<ul className="collapsible" data-collapsible="expandable">
 				   <li>
 					 <div className="collapsible-header no-pointer"><i className="material-icons">filter_drama</i>No se abre</div>
-					 {/* <div className="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div> */}
 				   </li>
 				   <li>
 					 <div className="collapsible-header">Second<i className="material-icons">keyboard_arrow_down</i></div>
@@ -133,7 +165,7 @@ export class ParseData extends React.Component {
 					 <div className="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
 				   </li>
 				 </ul>
-			</Row>
+			</Row> */}
 		</div>
 		)
 	}
