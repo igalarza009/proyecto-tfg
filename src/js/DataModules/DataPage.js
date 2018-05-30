@@ -5,8 +5,11 @@ import {Row, Col, Card, Icon} from 'react-materialize'
 import Papa from 'papaparse';
 import M from 'materialize-css';
 import axios from 'axios';
-import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
+import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
 import $ from 'jquery';
+
+const virtuosoURL = 'http://localhost:8890/sparql';
+const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insert';
 
 export class ParseData extends React.Component {
 	constructor(props) {
@@ -65,12 +68,9 @@ export class ParseData extends React.Component {
 
 		const querystring = require('querystring');
 
-		axios.post('http://localhost:8890/sparql-auth', querystring.stringify({'query': pruebaInsertQuery}),{
-			auth: {
-    			username: 'prueba1',
-    			password: 'prueba1'
-  			},
-		})
+		axios.post(RESTfulURLInsert,
+			querystring.stringify({'query': pruebaInsertQuery})
+		)
 		.then((response) => {
 			console.log(response);
 		})
@@ -116,7 +116,7 @@ export class ParseData extends React.Component {
 				</Col>
 			</Row>
 			<Row>
-				<HTTPPrueba />
+				<PruebaInsert />
 			</Row>
 			<Row>
 				<ul className="collapsible" data-collapsible="expandable">

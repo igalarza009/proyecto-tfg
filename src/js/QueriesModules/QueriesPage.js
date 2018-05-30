@@ -14,7 +14,7 @@ const sensorIconNames = ['tempIcon', 'resistIcon', 'ventIcon', 'rpmIcon', 'consu
 const sensorIconTooltips = {'tempIcon':'Temperatura', 'resistIcon':'Resistencia', 'ventIcon':'Ventilación', 'rpmIcon':'R.P.M. del motor', 'consumoIcon':'Consumo del motor', 'presionIcon':'Presión', 'tempFundidoIcon':'Temperatura de fundido'};
 
 const virtuosoURL = 'http://localhost:8890/sparql';
-const RESTfulURL = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
+const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 
 export class SensorsInfo extends React.Component {
 	constructor(props){
@@ -131,7 +131,7 @@ export class SensorsInfo extends React.Component {
 
 		const querystring = require('querystring');
 		// console.log(querystring.stringify({'query': query}));
-		axios.post(RESTfulURL,
+		axios.post(RESTfulURLQuery,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
@@ -183,7 +183,7 @@ export class SensorsInfo extends React.Component {
 
 		const querystring = require('querystring');
 		// console.log(querystring.stringify({'query': query}));
-		axios.post(RESTfulURL,
+		axios.post(RESTfulURLQuery,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
@@ -256,7 +256,7 @@ export class SensorsInfo extends React.Component {
 
 					if (info['groupBy']['min'])
 						selectValues.push('minValue');
-						
+
 					if (info['groupBy']['max'])
 						selectValues.push('maxValue');
 				}

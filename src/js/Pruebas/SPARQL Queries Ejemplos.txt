@@ -1,0 +1,111 @@
+==================== EJEMPLO DE LOS DATOS ====================
+
+:sensor2F1KT7 rdf:type owl:NamedIndividual ,
+                       :TemperatureSensor ;
+              :isInZone 1 .
+
+:sensor2F1KT7date20180402obs1 rdf:type owl:NamedIndividual , 
+	:TemperatureObservation . 
+
+:sensor2F1KT7date20180402obs1result rdf:type owl:NamedIndividual , 
+	:DoubleValueResult .
+
+:sensor2F1KT7date20180402obs1result sosa:hasSimpleResult "196"^^xsd:double . 
+
+:sensor2F1KT7date20180402obs1 sosa:hasResult :sensor2F1KT7date20180402obs1result . 
+:sensor2F1KT7date20180402obs1 sosa:resultTime "2018-04-02T23:59:59.558Z" . 
+
+:sensor2F1KT7 sosa:madeObservation :sensor2F1KT7date20180402obs1 . 
+
+======================= QUERY DE EJEMPLO ========================
+
+prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+select ?sensorName ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba02/extrusoras#>
+where {
+    { ?sensorType rdfs:subClassOf :DoubleValueSensor . }
+     union
+    { ?sensorType rdfs:subClassOf :BooleanSensor . }
+    ?sensorName rdf:type ?sensorType .
+    ?sensorName rdf:type owl:NamedIndividual .
+    ?sensorName sosa:madeObservation ?obsName .
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+}
+
+==================== EJEMPLOS DE SPARQL QUERIES ====================
+
+SPARQL 1.0
+
+---------------- Filter entre dos fechas ------------------
+
+base <http://danbri.org/foaf.rdf>
+prefix foaf: <http://xmlns.com/foaf/0.1/>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+select ?name ?dob
+from <http://danbri.org/foaf.rdf>
+where
+{
+	?person a foaf:Person .
+	?person foaf:name ?name .
+	?person foaf:dateOfBirth ?dob .
+	filter (xsd:date(str(?dob)) >= "1970-01-01"^^xsd:date &&
+			xsd:date(str(?dob)) < "1980-01-01"^^xsd:date )
+}
+
+---------------------- Ask query -----------------------
+
+SPARQL’s ask query is identified by the ask keyword, and the query processor
+simply returns a true or false value, depending on whether the given graph
+pattern has any matches in the dataset or not.
+List 6.31 is a simple example of the ask query:
+
+prefix foaf: <http://xmlns.com/foaf/0.1/>
+ask
+from <http://danbri.org/foaf.rdf>
+where
+{
+	?x foaf:mbox <mailto:danbri@danbri.org>.
+}
+
+===================================================================
+
+SPARQL 1.1
+
+---------------------- Aggregates -----------------------
+
+prefix foaf: <http://xmlns.com/foaf/0.1/>
+SELECT count(*) AS ?NumOfPeople
+from <http://danbri.org/foaf.rdf>
+WHERE {
+	?x a  foaf:Person;
+		  foaf:mbox ?mbox .
+}
+
+-- Group By
+
+PREFIX : <http://books.example/>
+SELECT ?org (SUM(?price) AS ?totalPrice)
+WHERE {
+	?org :affiliates ?auth .
+	?auth :writesBook ?book .
+	?book :price ?price .
+}
+GROUP BY ?org
+
+-- Group By + Having
+
+PREFIX : <http://books.example/>
+SELECT ?org (SUM(?price) AS ?totalPrice)
+WHERE {
+	?org :affiliates ?auth .
+	?auth :writesBook ?book .
+	?book :price ?price .
+}
+GROUP BY ?org
+HAVING (SUM(?price) > 10)

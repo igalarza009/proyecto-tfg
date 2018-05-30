@@ -1,0 +1,407 @@
+==================================== INFORMATION QUERIES ====================================
+
+--------------- Todos los valores de todos los sensores disponibles ---------------
+
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+select ?sensorName ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    { ?sensorType rdfs:subClassOf :DoubleValueSensor . }
+     union
+    { ?sensorType rdfs:subClassOf :BooleanSensor . }
+    ?sensorName rdf:type ?sensorType .
+    ?sensorName rdf:type owl:NamedIndividual .
+    ?sensorName sosa:madeObservation ?obsName .
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+}
+
+--------------- Todos los valores de dos los sensores específicos ---------------
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?obsName ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    {
+       <#sensor2F1KT7> sosa:madeObservation ?obsName .
+    }
+    union
+    {
+      <#sensorVMTKD6> sosa:madeObservation ?obsName .
+    }
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+}
+order by desc(?resultTime)
+
+--------------- Los valores de un sensor entre determinadas fechas ---------------
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    <#sensor2F1KT7> sosa:madeObservation ?obsName .
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+    filter( xsd:dateTime(?resultTime) >= "2018-03-01T00:00:00.000Z"^^xsd:dateTime &&
+            xsd:dateTime(?resultTime) < "2018-03-31T23:59:59.999Z"^^xsd:dateTime)
+}
+
+--------------- Los valores de un sensor entre determinadas horas ---------------
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    <#sensor2F1KT7> sosa:madeObservation ?obsName .
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+    filter( xsd:time(xsd:dateTime(?resultTime)) >= "12:00:00.000Z"^^xsd:time &&
+            xsd:time(xsd:dateTime(?resultTime)) < "16:59:59.999Z"^^xsd:time)
+}
+
+----------- Los valores de un sensor entre determinadas fechas y horas -----------
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    <#sensor2F1KT7> sosa:madeObservation ?obsName .
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+    filter(	xsd:dateTime(?resultTime) >= "2018-03-01T00:00:00.000Z"^^xsd:dateTime &&
+            xsd:dateTime(?resultTime) < "2018-03-31T23:59:59.999Z"^^xsd:dateTime &&
+    		xsd:time(xsd:dateTime(?resultTime)) >= "12:00:00.000Z"^^xsd:time &&
+            xsd:time(xsd:dateTime(?resultTime)) < "16:59:59.999Z"^^xsd:time)
+}
+
+---------------------- Los valores medios de cada sensor -----------------------
+
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+select ?sensorName xsd:decimal(AVG(?resultValue) as ?mediaResultados)
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    { ?sensorType rdfs:subClassOf :DoubleValueSensor . }
+     union
+    { ?sensorType rdfs:subClassOf :BooleanSensor . }
+    ?sensorName rdf:type ?sensorType .
+    ?sensorName rdf:type owl:NamedIndividual .
+    ?sensorName sosa:madeObservation ?obsName .
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+}
+group by ?sensorName
+
+------------- Los valores medios de cada sensor cada día  ---------------
+
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+select ?sensorName ?resultDate (AVG(?resultValue) as ?mediaResultados)
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    { ?sensorType rdfs:subClassOf :DoubleValueSensor . }
+     union
+    { ?sensorType rdfs:subClassOf :BooleanSensor . }
+    ?sensorName rdf:type ?sensorType .
+    ?sensorName rdf:type owl:NamedIndividual .
+    ?sensorName sosa:madeObservation ?obsName .
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+    bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate)
+}
+group by ?sensorName ?resultDate
+order by desc(?resultDate)
+
+==================================== OTRO SENSOR QUERIES ====================================
+
+------------- Dando el valor de un sensor ver los valores de otros dos  ---------------
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?sensorName ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    <#sensor2F1KT7> sosa:madeObservation ?knownObs1 .
+    ?knownObs1 sosa:hasResult/sosa:hasSimpleResult "195.5"^^xsd:double .
+    ?knownObs1 sosa:resultTime ?resultTime . 
+    {
+       <#sensorVMTKD6> sosa:madeObservation ?askedObs .
+       ?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+       ?askedObs sosa:resultTime ?resultTime .
+       bind(<#sensorVMTKD6> as ?sensorName) .
+    }
+    union
+    {
+       <#sensor79PWN7> sosa:madeObservation ?askedObs .
+       ?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+       ?askedObs sosa:resultTime ?resultTime .
+       bind(<#sensor79PWN7> as ?sensorName) .
+    }
+}
+order by desc(?resultTime)
+
+------------- Saber valor de un sensor cuando el de otro es mínimo y el de otro máximo  ---------------
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?sensorName ?askedValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+	{
+	    select (MIN(?calResultValue) as ?calculatedValue1)
+	    where{
+	    	<#sensor2F1KT7> sosa:madeObservation ?calObs1 .
+	    	?calObs1 sosa:hasResult/sosa:hasSimpleResult ?calResultValue .
+	    }
+  	}
+  	<#sensor2F1KT7> sosa:madeObservation ?knownObs1 .
+	?knownObs1 sosa:hasResult/sosa:hasSimpleResult ?calculatedValue1 .
+	?knownObs1 sosa:resultTime ?resultTime .
+    {
+        select (MAX(?calResultValue) as ?calculatedValue2)
+        where{
+            <#sensor79PWN7> sosa:madeObservation ?calObs2 .
+            ?calObs2 sosa:hasResult/sosa:hasSimpleResult ?calResultValue .
+        }
+    }
+    <#sensor79PWN7> sosa:madeObservation ?knownObs2 .
+    ?knownObs2 sosa:hasResult/sosa:hasSimpleResult ?calculatedValue2 .
+    ?knownObs2 sosa:resultTime ?resultTime .
+   {
+        <#sensorVMTKD6> sosa:madeObservation ?askedObs1 .
+        ?askedObs1 sosa:hasResult/sosa:hasSimpleResult ?askedValue .
+        ?askedObs1 sosa:resultTime ?resultTime .
+        bind(<#sensorVMTKD6> as ?sensorName) .
+    }
+}
+
+------------- Saber valor de un sensor cuando el de otro es máximo  ---------------
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?maxResult ?resultValue2 ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+	{
+	    select (MAX(?resultValue) as ?maxResult)
+	    where{
+	    	<#sensor2F1KT7> sosa:madeObservation ?obsName .
+	    	?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+	    }
+  	}
+  	<#sensor2F1KT7> sosa:madeObservation ?obsName1 .
+	?obsName1 sosa:hasResult/sosa:hasSimpleResult ?maxResult .
+	?obsName1 sosa:resultTime ?resultTime .
+    <#sensorVMTKD6> sosa:madeObservation ?obsName2 .
+    ?obsName2 sosa:hasResult/sosa:hasSimpleResult ?resultValue2 .
+    ?obsName2 sosa:resultTime ?resultTime .
+}
+
+
+================================== PRUEBAS MÓDULO QUERIES ==================================
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?sensorName ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+	{
+    	<#sensor2F1KT7> sosa:madeObservation ?obsName .
+    	bind(<#sensor2F1KT7> as ?sensorName)
+    }
+    union
+    {
+    	<#sensorVMTKD6> sosa:madeObservation ?obsName . 
+    	bind(<#sensorVMTKD6> as ?sensorName) 
+    }
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+    filter(	xsd:dateTime(?resultTime) >= "2018-03-01T00:00:00.000Z"^^xsd:dateTime &&
+            xsd:dateTime(?resultTime) < "2018-03-31T23:59:59.999Z"^^xsd:dateTime &&
+    		xsd:time(xsd:dateTime(?resultTime)) >= "12:00:00.000Z"^^xsd:time &&
+            xsd:time(xsd:dateTime(?resultTime)) < "16:59:59.999Z"^^xsd:time)
+}
+order by desc(?resultTime)
+
+============================================================================================
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?sensorName ?resultDate (AVG(?resultValue) as ?avgValue)
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    {
+        <#sensor2F1KT7> sosa:madeObservation ?obsName .
+        bind(<#sensor2F1KT7> as ?sensorName)
+    }
+    union
+    {
+        <#sensorVMTKD6> sosa:madeObservation ?obsName . 
+        bind(<#sensorVMTKD6> as ?sensorName) 
+    }
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+    bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate)
+    filter( xsd:dateTime(?resultTime) >= "2018-03-01T00:00:00.000Z"^^xsd:dateTime &&
+            xsd:dateTime(?resultTime) < "2018-03-31T23:59:59.999Z"^^xsd:dateTime &&
+            xsd:time(xsd:dateTime(?resultTime)) >= "12:00:00.000Z"^^xsd:time &&
+            xsd:time(xsd:dateTime(?resultTime)) < "16:59:59.999Z"^^xsd:time)
+}
+group by ?sensorName ?resultDate
+order by desc(?resultDate)
+
+============================================================================================
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?sensorName ?resultHour (AVG(?resultValue) as ?avgValue)
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    {
+        <#sensor2F1KT7> sosa:madeObservation ?obsName .
+        bind(<#sensor2F1KT7> as ?sensorName)
+    }
+    union
+    {
+        <#sensorVMTKD6> sosa:madeObservation ?obsName . 
+        bind(<#sensorVMTKD6> as ?sensorName) 
+    }
+    ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+    ?obsName sosa:resultTime ?resultTime .
+    bind(xsd:time(xsd:dateTime(?resultTime)) as ?time) .
+    bind(substr(str(?time), 1, 2) as ?hour) .
+    bind(concat(?hour, ":00:00") as ?resultHour)
+    filter( xsd:dateTime(?resultTime) >= "2018-03-01T00:00:00.000Z"^^xsd:dateTime &&
+            xsd:dateTime(?resultTime) < "2018-03-31T23:59:59.999Z"^^xsd:dateTime &&
+            xsd:time(xsd:dateTime(?resultTime)) >= "12:00:00.000Z"^^xsd:time &&
+            xsd:time(xsd:dateTime(?resultTime)) < "16:59:59.999Z"^^xsd:time)
+}
+group by ?sensorName ?resultHour
+order by desc(?resultHour)
+
+==========================================================================================
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?sensorName ?resultValue ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    <#sensor2F1KT7> sosa:madeObservation ?knownObs1 .
+    ?knownObs1 sosa:hasResult/sosa:hasSimpleResult "195.5"^^xsd:double .
+    ?knownObs1 sosa:resultTime ?resultTime . 
+    {
+       <#sensorVMTKD6> sosa:madeObservation ?askedObs .
+       ?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+       ?askedObs sosa:resultTime ?resultTime .
+       bind(<#sensorVMTKD6> as ?sensorName) .
+    }
+    union
+    {
+       <#sensor79PWN7> sosa:madeObservation ?askedObs .
+       ?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+       ?askedObs sosa:resultTime ?resultTime .
+       bind(<#sensor79PWN7> as ?sensorName) .
+    }
+}
+order by desc(?resultTime)
+
+===========================================================================================
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?maxResult ?resultValue2 ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    {
+        select (MAX(?resultValue) as ?maxResult)
+        where{
+            <#sensor2F1KT7> sosa:madeObservation ?obsName .
+            ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+            filter(?resultValue < 3000 && ?resultValue > 0) .
+        }
+    }
+    <#sensor2F1KT7> sosa:madeObservation ?obsName1 .
+    ?obsName1 sosa:hasResult/sosa:hasSimpleResult ?maxResult .
+    ?obsName1 sosa:resultTime ?resultTime .
+    <#sensorVMTKD6> sosa:madeObservation ?obsName2 .
+    ?obsName2 sosa:hasResult/sosa:hasSimpleResult ?resultValue2 .
+    ?obsName2 sosa:resultTime ?resultTime .
+}
+order by desc(?resultTime)
+
+===========================================================================================
+
+base <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix : <http://www.sensores.com/ontology/prueba03/extrusoras#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+
+select ?maxResult ?resultValue2 ?resultTime
+from <http://www.sensores.com/ontology/prueba03/extrusoras#>
+where {
+    {
+        select (MAX(?resultValue) as ?maxResult)
+        where{
+            <#sensor2F1KT7> sosa:madeObservation ?obsName .
+            ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
+            filter(?resultValue < 3000 && ?resultValue > 0) .
+        }
+    }
+    <#sensor2F1KT7> sosa:madeObservation ?obsName1 .
+    ?obsName1 sosa:hasResult/sosa:hasSimpleResult ?maxResult .
+    ?obsName1 sosa:resultTime ?resultTime .
+    <#sensor649NNJ> sosa:madeObservation ?obsName2 .
+    ?obsName2 sosa:hasResult/sosa:hasSimpleResult "183"^^xsd:double .
+    ?obsName2 sosa:resultTime ?resultTime .
+    {
+        <#sensorVMTKD6> sosa:madeObservation ?obsName3 .
+        ?obsName3 sosa:hasResult/sosa:hasSimpleResult ?resultValue2 .
+        ?obsName3 sosa:resultTime ?resultTime .
+    }
+}
+order by desc(?resultTime)
+
+
+
+==================================================================================================

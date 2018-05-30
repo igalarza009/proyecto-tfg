@@ -72,32 +72,32 @@ export function parseDataToRDF(filename, data){
 
 }
 
-export function getInfoBeforeParsing(filename){
-	var _ = require('lodash');
-
-	const prefixes = "@prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#> . \n" +
-					"@prefix owl: <http://www.w3.org/2002/07/owl#> . \n" +
-					"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n" +
-					"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . \n" +
-					"@prefix sosa: <http://www.w3.org/ns/sosa/> . \n" +
-					"@base <http://www.sensores.com/ontology/prueba02/extrusoras#> . \n";
-
-	const indexOfDot = filename.indexOf('.');
-	const sensorIndicator = filename.substring(0, indexOfDot);
-	const sensorName = 'sensor' + sensorIndicator;
-
-	const currentSensor = _.find(infoSensores, ['indicatorId', sensorIndicator]);
-
-	// let observationResult = '';
-	const observationType = currentSensor.observationType;
-	const resultType = currentSensor.resultType;
-
-	const valueType = (resultType === 'DoubleValueResult')
-			? ("xsd:double")
-			: ("xsd:boolean");
-
-	return {'prefixes':prefixes, 'sensorName':sensorName, 'observationType':observationType, 'resultType':resultType, 'valueType':valueType};
-}
+// export function getInfoBeforeParsing(filename){
+// 	var _ = require('lodash');
+//
+// 	const prefixes = "@prefix : <http://www.sensores.com/ontology/prueba02/extrusoras#> . \n" +
+// 					"@prefix owl: <http://www.w3.org/2002/07/owl#> . \n" +
+// 					"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n" +
+// 					"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . \n" +
+// 					"@prefix sosa: <http://www.w3.org/ns/sosa/> . \n" +
+// 					"@base <http://www.sensores.com/ontology/prueba02/extrusoras#> . \n";
+//
+// 	const indexOfDot = filename.indexOf('.');
+// 	const sensorIndicator = filename.substring(0, indexOfDot);
+// 	const sensorName = 'sensor' + sensorIndicator;
+//
+// 	const currentSensor = _.find(infoSensores, ['indicatorId', sensorIndicator]);
+//
+// 	// let observationResult = '';
+// 	const observationType = currentSensor.observationType;
+// 	const resultType = currentSensor.resultType;
+//
+// 	const valueType = (resultType === 'DoubleValueResult')
+// 			? ("xsd:double")
+// 			: ("xsd:boolean");
+//
+// 	return {'prefixes':prefixes, 'sensorName':sensorName, 'observationType':observationType, 'resultType':resultType, 'valueType':valueType};
+// }
 
 // export function parseEachRow(rowData, info){
 // 	let observationResult = "";
