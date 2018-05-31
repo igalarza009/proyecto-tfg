@@ -22,6 +22,7 @@ export class ParseData extends React.Component {
 			file: null,
 			fileName: null,
 			fileUploaded: false,
+			uploadingFile: false,
 	    }
  	}
 
@@ -121,30 +122,31 @@ export class ParseData extends React.Component {
 	}
 
 	handleUpload(){
-		if (this.state.fileUploaded){
-			alert("The file has already been uploaded.")
-		}
-		else{
-			const file = this.state.file;
+		const file = this.state.file;
+		this.setState({
+			uploadingFile: true,
+			parsingEnded: false,
+		})
 
-			// var formData = new FormData();
-			// formData.append("file", file);
-			// axios.post(RESTfulURLInsert, formData, {
-			// 	headers: {
-			// 		 'Content-Type': 'multipart/form-data'
-			// 	}
-			// })
-			// .then((response) => {
-			// 	console.log(response);
-				this.setState({
-					fileUploaded: true,
-				})
-			// })
-			// .catch((error) => {
-			// 	console.log(error);
-			// });
-			alert("Se subiría el archivo a Virtuoso.");
-		}
+		var formData = new FormData();
+		formData.append("file", file);
+		axios.post(RESTfulURLInsert, formData, {
+			headers: {
+				 'Content-Type': 'multipart/form-data'
+			}
+		})
+		.then((response) => {
+			console.log(response);
+			this.setState({
+				uploadingFile: false,
+				fileUploaded: true,
+				parsingEnded: true,
+			})
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+		// alert("Se subiría el archivo a Virtuoso.");
 	}
 
 	hanldeNewFile(){
@@ -155,82 +157,97 @@ export class ParseData extends React.Component {
 			file: null,
 			fileName: null,
 			fileUploaded: false,
+			uploadingFile: false,
 		});
 	}
 
 	render(){
-		const loading = (this.state.parsingFile)
-			? (<div>
+		const loadingParseFile = (this.state.parsingFile)
+			? (<div className="center">
 					<p> Traduciendo fichero... </p>
-					<img className='loading'alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
 				</div>)
 			: (null);
 
-		const uploadFile = (this.state.selectFile)
-			? (<form action="#">
-					<div className="file-field input-field">
-						<div className="btn blue darken-3">
-							<span>File</span>
-							<input type="file"
-								ref={input => {this.fileInput = input;}} />
+		const loadingInsertData = (this.state.uploadingFile)
+			? (<div className="center">
+					<p> Insertando los datos en Virtuoso... </p>
+					<p> La operación puede tardar varios minutos. </p>
+					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+				</div>)
+			: (null);
+
+		const uploadDataButton = (this.state.fileUploaded)
+			? (<Button className="blue darken-3 valign-wrapper" disabled>
+					Datos insertados
+					<Icon left>done</Icon>
+				</Button>)
+			: (<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
+					Insertar datos
+					<Icon left>publish</Icon>
+				</Button>);
+
+		const selectFileOption = (this.state.selectFile)
+			? (<div className="upload_file">
+					<form action="#">
+						<div className="file-field input-field">
+							<div className="btn blue darken-3">
+								<span>File</span>
+								<input type="file"
+									ref={input => {this.fileInput = input;}} />
+							</div>
+							<div className="file-path-wrapper">
+								<input className="file-path validate"
+									type="text"
+									placeholder="Subir archivo para traducir"/>
+							</div>
 						</div>
-						<div className="file-path-wrapper">
-							<input className="file-path validate"
-								type="text"
-								placeholder="Subir archivo para traducir"/>
-						</div>
-					</div>
-				</form>)
+					</form>
+					<a href='#' className="blue-text text-darken-3 valign-wrapper" onClick={() => this.handleParseFile()}>
+							<Icon className='blue-text text-darken-3'>cached</Icon>
+							Traducir archivo a formato RDF.
+					</a>
+				</div>)
 			: (null);
 
-		const parseFile = (this.state.selectFile)
-			? (<a href='#' className="blue-text darken-3 valign-wrapper" onClick={() => this.handleParseFile()}>
-					<Icon className='blue-text darken-3'>cached</Icon>
-					Traducir archivo a formato RDF.
-				</a>)
-			: (null);
-
-		const fileUploaded = (this.state.parsingEnded)
-			? (<p>El fichero  {this.state.fileName}  ha sido correctamente traducido a RDF.</p>)
-			: (null);
-
-		const downloadFile = (this.state.parsingEnded)
-			? (<Col s={6}>
-					<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
-						<Icon>file_download</Icon>
-						Descargar archivo
-					</Button>)
-				</Col>)
-			: (null);
-
-		const insertDataVirtuoso = (this.state.parsingEnded)
-			? (<Col s={12}>
-					<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
-						<Icon>arrow_upward</Icon>
-						Insertar datos
-					</Button>
-				</Col>)
-			: (null);
-
-		const newfile = (this.state.parsingEnded)
-			? (<a href="#" className="blue-text darken-3-text" onClick={() => {this.hanldeNewFile();}}>
-					Subir nuevo archivo
-				</a>)
+		const fileParsedOptions = (this.state.parsingEnded)
+			? (<Row>
+					<Col s={12} className="center">
+						<p>El fichero  {this.state.fileName}  ha sido correctamente traducido a RDF.</p>
+						<br/>
+					</Col>
+					<Col s={6} className="center">
+					 	<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
+							Descargar RDF
+							<Icon left>file_download</Icon>
+					 	</Button>
+					 </Col>
+					 <Col s={6} className="center">
+			 			{uploadDataButton}
+			 	 	</Col>
+					<Col s={12}>
+						<br/>
+						<a href="#" className="blue-text text-darken-3" onClick={() => {this.hanldeNewFile();}}>
+						 	<Icon left>insert_drive_file</Icon>
+							Traducir otro archivo
+						</a>
+					</Col>
+				</Row>)
 			: (null);
 
 		return(
 			<div>
-			<Row s={12}>
-				<Card>
-						{uploadFile}
-						{parseFile}
-						{fileUploaded}
-						{downloadFile}
-						{insertDataVirtuoso}
-						{loading}
-						{newfile}
-				</Card>
-			</Row>
+				<Row>
+					<Col s={12} m={10} l={8} offset="m1 l2">
+						<Card>
+							{selectFileOption}
+							{loadingParseFile}
+							{fileParsedOptions}
+							{loadingInsertData}
+						</Card>
+					</Col>
+
+				</Row>
 			{/* <Row>
 				<PruebaInsert />
 			</Row> */}
