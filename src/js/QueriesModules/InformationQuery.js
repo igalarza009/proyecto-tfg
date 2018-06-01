@@ -2,8 +2,11 @@ import React from 'react';
 import '../../index.css';
 import {Button, Icon, Row, Col, Card, Input} from 'react-materialize'
 import M from 'materialize-css';
+import Slider, { Range } from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
+const infoSensores = require('../../infoSensores.json');
 
 export class InformationQueryForm extends React.Component{
 	constructor(props){
@@ -129,9 +132,32 @@ export class InformationQueryForm extends React.Component{
 
 	render(){
 		const groupBy = this.state.groupBy;
+		const selectedSensors = this.props.selectedSensors;
+
 		let groupByDisabled = (groupBy === '')
 			? (true)
 			: (false);
+
+		const filtrarValores = selectedSensors.map((sensorId) => {
+			const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			const sensorName = sensor['name'];
+			const valuePicker = (sensor['resultType'] === 'DoubleValueResult')
+				? (<Range />)
+				: (<div className="switch">
+						<label>
+							Off
+							<input type="checkbox" />
+							<span className="lever"></span>
+							On
+						</label>
+					</div>);
+			return(
+				<Row key={sensorId} s={12}>
+					<p className="grey-text"> Sensor {sensorId} ({sensorName}): </p>
+					{valuePicker}
+				</Row>
+			);
+		});
 
 		return(
 			<Card>
@@ -190,6 +216,10 @@ export class InformationQueryForm extends React.Component{
 								onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
 						</Col>
 					</Row>
+					<Row s={12}>
+						<p className='blue-text text-darken-3'>Filtrar resultados por valores: </p>
+					</Row>
+					{filtrarValores}
 					<Row s={12}>
 						<p className='blue-text text-darken-3'>Agrupar resultados para mostrar: </p>
 					</Row>

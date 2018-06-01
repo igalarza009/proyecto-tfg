@@ -6,6 +6,7 @@ import Papa from 'papaparse';
 import M from 'materialize-css';
 import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
+import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
 import $ from 'jquery';
 
 const virtuosoURL = 'http://localhost:8890/sparql';
@@ -249,7 +250,7 @@ export class ParseData extends React.Component {
 
 				</Row>
 			{/* <Row>
-				<PruebaInsert />
+				<HTTPPrueba />
 			</Row> */}
 			{/* <Row>
 				<ul className="collapsible" data-collapsible="expandable">
