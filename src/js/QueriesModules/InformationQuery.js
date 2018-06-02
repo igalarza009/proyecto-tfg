@@ -17,7 +17,9 @@ export class InformationQueryForm extends React.Component{
 			horaInicio: {hor:null, min:null, seg:null},
 			horaFin: {hor:null, min:null, seg:null},
 			selectAggregates: {'avg':false, 'min':false, 'max':false},
-			groupBy: 'day'
+			groupBy: 'day',
+			filterValues: [],
+			values: {},
 		};
 	}
 
@@ -51,6 +53,50 @@ export class InformationQueryForm extends React.Component{
 		});
 	}
 
+	handleSwitch(event, sensorId){
+		let checked = event.target.checked;
+		let values = this.state.values;
+		if (values[sensorId])
+			values[sensorId][0] = checked;
+		else
+			values[sensorId] = [checked];
+
+		this.setState({
+			values: values,
+		});
+		console.log(values);
+	}
+
+	handleRange(range, sensorId){
+		let values = this.state.values;
+		values[sensorId] = range;
+		this.setState({
+			values: values,
+		});
+		console.log(values);
+
+	}
+
+	handleFilterValueChecked(event, sensorId, min, max){
+		let values = this.state.values;
+		let checked = event.target.checked;
+		let filterValues = this.state.filterValues;
+		if (checked){
+			filterValues.push(sensorId);
+			if (!values[sensorId]){
+				values[sensorId] = [min, max];
+			}
+		}
+		else{
+			let iSensor = filterValues.indexOf(sensorId);
+			filterValues.splice(iSensor,1);
+		}
+		this.setState({
+			values: values,
+			filterValues: filterValues,
+		});
+	}
+
 	handleAggregates(event){
 		let selectAggregates = this.state.selectAggregates;
 		let groupBy = this.state.groupBy;
@@ -79,6 +125,7 @@ export class InformationQueryForm extends React.Component{
 		const sensors = this.props.selectedSensors;
 		let groupBy = {'groupBy':false, 'groupByDate':false, 'groupByHour':false, 'groupByAll': false, 'avg':false, 'min':false, 'max':false};
 		let filter = {'filter':false, 'filterDate':false, 'startDate':'', 'endDate':'', 'filterTime':false, 'startTime':'', 'endTime':''};
+		let filterValues = {'filter': false, 'values': {}};
 		let orderBy = {'orderBy':true, 'order':'desc', 'orderField':'dateTime'};
 
 		const fechaInicio = this.state.fechaInicio;
@@ -127,12 +174,18 @@ export class InformationQueryForm extends React.Component{
 
 		console.log(filter);
 
-		this.props.getInformationQuery(sensors, groupBy, filter, orderBy);
+		this.props.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
 	}
 
 	render(){
 		const groupBy = this.state.groupBy;
 		const selectedSensors = this.props.selectedSensors;
+		const filterValues = this.state.filterValues;
+		const values = this.state.values;
+
+		const Slider = require('rc-slider');
+		const createSliderWithTooltip = Slider.createSliderWithTooltip;
+		const Range = createSliderWithTooltip(Slider.Range);
 
 		let groupByDisabled = (groupBy === '')
 			? (true)
@@ -141,20 +194,45 @@ export class InformationQueryForm extends React.Component{
 		const filtrarValores = selectedSensors.map((sensorId) => {
 			const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
 			const sensorName = sensor['name'];
+			const labelCheckbox = "Sensor " + sensorId + " (" + sensorName + ") : ";
+			const minValue = sensor["minValue"];
+			const maxValue = sensor["maxValue"];
+			const disabled = (filterValues.indexOf(sensorId) === -1)
+				? (true)
+				: (false);
+
+			const defaultRange = (!values[sensorId])
+				? ([minValue, maxValue])
+				: ([values[sensorId][0], values[sensorId][1]]);
+
 			const valuePicker = (sensor['resultType'] === 'DoubleValueResult')
-				? (<Range />)
+				? (<Range
+						min={minValue} max={maxValue}
+						defaultValue={defaultRange}
+						disabled={disabled}
+						onAfterChange={(e) => {this.handleRange(e,sensorId);}}
+					/>)
 				: (<div className="switch">
 						<label>
 							Off
-							<input type="checkbox" />
+							<input type="checkbox" disabled={disabled}
+								onChange={(r) => {this.handleSwitch(r,sensorId);}}
+							/>
 							<span className="lever"></span>
 							On
 						</label>
 					</div>);
 			return(
 				<Row key={sensorId} s={12}>
-					<p className="grey-text"> Sensor {sensorId} ({sensorName}): </p>
-					{valuePicker}
+					<Col s={12}>
+						<Input name='filterValue' type='checkbox' className='filled-in'
+							label={labelCheckbox}
+							onChange={(e) => {this.handleFilterValueChecked(e,sensorId,minValue,maxValue);}}
+						/>
+					</Col>
+					<Col s={10} offset="s1">
+						{valuePicker}
+					</Col>
 				</Row>
 			);
 		});
@@ -225,13 +303,22 @@ export class InformationQueryForm extends React.Component{
 					</Row>
 					<Row>
 						<Col s={12}>
-							<Input name='groupBy' type='checkbox' className='filled-in' value='avg' label='Valor medio del sensor (AVG)' onChange={(e) => {this.handleAggregates(e);}}/>
+							<Input name='groupBy' type='checkbox' className='filled-in'
+								value='avg' label='Valor medio del sensor (AVG)'
+								onChange={(e) => {this.handleAggregates(e);}}
+							/>
 						</Col>
 						<Col s={12}>
-							<Input name='groupBy' type='checkbox' className='filled-in' value='max' label='Valor máximo del sensor (MAX)' onChange={(e) => {this.handleAggregates(e);}}/>
+							<Input name='groupBy' type='checkbox' className='filled-in'
+								value='max' label='Valor máximo del sensor (MAX)'
+								onChange={(e) => {this.handleAggregates(e);}}
+							/>
 						</Col>
 						<Col s={12}>
-							<Input name='groupBy' type='checkbox' className='filled-in' value='min' label='Valor mínimo del sensor (MIN)' onChange={(e) => {this.handleAggregates(e);}}/>
+							<Input name='groupBy' type='checkbox' className='filled-in'
+								value='min' label='Valor mínimo del sensor (MIN)'
+								onChange={(e) => {this.handleAggregates(e);}}
+							/>
 						</Col>
 						<Col s={12}>
 							<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>

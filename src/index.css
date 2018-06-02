@@ -80,6 +80,7 @@
 	border-color: #1565c0;
 }
 
+
 /*--------------- TABS ---------------*/
 
 .row .col.s12 {
@@ -335,6 +336,32 @@ input[type="checkbox"].filled-in {
 /* icon prefix focus color */
 .input-field .prefix.active {
     color: #1565c0;
+}
+
+.switch label input[type=checkbox]:checked+.lever:after{
+	background-color: #1565c0;
+}
+
+.switch label input[type=checkbox]:checked+.lever{
+	background-color: #42a5f5;
+}
+
+.rc-slider-track{
+	/* background-color: #90caf9 !important; */
+	background-color: rgba(21,101,192,0.5) !important;
+}
+
+.rc-slider-disabled .rc-slider-track{
+	/* background-color: #90caf9 !important; */
+	background-color: #ccc !important;
+}
+
+.rc-slider-handle{
+	border-color: #1565c0 !important;
+}
+
+.rc-slider-disabled .rc-slider-handle{
+	border-color: #ccc !important;
 }
 
 /*

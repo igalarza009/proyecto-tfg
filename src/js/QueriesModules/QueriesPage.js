@@ -15,6 +15,7 @@ const sensorIconTooltips = {'tempIcon':'Temperatura', 'resistIcon':'Resistencia'
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
+const usedURL = virtuosoURL;
 
 export class SensorsInfo extends React.Component {
 	constructor(props){
@@ -117,7 +118,7 @@ export class SensorsInfo extends React.Component {
 		)
 	}
 
-	getInformationQuery(sensors, groupBy, filter, orderBy){
+	getInformationQuery(sensors, groupBy, filter, filterValues, orderBy){
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -125,13 +126,13 @@ export class SensorsInfo extends React.Component {
 
 		let chartType = "ColumnChart";
 
-		const query = Queries.getInformationQuery(sensors, groupBy, filter, orderBy);
+		const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
 
 		// console.log(query);
 
 		const querystring = require('querystring');
 		// console.log(querystring.stringify({'query': query}));
-		axios.post(RESTfulURLQuery,
+		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
@@ -183,7 +184,7 @@ export class SensorsInfo extends React.Component {
 
 		const querystring = require('querystring');
 		// console.log(querystring.stringify({'query': query}));
-		axios.post(RESTfulURLQuery,
+		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
@@ -389,7 +390,7 @@ export class SensorsInfo extends React.Component {
 			? (<PruebaTabsMat
 		      		selectedSensors={selectedSensors}
 		          	moreThanOneSensor={moreThanOneSensor}
-		          	getInformationQuery={(s,g,f,o) => {this.getInformationQuery(s,g,f,o);}}
+		          	getInformationQuery={(s,g,f,fv,o) => {this.getInformationQuery(s,g,f,fv,o);}}
 		          	getOtherSensorQuery={(k,a,q,o) => {this.getOtherSensorQuery(k,a,q,o);}}
 		        />)
 			: (null);
