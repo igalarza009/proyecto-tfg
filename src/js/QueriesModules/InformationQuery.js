@@ -132,6 +132,8 @@ export class InformationQueryForm extends React.Component{
 		const fechaFin = this.state.fechaFin;
 		const horaInicio = this.state.horaInicio;
 		const horaFin = this.state.horaFin;
+		const values = this.state.values;
+		const stateFilterValues = this.state.filterValues;
 		const selectAggregates = this.state.selectAggregates;
 		const groupByState = this.state.groupBy;
 
@@ -154,6 +156,13 @@ export class InformationQueryForm extends React.Component{
 			filter['filterTime'] = true;
 			filter['startTime'] = horaInicio['hor'] + ':' + horaInicio['min'] + ':' + horaInicio['seg'];
 			filter['endTime'] = horaFin['hor'] + ':' + horaFin['min'] + ':' + horaFin['seg'];
+		}
+
+		if (stateFilterValues.length > 0){
+			filterValues['filter'] = true;
+			stateFilterValues.forEach((sensorId) => {
+				filterValues['values'][sensorId] = values[sensorId];
+			});
 		}
 
 		if (_.includes(selectAggregates, true)){
