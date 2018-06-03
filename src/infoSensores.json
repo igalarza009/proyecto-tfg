@@ -4,7 +4,7 @@
     {"indicatorId":"REMSDB", "name":"Temperatura Zona 3", "class":"temp3", "sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "3", "minValue":0, "maxValue":250},
     {"indicatorId":"XYY72L", "name":"Temperatura Zona 4", "class":"temp4", "sensorType":"TemperatureSensor", "observationType":"TemperatureObservation", "resultType":"DoubleValueResult", "zone": "4", "minValue":0, "maxValue":250},
     {"indicatorId":"VMTKD6", "name":"Temperatura de fundido", "class":"tempFundido", "sensorType":"MeltingTemperatureSensor", "observationType":"MeltingTemperatureObservation", "resultType":"DoubleValueResult", "zone": "", "minValue":0, "maxValue":250},
-    {"indicatorId":"T4C3B9", "name":"Revoluciones por minuto", "class":"rpm", "sensorType":"EngineRPMSensor", "observationType":"EngineRPMObservation", "resultType":"DoubleValueResult", "zone": "", "minValue":19000, "maxValue":30000},
+    {"indicatorId":"T4C3B9", "name":"RPM husillo", "class":"rpm", "sensorType":"EngineRPMSensor", "observationType":"EngineRPMObservation", "resultType":"DoubleValueResult", "zone": "", "minValue":19000, "maxValue":30000},
     {"indicatorId":"79PWN7", "name":"Consumo del motor", "class":"consumo", "sensorType":"EngineConsumptionSensor", "observationType":"EngineConsumptionObservation", "resultType":"DoubleValueResult", "zone": "", "minValue":10000, "maxValue":20000},
     {"indicatorId":"84RATS", "name":"Presión", "class":"presion", "sensorType":"PressureSensor", "observationType":"PressureObservation", "resultType":"DoubleValueResult", "zone": "", "minValue":0, "maxValue":350},
 

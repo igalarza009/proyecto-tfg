@@ -31,6 +31,8 @@ export class OtroSensorQueryForm extends React.Component{
 			knownSensorIds: knownSensorIds,
 			knownSensorValues: values,
 		});
+		console.log(knownSensorIds);
+		console.log(values);
 	}
 
 	handleCheckedSensor(event){

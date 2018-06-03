@@ -5,8 +5,10 @@ import $ from 'jquery';
 import {Icon} from 'react-materialize'
 import {InformationQueryForm} from './InformationQuery.js'
 import {OtroSensorQueryForm} from './OtroSensorQuery.js'
+import {AnomaliasQueryForm} from './AnomaliasQuery.js'
 
 export class PruebaTabsMat extends React.Component {
+
 	componentDidMount(){
 		$(document).ready(function(){
 			$('ul.tabs').tabs();
@@ -53,7 +55,9 @@ export class PruebaTabsMat extends React.Component {
 			         />
 				 </div>
 				 <div id="anom" className="col s12">
-					 Anomalías
+					 <AnomaliasQueryForm
+			             selectedSensors={selectedSensors}
+			         />
 				 </div>
 			 </div>
 		 </div>
