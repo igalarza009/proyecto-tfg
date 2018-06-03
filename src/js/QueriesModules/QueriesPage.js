@@ -17,6 +17,8 @@ const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 const usedURL = virtuosoURL;
 
+const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
+
 export class SensorsInfo extends React.Component {
 	constructor(props){
 		super(props);
@@ -118,7 +120,7 @@ export class SensorsInfo extends React.Component {
 		)
 	}
 
-	getInformationQuery(sensors, groupBy, filter, filterValues, orderBy){
+	getInformationQuery(sensors, groupBy, filter, filterValues){
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -145,22 +147,6 @@ export class SensorsInfo extends React.Component {
 				chartType: chartType,
 			});
 			// var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
-			// var outputFileName = 'queryResultsVirtuoso.json'
-			//
-			// if (window.navigator.msSaveOrOpenBlob) // IE10+
-		    //     window.navigator.msSaveOrOpenBlob(file, outputFileName);
-		    // else { // Others
-		    //     var a = document.createElement("a"),
-		    //             url = URL.createObjectURL(file);
-		    //     a.href = url;
-		    //     a.download = outputFileName;
-		    //     document.body.appendChild(a);
-		    //     a.click();
-		    //     setTimeout(function() {
-		    //         document.body.removeChild(a);
-		    //         window.URL.revokeObjectURL(url);
-		    //     }, 0);
-		    // }
 		})
 		.catch((error) => {
 			console.log(error);
@@ -170,7 +156,7 @@ export class SensorsInfo extends React.Component {
 
 	}
 
-	getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate){
+	getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias){
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -178,7 +164,7 @@ export class SensorsInfo extends React.Component {
 
 		let chartType = "ColumnChart";
 
-		const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
+		const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy);
 
 		// console.log(query);
 
@@ -199,23 +185,6 @@ export class SensorsInfo extends React.Component {
 				allChartData: allChartData,
 			});
 			// console.log(response);
-			// var file = new Blob([response.data], {type: 'text/html'});
-			// var outputFileName = 'queryPruebaResults.html'
-
-			// if (window.navigator.msSaveOrOpenBlob) // IE10+
-		 //        window.navigator.msSaveOrOpenBlob(file, outputFileName);
-		 //    else { // Others
-		 //        var a = document.createElement("a"),
-		 //                url = URL.createObjectURL(file);
-		 //        a.href = url;
-		 //        a.download = outputFileName;
-		 //        document.body.appendChild(a);
-		 //        a.click();
-		 //        setTimeout(function() {
-		 //            document.body.removeChild(a);
-		 //            window.URL.revokeObjectURL(url);
-		 //        }, 0);
-		 //    }
 		})
 		.catch((error) => {
 			console.log(error);
@@ -224,133 +193,132 @@ export class SensorsInfo extends React.Component {
 		});
 	}
 
+	getAnomaliasQuery(sensorsDir){
+		this.setState({
+			showQueries: false,
+			loadingQuery: true,
+		});
+
+		let chartType = "ScatterChart";
+
+		const selectedSensors = this.state.selectedSensors.slice();
+
+		const query = Queries.getInformationQuery(selectedSensors, {}, {}, {}, orderBy);
+
+		// console.log(query);
+		const querystring = require('querystring');
+		axios.post(usedURL,
+			querystring.stringify({'query': query})
+		)
+		.then((response) => {
+			console.log(response);
+			let allChartData = this.getResultAnomalias(response.data, selectedSensors, sensorsDir);
+			console.log(allChartData);
+			this.setState({
+				showChart: true,
+				allChartData: allChartData,
+				chartType: chartType,
+			});
+		})
+		.catch((error) => {
+			console.log(error);
+			alert("An error occurred, check the console.log for more info.");
+			this.newQuery();
+		});
+
+	}
+
 	prepareResponseData(response, info){
 		// info: (sensors, groupBy, filter, orderBy, type)
-  		const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 		const results = response["results"]["bindings"];
 
 		let selectValues = [];
 		let selectDateTime = '';
+		let datetimes = [];
+		prepareForParsingResponse(info, selectValues, selectDateTime, datetimes);
 
 		let sensors = {};
-		let datetimes = [];
-		// let dataHeaders = [];
-		// let iDataHeader = 0;
-
-		if (info['type'] === 'infor'){
-			if (!info['groupBy']['groupByAll']){
-				let dateTimeHeader = 'Día y hora';
-
-				if (info['groupBy']['groupBy']){
-					if (info['groupBy']['groupByDate']) {
-				    	selectDateTime = 'resultDate';
-				    	dateTimeHeader = 'Día';
-				    }
-				    else if (info['groupBy']['groupByHour']){
-				    	selectDateTime = 'resultHour';
-				    	dateTimeHeader = 'Hora inicial';
-				    }
-					if (info['groupBy']['avg']){
-						selectValues.push('avgValue');
-						console.log('push in select values' + selectValues);
-					}
-
-					if (info['groupBy']['min'])
-						selectValues.push('minValue');
-
-					if (info['groupBy']['max'])
-						selectValues.push('maxValue');
-				}
-				else {
-					selectValues.push('resultValue');
-					selectDateTime = "resultTime";
-				}
-
-				datetimes.push(dateTimeHeader);
-			}
-		}
-		else{
-			selectValues.push('resultValue');
-			selectDateTime = "resultTime";
-			datetimes.push("Día y hora");
-		}
+		sepResponseInArrays(results, sensors, datetimes, info, selectValues, selectDateTime);
 
 		let allChartData = [];
+		prepareResponseForGoogleCharts(info, selectValues, sensors, datetimes, allChartData);
 
-		if (selectValues.length === 1){
-			info['sensors'].forEach((sensorId) => {
-				sensors[sensorId] = [sensorId];
-			});
-		}
-		else{
-			info['sensors'].forEach((sensorId) => {
-				sensors[sensorId] = {};
-				selectValues.forEach((selectValue) => {
-					sensors[sensorId][selectValue] = [selectValue];
-				})
-			});
-		}
+		return allChartData;
+	}
+
+	getResultAnomalias(response, selectedSensors, sensorDir){
+		console.log(sensorDir);
+		const results = response["results"]["bindings"];
+
+		let sensorValues = {};
+		let anomValues = {}
+		let datetimes = ["Día y hora"];
+		let anomDatetimes = [];
+
+		selectedSensors.forEach((sensorId) => {
+			sensorValues[sensorId] = [sensorId];
+			anomValues[sensorId] = [sensorId];
+		});
 
 		results.forEach((value) => {
 			var sensorNameValue = value["sensorName"]["value"];
 			var indexName = sensorNameValue.indexOf('#');
 			var sensorId = sensorNameValue.substring(indexName+7);
 
-			if (selectDateTime !== '' && info['sensors'][0] === sensorId){
-				var resultDateTimeValue = value[selectDateTime]["value"];
-				var datetime;
-					if (selectDateTime === 'resultDate'){
-					var indexFirstDash = resultDateTimeValue.indexOf('-');
-					var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
-					var day = resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6);
-					datetime = day + ' ' + month[monthNumber-1];
-				}
-				else if (selectDateTime === 'resultHour'){
-					// var hora = resultDateTimeValue.substring(0,2);
-					datetime = resultDateTimeValue.substring(0,5);
-				}
-				else {
-					datetime = resultDateTimeValue;
-				}
-			datetimes.push(datetime);
+			if (selectedSensors[0] === sensorId){
+				datetimes.push(value["resultTime"]["value"]);
 			}
-
-			if (selectValues.length === 1){
-				sensors[sensorId].push(parseFloat(value[selectValues[0]]["value"]));
-			}
-			else{
-				selectValues.forEach((selectValue) => {
-					sensors[sensorId][selectValue].push(parseFloat(value[selectValue]["value"]));
-				});
-			}
+			sensorValues[sensorId].push(parseFloat(value["resultValue"]["value"]));
 		});
 
-		if (selectValues.length === 1){
-			let dataToZip = [datetimes];
+		let primSensor = selectedSensors[0];
+		let restoSensores = selectedSensors.slice(1,selectedSensors.length);
+		let prevValues = {};
+		sensorValues[primSensor].forEach((value, i) => {
+			if (i > 1){
+				console.log("Anteriores: " + JSON.stringify(prevValues));
+				console.log("Actual: " + value);
+				var booleans = [];
+				if (sensorDir[primSensor] === 'up' && prevValues[primSensor] < value )
+					booleans.push(true);
+				else if (sensorDir[primSensor] === 'down' && prevValues[primSensor] > value )
+					booleans.push(true);
+				else if (prevValues[primSensor] !== value)
+					booleans.push(false);
 
-			info['sensors'].forEach((sensorId) => {
-				dataToZip.push(sensors[sensorId]);
-			})
-
-			let chartData = _.zip.apply(_,dataToZip);
-
-			allChartData.push(chartData);
-		}
-		else{
-			_.forEach(sensors, (sensorData, sensorId) =>{
-				var dataToZip = [datetimes];
-
-				_.forEach(sensorData, (data, selectHeader) =>{
-					dataToZip.push(data);
+				restoSensores.forEach((sensorId) => {
+					console.log("Actual: " + sensorValues[sensorId][i]);
+					if (sensorDir[sensorId] === 'up' && prevValues[sensorId] < sensorValues[sensorId][i] )
+						booleans.push(true);
+					else if (sensorDir[sensorId] === 'down' && prevValues[sensorId] > sensorValues[sensorId][i] )
+						booleans.push(true);
+					else if (prevValues[sensorId] !== sensorValues[sensorId][i])
+						booleans.push(false);
 				});
-
-				var chartData = _.zip.apply(_,dataToZip);
-
-				allChartData.push([sensorId, chartData]);
+				console.log(booleans);
+				if (!(booleans.every(allTrue) || booleans.every(allFalse))) {
+					console.log('Anomalía detectada');
+					anomValues[primSensor].push(value);
+					anomDatetimes.push(datetimes[i]);
+					restoSensores.forEach((sensorId) => {
+						anomValues[sensorId].push(sensorValues[sensorId][i]);
+					});
+				}
+				else{
+					console.log("No hay anomalía");
+				}
+			}
+			prevValues[primSensor] = value;
+			restoSensores.forEach((sensorId) => {
+				prevValues[sensorId] = sensorValues[sensorId][i];
 			});
-		}
+		});
+
+		let allChartData = [];
+		prepareResponseForGoogleCharts({'sensors': selectedSensors}, ["resultValue"], anomValues, anomDatetimes, allChartData);
 
 		return allChartData;
+
 	}
 
 	newQuery(){
@@ -390,8 +358,9 @@ export class SensorsInfo extends React.Component {
 			? (<PruebaTabsMat
 		      		selectedSensors={selectedSensors}
 		          	moreThanOneSensor={moreThanOneSensor}
-		          	getInformationQuery={(s,g,f,fv,o) => {this.getInformationQuery(s,g,f,fv,o);}}
-		          	getOtherSensorQuery={(k,a,q,o) => {this.getOtherSensorQuery(k,a,q,o);}}
+		          	getInformationQuery={(s,g,f,fv) => {this.getInformationQuery(s,g,f,fv);}}
+		          	getOtherSensorQuery={(k,a,q) => {this.getOtherSensorQuery(k,a,q);}}
+					getAnomaliasQuery={(s) => {this.getAnomaliasQuery(s);}}
 		        />)
 			: (null);
 
@@ -441,4 +410,130 @@ export class SensorsInfo extends React.Component {
 			</div>
 		);
 	}
+}
+
+function sepResponseInArrays(results, sensors, datetimes, info, selectValues, selectDateTime){
+	const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+	if (selectValues.length === 1){
+		info['sensors'].forEach((sensorId) => {
+			sensors[sensorId] = [sensorId];
+		});
+	}
+	else{
+		info['sensors'].forEach((sensorId) => {
+			sensors[sensorId] = {};
+			selectValues.forEach((selectValue) => {
+				sensors[sensorId][selectValue] = [selectValue];
+			})
+		});
+	}
+
+	results.forEach((value) => {
+		var sensorNameValue = value["sensorName"]["value"];
+		var indexName = sensorNameValue.indexOf('#');
+		var sensorId = sensorNameValue.substring(indexName+7);
+
+		if (selectDateTime !== '' && info['sensors'][0] === sensorId){
+			var resultDateTimeValue = value[selectDateTime]["value"];
+			var datetime;
+				if (selectDateTime === 'resultDate'){
+				var indexFirstDash = resultDateTimeValue.indexOf('-');
+				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
+				var day = resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6);
+				datetime = day + ' ' + month[monthNumber-1];
+			}
+			else if (selectDateTime === 'resultHour'){
+				// var hora = resultDateTimeValue.substring(0,2);
+				datetime = resultDateTimeValue.substring(0,5);
+			}
+			else {
+				datetime = resultDateTimeValue;
+			}
+		datetimes.push(datetime);
+		}
+
+		if (selectValues.length === 1){
+			sensors[sensorId].push(parseFloat(value[selectValues[0]]["value"]));
+		}
+		else{
+			selectValues.forEach((selectValue) => {
+				sensors[sensorId][selectValue].push(parseFloat(value[selectValue]["value"]));
+			});
+		}
+	});
+}
+
+function prepareForParsingResponse(info, selectValues, selectDateTime, datetimes){
+	if (info['type'] === 'infor'){
+		if (!info['groupBy']['groupByAll']){
+			let dateTimeHeader = 'Día y hora';
+
+			if (info['groupBy']['groupBy']){
+				if (info['groupBy']['groupByDate']) {
+					selectDateTime = 'resultDate';
+					dateTimeHeader = 'Día';
+				}
+				else if (info['groupBy']['groupByHour']){
+					selectDateTime = 'resultHour';
+					dateTimeHeader = 'Hora inicial';
+				}
+				if (info['groupBy']['avg']){
+					selectValues.push('avgValue');
+				}
+
+				if (info['groupBy']['min'])
+					selectValues.push('minValue');
+
+				if (info['groupBy']['max'])
+					selectValues.push('maxValue');
+			}
+			else {
+				selectValues.push('resultValue');
+				selectDateTime = "resultTime";
+			}
+
+			datetimes.push(dateTimeHeader);
+		}
+	}
+	else{
+		selectValues.push('resultValue');
+		selectDateTime = "resultTime";
+		datetimes.push("Día y hora");
+	}
+}
+
+function prepareResponseForGoogleCharts(info, selectValues, sensors, datetimes, allChartData){
+	if (selectValues.length === 1){
+		let dataToZip = [datetimes];
+
+		info['sensors'].forEach((sensorId) => {
+			dataToZip.push(sensors[sensorId]);
+		})
+
+		let chartData = _.zip.apply(_,dataToZip);
+
+		allChartData.push(chartData);
+	}
+	else{
+		_.forEach(sensors, (sensorData, sensorId) =>{
+			var dataToZip = [datetimes];
+
+			_.forEach(sensorData, (data, selectHeader) =>{
+				dataToZip.push(data);
+			});
+
+			var chartData = _.zip.apply(_,dataToZip);
+
+			allChartData.push([sensorId, chartData]);
+		});
+	}
+}
+
+function allTrue(value){
+	return value === true;
+}
+
+function allFalse(value){
+	return value === false;
 }

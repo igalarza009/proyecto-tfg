@@ -103,14 +103,13 @@ export class OtroSensorQueryForm extends React.Component{
 		const knownSensorIds = this.state.knownSensorIds.slice();
 		const askedSensors = this.state.askedSensors.slice();
 		const quitarAnomalias = this.state.quitarAnomalias;;
-		const orderByDate = true;
 
 		let knownSensors = {};
 		knownSensorIds.forEach((value,i) => {
 			knownSensors[value] = knownSensorValues[i];
 		});
 
-		this.props.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
+		this.props.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias);
 	}
 
 	render(){

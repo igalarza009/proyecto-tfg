@@ -126,7 +126,6 @@ export class InformationQueryForm extends React.Component{
 		let groupBy = {'groupBy':false, 'groupByDate':false, 'groupByHour':false, 'groupByAll': false, 'avg':false, 'min':false, 'max':false};
 		let filter = {'filter':false, 'filterDate':false, 'startDate':'', 'endDate':'', 'filterTime':false, 'startTime':'', 'endTime':''};
 		let filterValues = {'filter': false, 'values': {}};
-		let orderBy = {'orderBy':true, 'order':'desc', 'orderField':'dateTime'};
 
 		const fechaInicio = this.state.fechaInicio;
 		const fechaFin = this.state.fechaFin;
@@ -183,7 +182,7 @@ export class InformationQueryForm extends React.Component{
 
 		console.log(filter);
 
-		this.props.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
+		this.props.getInformationQuery(sensors, groupBy, filter, filterValues);
 	}
 
 	render(){

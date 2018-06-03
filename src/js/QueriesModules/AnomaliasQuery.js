@@ -41,6 +41,11 @@ export class AnomaliasQueryForm extends React.Component{
           });
 	}
 
+	handleSubmit(){
+		const sensorDir = this.state.sensorDir;
+		this.props.getAnomaliasQuery(sensorDir);
+	}
+
 	render(){
         const sensorDir = this.state.sensorDir;
         const selectedSensors = this.props.selectedSensors;

@@ -106,7 +106,11 @@ export function getInformationQuery(sensors, groupBy, filter, filterValues, orde
 // 		{'sensorName':'min'/'max', ...}
 // 	askedSensors: Array
 // 	quitarAnomalias: true or false
-export function getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate){
+// 	orderBy: Collection
+// 		- orderBy['orderBy']: true or false
+// 		- orderBy['order']: 'desc' or 'asc'
+// 		- orderBy['orderField']: 'value', 'dateTime', 'date', 'sensorId'
+export function getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy){
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
 		'prefix sosa: <http://www.w3.org/ns/sosa/> '+
@@ -178,9 +182,9 @@ export function getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias,
 
 	let finalQuery = prefixes + select + from + where;
 
-	if (orderByDate){
-		finalQuery += 'order by desc(?resultTime) ';
-	}
+	if (orderBy['orderBy']){
+    	finalQuery += getOrderBy(orderBy, {});
+    }
 
 	return finalQuery;
 }
