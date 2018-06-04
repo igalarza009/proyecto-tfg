@@ -15,7 +15,7 @@ const sensorIconTooltips = {'tempIcon':'Temperatura', 'resistIcon':'Resistencia'
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = virtuosoURL;
+const usedURL = RESTfulURLQuery;
 
 const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
 
@@ -24,7 +24,6 @@ export class SensorsInfo extends React.Component {
 		super(props);
 		this.state = {
 			selectedSensors: [],
-			// selectedTab: {'info': true, 'otro':false, 'anom': false},
 			showQueries: false,
 			moreThanOneSensor: false,
 			loadingQuery: false,
@@ -56,9 +55,20 @@ export class SensorsInfo extends React.Component {
 				showQueries: true,
 			});
 		}
+		else if (selectedSensors.length === 0){
+			this.setState({
+				showQueries: false,
+			});
+		}
+
 		if (selectedSensors.length > 1 && !moreThanOneSensor){
 			this.setState({
 				moreThanOneSensor: true,
+			});
+		}
+		else if (selectedSensors.length <= 1){
+			this.setState({
+				moreThanOneSensor: false,
 			});
 		}
 
@@ -174,7 +184,7 @@ export class SensorsInfo extends React.Component {
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
-			// console.log(response);
+			console.log(response);
 			let allChartData = this.prepareResponseData(response.data, {'sensors': askedSensors, 'type': 'otro'});
 			console.log(allChartData);
 
@@ -183,8 +193,8 @@ export class SensorsInfo extends React.Component {
 			this.setState({
 				showChart: true,
 				allChartData: allChartData,
+				chartType: chartType,
 			});
-			// console.log(response);
 		})
 		.catch((error) => {
 			console.log(error);
@@ -204,8 +214,8 @@ export class SensorsInfo extends React.Component {
 		const selectedSensors = this.state.selectedSensors.slice();
 
 		const query = Queries.getInformationQuery(selectedSensors, {}, {}, {}, orderBy);
-
-		// console.log(query);
+		console.log(query);
+		// console.log("http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet" + "?query=" + encodeURIComponent(query));
 		const querystring = require('querystring');
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
@@ -235,7 +245,42 @@ export class SensorsInfo extends React.Component {
 		let selectValues = [];
 		let selectDateTime = '';
 		let datetimes = [];
-		prepareForParsingResponse(info, selectValues, selectDateTime, datetimes);
+		if (info['type'] === 'infor'){
+			if (!info['groupBy']['groupByAll']){
+				let dateTimeHeader = 'Día y hora';
+
+				if (info['groupBy']['groupBy']){
+					if (info['groupBy']['groupByDate']) {
+						selectDateTime = 'resultDate';
+						dateTimeHeader = 'Día';
+					}
+					else if (info['groupBy']['groupByHour']){
+						selectDateTime = 'resultHour';
+						dateTimeHeader = 'Hora inicial';
+					}
+					if (info['groupBy']['avg']){
+						selectValues.push('avgValue');
+					}
+
+					if (info['groupBy']['min'])
+						selectValues.push('minValue');
+
+					if (info['groupBy']['max'])
+						selectValues.push('maxValue');
+				}
+				else {
+					selectValues.push('resultValue');
+					selectDateTime = "resultTime";
+				}
+
+				datetimes.push(dateTimeHeader);
+			}
+		}
+		else{
+			selectValues.push('resultValue');
+			selectDateTime = "resultTime";
+			datetimes.push("Día y hora");
+		}
 
 		let sensors = {};
 		sepResponseInArrays(results, sensors, datetimes, info, selectValues, selectDateTime);
@@ -247,7 +292,7 @@ export class SensorsInfo extends React.Component {
 	}
 
 	getResultAnomalias(response, selectedSensors, sensorDir){
-		console.log(sensorDir);
+		// console.log(sensorDir);
 		const results = response["results"]["bindings"];
 
 		let sensorValues = {};
@@ -265,8 +310,22 @@ export class SensorsInfo extends React.Component {
 			var indexName = sensorNameValue.indexOf('#');
 			var sensorId = sensorNameValue.substring(indexName+7);
 
-			if (selectedSensors[0] === sensorId){
-				datetimes.push(value["resultTime"]["value"]);
+			if (selectedSensors[0] === sensorId){// "2018-03-24T23:59:58.657Z"
+				var resultDateTimeValue = value["resultTime"]["value"];
+				var indexFirstDash = resultDateTimeValue.indexOf('-');
+				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
+				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
+				var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
+				var indexTime = resultDateTimeValue.indexOf('T');
+				var hour = parseInt(resultDateTimeValue.substring(indexTime+1,indexTime+3),10);
+				var min = parseInt(resultDateTimeValue.substring(indexTime+4, indexTime+6), 10);
+				var sec = parseInt(resultDateTimeValue.substring(indexTime+7, indexTime+9),10);
+				var milsec = parseInt(resultDateTimeValue.substring(indexTime+10,indexTime+13),10);
+				// datetime = resultDateTimeValue;
+				// console.log(resultDateTimeValue);
+				// console.log(year + monthNumber-1 + day + hour + min + sec + milsec);
+				// datetime = new Date(year, monthNumber-1, day, hour, min, sec, milsec);
+				datetimes.push(new Date(year, monthNumber-1, day, hour, min, sec, milsec));
 			}
 			sensorValues[sensorId].push(parseFloat(value["resultValue"]["value"]));
 		});
@@ -276,8 +335,8 @@ export class SensorsInfo extends React.Component {
 		let prevValues = {};
 		sensorValues[primSensor].forEach((value, i) => {
 			if (i > 1){
-				console.log("Anteriores: " + JSON.stringify(prevValues));
-				console.log("Actual: " + value);
+				// console.log("Anteriores: " + JSON.stringify(prevValues));
+				// console.log("Actual: " + value);
 				var booleans = [];
 				if (sensorDir[primSensor] === 'up' && prevValues[primSensor] < value )
 					booleans.push(true);
@@ -287,7 +346,7 @@ export class SensorsInfo extends React.Component {
 					booleans.push(false);
 
 				restoSensores.forEach((sensorId) => {
-					console.log("Actual: " + sensorValues[sensorId][i]);
+					// console.log("Actual: " + sensorValues[sensorId][i]);
 					if (sensorDir[sensorId] === 'up' && prevValues[sensorId] < sensorValues[sensorId][i] )
 						booleans.push(true);
 					else if (sensorDir[sensorId] === 'down' && prevValues[sensorId] > sensorValues[sensorId][i] )
@@ -295,9 +354,9 @@ export class SensorsInfo extends React.Component {
 					else if (prevValues[sensorId] !== sensorValues[sensorId][i])
 						booleans.push(false);
 				});
-				console.log(booleans);
+				// console.log(booleans);
 				if (!(booleans.every(allTrue) || booleans.every(allFalse))) {
-					console.log('Anomalía detectada');
+					// console.log('Anomalía detectada');
 					anomValues[primSensor].push(value);
 					anomDatetimes.push(datetimes[i]);
 					restoSensores.forEach((sensorId) => {
@@ -305,7 +364,12 @@ export class SensorsInfo extends React.Component {
 					});
 				}
 				else{
-					console.log("No hay anomalía");
+					// console.log("No hay anomalía");
+					// anomValues[primSensor].push(0);
+					// anomDatetimes.push(datetimes[i]);
+					// restoSensores.forEach((sensorId) => {
+					// 	anomValues[sensorId].push(0);
+					// });
 				}
 			}
 			prevValues[primSensor] = value;
@@ -412,58 +476,6 @@ export class SensorsInfo extends React.Component {
 	}
 }
 
-function sepResponseInArrays(results, sensors, datetimes, info, selectValues, selectDateTime){
-	const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
-	if (selectValues.length === 1){
-		info['sensors'].forEach((sensorId) => {
-			sensors[sensorId] = [sensorId];
-		});
-	}
-	else{
-		info['sensors'].forEach((sensorId) => {
-			sensors[sensorId] = {};
-			selectValues.forEach((selectValue) => {
-				sensors[sensorId][selectValue] = [selectValue];
-			})
-		});
-	}
-
-	results.forEach((value) => {
-		var sensorNameValue = value["sensorName"]["value"];
-		var indexName = sensorNameValue.indexOf('#');
-		var sensorId = sensorNameValue.substring(indexName+7);
-
-		if (selectDateTime !== '' && info['sensors'][0] === sensorId){
-			var resultDateTimeValue = value[selectDateTime]["value"];
-			var datetime;
-				if (selectDateTime === 'resultDate'){
-				var indexFirstDash = resultDateTimeValue.indexOf('-');
-				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
-				var day = resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6);
-				datetime = day + ' ' + month[monthNumber-1];
-			}
-			else if (selectDateTime === 'resultHour'){
-				// var hora = resultDateTimeValue.substring(0,2);
-				datetime = resultDateTimeValue.substring(0,5);
-			}
-			else {
-				datetime = resultDateTimeValue;
-			}
-		datetimes.push(datetime);
-		}
-
-		if (selectValues.length === 1){
-			sensors[sensorId].push(parseFloat(value[selectValues[0]]["value"]));
-		}
-		else{
-			selectValues.forEach((selectValue) => {
-				sensors[sensorId][selectValue].push(parseFloat(value[selectValue]["value"]));
-			});
-		}
-	});
-}
-
 function prepareForParsingResponse(info, selectValues, selectDateTime, datetimes){
 	if (info['type'] === 'infor'){
 		if (!info['groupBy']['groupByAll']){
@@ -501,6 +513,77 @@ function prepareForParsingResponse(info, selectValues, selectDateTime, datetimes
 		selectDateTime = "resultTime";
 		datetimes.push("Día y hora");
 	}
+}
+
+function sepResponseInArrays(results, sensors, datetimes, info, selectValues, selectDateTime){
+	const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+	if (selectValues.length === 1){
+		info['sensors'].forEach((sensorId) => {
+			sensors[sensorId] = [sensorId];
+		});
+	}
+	else{
+		info['sensors'].forEach((sensorId) => {
+			sensors[sensorId] = {};
+			selectValues.forEach((selectValue) => {
+				sensors[sensorId][selectValue] = [selectValue];
+			})
+		});
+	}
+
+	results.forEach((value) => {
+		var sensorNameValue = value["sensorName"]["value"];
+		var indexName = sensorNameValue.indexOf('#');
+		var sensorId = sensorNameValue.substring(indexName+7);
+		if (selectDateTime !== '' && info['sensors'][0] === sensorId){
+			var resultDateTimeValue = value[selectDateTime]["value"];
+			var datetime;
+			if (selectDateTime === 'resultDate'){
+				var indexFirstDash = resultDateTimeValue.indexOf('-');
+				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
+				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
+				var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
+				// datetime = day + ' ' + month[monthNumber-1];
+				datetime = new Date(year, monthNumber-1, day);
+			}
+			else if (selectDateTime === 'resultHour'){
+				// var indexFirstSep = resultDateTimeValue.indexOf(':');
+				// var hour = parseInt(resultDateTimeValue.substring(0,indexFirstSep),10);
+				// var min = parseInt(resultDateTimeValue.substring(indexFirstSep+1, indexFirstSep+3), 10);
+				// var sec = parseInt(resultDateTimeValue.substring(indexFirstSep+4,indexFirstSep+6),10);
+				// var milsec = parseInt(resultDateTimeValue.substring(indexFirstSep+7,indexFirstSep+10),10);
+				// var hora = resultDateTimeValue.substring(0,2);
+				datetime = resultDateTimeValue.substring(0,5);
+			}
+			else {
+				// "2018-03-24T23:59:58.657Z"
+				var indexFirstDash = resultDateTimeValue.indexOf('-');
+				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
+				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
+				var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
+				var indexTime = resultDateTimeValue.indexOf('T');
+				var hour = parseInt(resultDateTimeValue.substring(indexTime+1,indexTime+3),10);
+				var min = parseInt(resultDateTimeValue.substring(indexTime+4, indexTime+6), 10);
+				var sec = parseInt(resultDateTimeValue.substring(indexTime+7, indexTime+9),10);
+				var milsec = parseInt(resultDateTimeValue.substring(indexTime+10,indexTime+13),10);
+				// datetime = resultDateTimeValue;
+				// console.log(resultDateTimeValue);
+				// console.log(year + monthNumber-1 + day + hour + min + sec + milsec);
+				datetime = new Date(year, monthNumber-1, day, hour, min, sec, milsec);
+			}
+		datetimes.push(datetime);
+		}
+
+		if (selectValues.length === 1){
+			sensors[sensorId].push(parseFloat(value[selectValues[0]]["value"]));
+		}
+		else{
+			selectValues.forEach((selectValue) => {
+				sensors[sensorId][selectValue].push(parseFloat(value[selectValue]["value"]));
+			});
+		}
+	});
 }
 
 function prepareResponseForGoogleCharts(info, selectValues, sensors, datetimes, allChartData){

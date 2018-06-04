@@ -11,6 +11,20 @@ export class GoogleChart extends React.Component{
 	    this.state = {
 	      options: {
 	        title: 'Una gráfica',
+			explorer: {
+			 	axis: 'horizontal',
+			 	keepInBounds: true
+		 	},
+			hAxis: {
+				title: "Fecha y hora",
+				gridlines: {
+	            count: -1,
+	            units: {
+	              days: {format: ['MMM dd']},
+	              hours: {format: ['HH:mm', 'ha']},
+	            }
+	          },
+			}
 	      },
 	      data: [
 	        ['Age', 'Weight'],

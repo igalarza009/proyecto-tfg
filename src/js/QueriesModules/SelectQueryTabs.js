@@ -31,11 +31,11 @@ export class PruebaTabsMat extends React.Component {
 					 <ul className="tabs tabs-fixed-width">
 						 <li className="tab col s4">
 							 <a className="active" href="#infor">Información
-								 <i className="tiny grey-text material-icons tooltipped infoTabs"
+								 {/* <i className="tiny grey-text material-icons tooltipped infoTabs"
 									 data-position="bottom"
 									 data-tooltip="I am a tooltip">
 									 info
-								 </i>
+								 </i> */}
 							 </a>
 						 </li>
 						 <li className={classNames}><a href="#otro">Otro sensor</a></li>
