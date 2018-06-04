@@ -11,11 +11,19 @@ var _ = require('lodash');
 
 const infoSensores = require('../../infoSensores.json');
 const sensorIconNames = ['tempIcon', 'resistIcon', 'ventIcon', 'rpmIcon', 'consumoIcon', 'presionIcon', 'tempFundidoIcon'];
-const sensorIconTooltips = {'tempIcon':'Temperatura', 'resistIcon':'Resistencia', 'ventIcon':'Ventilación', 'rpmIcon':'R.P.M. del motor', 'consumoIcon':'Consumo del motor', 'presionIcon':'Presión', 'tempFundidoIcon':'Temperatura de fundido'};
+const sensorIconTooltips = {
+	'tempIcon':'Temperatura',
+	'resistIcon':'Resistencia',
+	'ventIcon':'Ventilación',
+	'rpmIcon':'R.P.M. husillo',
+	'consumoIcon':'Consumo del motor',
+	'presionIcon':'Presión',
+	'tempFundidoIcon':'Temperatura de fundido'
+};
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = RESTfulURLQuery;
+const usedURL = virtuosoURL;
 
 const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
 
@@ -90,7 +98,9 @@ export class SensorsInfo extends React.Component {
 				classes = 'sensorDivSelected z-depth-1 ' + sensorClass;
 
 			return(
-				<div key={sensorId} className={classes} onClick={() => this.toggleSelectedSensor(sensorId)}> </div>
+				<div key={sensorId} className={classes}
+					onClick={() => this.toggleSelectedSensor(sensorId)}>
+				</div>
 			);
 		});
 
@@ -98,7 +108,9 @@ export class SensorsInfo extends React.Component {
 			const classes = 'iconDiv tooltipped ' + iconName;
 			const tooltipName = sensorIconTooltips[iconName];
 			return(
-				<div key={classes} className={classes} data-position="top" data-delay="10" data-tooltip={tooltipName}>
+				<div key={classes} className={classes} data-position="top"
+					data-delay="10" data-tooltip={tooltipName}
+				>
 					<img alt={iconName} src={require('../../img/'+iconName+'.png')}/>
 				</div>
 			);
@@ -115,13 +127,22 @@ export class SensorsInfo extends React.Component {
 		});
 
 		const cardValue = (selectedSensors.length === 0)
-			? (<p className='center'> Selecciona el sensor o sensores deseados </p>)
-			: (<div> <p> Sensores seleccionados: </p> <div className='margin-left margin-top'> {selectedSensorsNames} </div> </div>);
+			? (<p className='center'>
+					Selecciona el sensor o sensores deseados
+				</p>)
+			: (<div>
+					<p> Sensores seleccionados: </p>
+					<div className='margin-left margin-top'>
+						{selectedSensorsNames}
+					</div>
+				</div>);
 
 		return(
 			<Card header={
 				<div className='mapContainer'>
-					<img alt='Mapa de sensores' src={require('../../img/extrusora_editada_grande_claro.png')}/>
+					<img alt='Mapa de sensores'
+						src={require('../../img/extrusora_editada_grande_claro.png')}
+					/>
 					{iconDivs}
 					{sensorDivs}
 				</div>} >
@@ -149,7 +170,7 @@ export class SensorsInfo extends React.Component {
 		)
 		.then((response) => {
 			console.log(response);
-			let allChartData = this.prepareResponseData(response.data, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
+			let allChartData = prepareResponseData(response.data, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
 			console.log(allChartData);
 			this.setState({
 				showChart: true,
@@ -185,7 +206,7 @@ export class SensorsInfo extends React.Component {
 		)
 		.then((response) => {
 			console.log(response);
-			let allChartData = this.prepareResponseData(response.data, {'sensors': askedSensors, 'type': 'otro'});
+			let allChartData = prepareResponseData(response.data, {'sensors': askedSensors, 'type': 'otro'});
 			console.log(allChartData);
 
 			// let options = {'title':'Relación entre los valores de los sensores'};
@@ -222,7 +243,7 @@ export class SensorsInfo extends React.Component {
 		)
 		.then((response) => {
 			console.log(response);
-			let allChartData = this.getResultAnomalias(response.data, selectedSensors, sensorsDir);
+			let allChartData = prepareResponseDataAnomalias(response.data, selectedSensors, sensorsDir);
 			console.log(allChartData);
 			this.setState({
 				showChart: true,
@@ -235,153 +256,6 @@ export class SensorsInfo extends React.Component {
 			alert("An error occurred, check the console.log for more info.");
 			this.newQuery();
 		});
-
-	}
-
-	prepareResponseData(response, info){
-		// info: (sensors, groupBy, filter, orderBy, type)
-		const results = response["results"]["bindings"];
-
-		let selectValues = [];
-		let selectDateTime = '';
-		let datetimes = [];
-		if (info['type'] === 'infor'){
-			if (!info['groupBy']['groupByAll']){
-				let dateTimeHeader = 'Día y hora';
-
-				if (info['groupBy']['groupBy']){
-					if (info['groupBy']['groupByDate']) {
-						selectDateTime = 'resultDate';
-						dateTimeHeader = 'Día';
-					}
-					else if (info['groupBy']['groupByHour']){
-						selectDateTime = 'resultHour';
-						dateTimeHeader = 'Hora inicial';
-					}
-					if (info['groupBy']['avg']){
-						selectValues.push('avgValue');
-					}
-
-					if (info['groupBy']['min'])
-						selectValues.push('minValue');
-
-					if (info['groupBy']['max'])
-						selectValues.push('maxValue');
-				}
-				else {
-					selectValues.push('resultValue');
-					selectDateTime = "resultTime";
-				}
-
-				datetimes.push(dateTimeHeader);
-			}
-		}
-		else{
-			selectValues.push('resultValue');
-			selectDateTime = "resultTime";
-			datetimes.push("Día y hora");
-		}
-
-		let sensors = {};
-		sepResponseInArrays(results, sensors, datetimes, info, selectValues, selectDateTime);
-
-		let allChartData = [];
-		prepareResponseForGoogleCharts(info, selectValues, sensors, datetimes, allChartData);
-
-		return allChartData;
-	}
-
-	getResultAnomalias(response, selectedSensors, sensorDir){
-		// console.log(sensorDir);
-		const results = response["results"]["bindings"];
-
-		let sensorValues = {};
-		let anomValues = {}
-		let datetimes = ["Día y hora"];
-		let anomDatetimes = [];
-
-		selectedSensors.forEach((sensorId) => {
-			sensorValues[sensorId] = [sensorId];
-			anomValues[sensorId] = [sensorId];
-		});
-
-		results.forEach((value) => {
-			var sensorNameValue = value["sensorName"]["value"];
-			var indexName = sensorNameValue.indexOf('#');
-			var sensorId = sensorNameValue.substring(indexName+7);
-
-			if (selectedSensors[0] === sensorId){// "2018-03-24T23:59:58.657Z"
-				var resultDateTimeValue = value["resultTime"]["value"];
-				var indexFirstDash = resultDateTimeValue.indexOf('-');
-				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
-				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
-				var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
-				var indexTime = resultDateTimeValue.indexOf('T');
-				var hour = parseInt(resultDateTimeValue.substring(indexTime+1,indexTime+3),10);
-				var min = parseInt(resultDateTimeValue.substring(indexTime+4, indexTime+6), 10);
-				var sec = parseInt(resultDateTimeValue.substring(indexTime+7, indexTime+9),10);
-				var milsec = parseInt(resultDateTimeValue.substring(indexTime+10,indexTime+13),10);
-				// datetime = resultDateTimeValue;
-				// console.log(resultDateTimeValue);
-				// console.log(year + monthNumber-1 + day + hour + min + sec + milsec);
-				// datetime = new Date(year, monthNumber-1, day, hour, min, sec, milsec);
-				datetimes.push(new Date(year, monthNumber-1, day, hour, min, sec, milsec));
-			}
-			sensorValues[sensorId].push(parseFloat(value["resultValue"]["value"]));
-		});
-
-		let primSensor = selectedSensors[0];
-		let restoSensores = selectedSensors.slice(1,selectedSensors.length);
-		let prevValues = {};
-		sensorValues[primSensor].forEach((value, i) => {
-			if (i > 1){
-				// console.log("Anteriores: " + JSON.stringify(prevValues));
-				// console.log("Actual: " + value);
-				var booleans = [];
-				if (sensorDir[primSensor] === 'up' && prevValues[primSensor] < value )
-					booleans.push(true);
-				else if (sensorDir[primSensor] === 'down' && prevValues[primSensor] > value )
-					booleans.push(true);
-				else if (prevValues[primSensor] !== value)
-					booleans.push(false);
-
-				restoSensores.forEach((sensorId) => {
-					// console.log("Actual: " + sensorValues[sensorId][i]);
-					if (sensorDir[sensorId] === 'up' && prevValues[sensorId] < sensorValues[sensorId][i] )
-						booleans.push(true);
-					else if (sensorDir[sensorId] === 'down' && prevValues[sensorId] > sensorValues[sensorId][i] )
-						booleans.push(true);
-					else if (prevValues[sensorId] !== sensorValues[sensorId][i])
-						booleans.push(false);
-				});
-				// console.log(booleans);
-				if (!(booleans.every(allTrue) || booleans.every(allFalse))) {
-					// console.log('Anomalía detectada');
-					anomValues[primSensor].push(value);
-					anomDatetimes.push(datetimes[i]);
-					restoSensores.forEach((sensorId) => {
-						anomValues[sensorId].push(sensorValues[sensorId][i]);
-					});
-				}
-				else{
-					// console.log("No hay anomalía");
-					// anomValues[primSensor].push(0);
-					// anomDatetimes.push(datetimes[i]);
-					// restoSensores.forEach((sensorId) => {
-					// 	anomValues[sensorId].push(0);
-					// });
-				}
-			}
-			prevValues[primSensor] = value;
-			restoSensores.forEach((sensorId) => {
-				prevValues[sensorId] = sensorValues[sensorId][i];
-			});
-		});
-
-		let allChartData = [];
-		prepareResponseForGoogleCharts({'sensors': selectedSensors}, ["resultValue"], anomValues, anomDatetimes, allChartData);
-
-		return allChartData;
 
 	}
 
@@ -476,75 +350,110 @@ export class SensorsInfo extends React.Component {
 	}
 }
 
-function prepareForParsingResponse(info, selectValues, selectDateTime, datetimes){
+// info: (sensors, groupBy, filter, orderBy, type)
+function prepareResponseData(responseData, info){
+	const results = responseData["results"]["bindings"];
+	let selectedValues = [];
+	let selectDateTime = '';
 	if (info['type'] === 'infor'){
 		if (!info['groupBy']['groupByAll']){
-			let dateTimeHeader = 'Día y hora';
-
 			if (info['groupBy']['groupBy']){
-				if (info['groupBy']['groupByDate']) {
+				if (info['groupBy']['groupByDate'])
 					selectDateTime = 'resultDate';
-					dateTimeHeader = 'Día';
-				}
-				else if (info['groupBy']['groupByHour']){
+				else if (info['groupBy']['groupByHour'])
 					selectDateTime = 'resultHour';
-					dateTimeHeader = 'Hora inicial';
-				}
-				if (info['groupBy']['avg']){
-					selectValues.push('avgValue');
-				}
+
+				if (info['groupBy']['avg'])
+					selectedValues.push('avgValue');
 
 				if (info['groupBy']['min'])
-					selectValues.push('minValue');
+					selectedValues.push('minValue');
 
 				if (info['groupBy']['max'])
-					selectValues.push('maxValue');
+					selectedValues.push('maxValue');
 			}
 			else {
-				selectValues.push('resultValue');
+				selectedValues.push('resultValue');
 				selectDateTime = "resultTime";
 			}
-
-			datetimes.push(dateTimeHeader);
 		}
 	}
 	else{
-		selectValues.push('resultValue');
+		selectedValues.push('resultValue');
 		selectDateTime = "resultTime";
-		datetimes.push("Día y hora");
 	}
+
+	let separateResults = sepResponseInArrays(results, info['sensors'], selectedValues, selectDateTime);
+
+	let sensorValues = separateResults['sensorValues'];
+	let datetimes = separateResults['datetimes'];
+
+	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes);
+
+	return allChartData;
 }
 
-function sepResponseInArrays(results, sensors, datetimes, info, selectValues, selectDateTime){
-	const month = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+function prepareResponseDataAnomalias(response, selectedSensors, sensorDir){
+	const results = response["results"]["bindings"];
+
+	let selectValues = ["resultValue"];
+	let selectDateTime = ["resultTime"];
+
+	let separateResults = sepResponseInArrays(results, selectedSensors, selectValues, selectDateTime);
+
+	let datetimes = separateResults['datetimes'];
+	let sensorValues = separateResults['sensorValues'];
+
+	let anomValuesResult = getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes);
+
+	let anomDatetimes = anomValuesResult['anomDatetimes'];
+	let anomValues = anomValuesResult['anomValues'];
+
+	let allChartData = prepareDataForGoogleCharts(selectedSensors, selectValues, anomValues, anomDatetimes);
+
+	return allChartData;
+}
+
+function sepResponseInArrays(results, selectedSensors, selectValues, selectDateTime){
+	let sensorValuesSep = {};
+	let datetimes = [];
+
+	if (selectDateTime === "resultHour"){
+		datetimes.push("Hora");
+	}
+	else if (selectDateTime === "resultDate"){
+		datetimes.push("Fecha");
+	}
+	else if (selectDateTime === "resultTime"){
+		datetimes.push("Fecha y hora");
+	}
 
 	if (selectValues.length === 1){
-		info['sensors'].forEach((sensorId) => {
-			sensors[sensorId] = [sensorId];
+		selectedSensors.forEach((sensorId) => {
+			sensorValuesSep[sensorId] = [sensorId];
 		});
 	}
 	else{
-		info['sensors'].forEach((sensorId) => {
-			sensors[sensorId] = {};
+		selectedSensors.forEach((sensorId) => {
+			sensorValuesSep[sensorId] = {};
 			selectValues.forEach((selectValue) => {
-				sensors[sensorId][selectValue] = [selectValue];
+				sensorValuesSep[sensorId][selectValue] = [selectValue];
 			})
 		});
 	}
 
-	results.forEach((value) => {
-		var sensorNameValue = value["sensorName"]["value"];
+	results.forEach((result) => {
+		var sensorNameValue = result["sensorName"]["value"];
 		var indexName = sensorNameValue.indexOf('#');
 		var sensorId = sensorNameValue.substring(indexName+7);
-		if (selectDateTime !== '' && info['sensors'][0] === sensorId){
-			var resultDateTimeValue = value[selectDateTime]["value"];
+		if (selectDateTime !== '' && selectedSensors[0] === sensorId){
+			var resultDateTimeValue = result[selectDateTime]["value"];
 			var datetime;
 			if (selectDateTime === 'resultDate'){
 				var indexFirstDash = resultDateTimeValue.indexOf('-');
 				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
 				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
 				var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
-				// datetime = day + ' ' + month[monthNumber-1];
 				datetime = new Date(year, monthNumber-1, day);
 			}
 			else if (selectDateTime === 'resultHour'){
@@ -553,11 +462,10 @@ function sepResponseInArrays(results, sensors, datetimes, info, selectValues, se
 				// var min = parseInt(resultDateTimeValue.substring(indexFirstSep+1, indexFirstSep+3), 10);
 				// var sec = parseInt(resultDateTimeValue.substring(indexFirstSep+4,indexFirstSep+6),10);
 				// var milsec = parseInt(resultDateTimeValue.substring(indexFirstSep+7,indexFirstSep+10),10);
-				// var hora = resultDateTimeValue.substring(0,2);
 				datetime = resultDateTimeValue.substring(0,5);
+				// datetime = new Date (0, 0, 0, hour, min, sec, milsec);
 			}
 			else {
-				// "2018-03-24T23:59:58.657Z"
 				var indexFirstDash = resultDateTimeValue.indexOf('-');
 				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
 				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
@@ -576,22 +484,28 @@ function sepResponseInArrays(results, sensors, datetimes, info, selectValues, se
 		}
 
 		if (selectValues.length === 1){
-			sensors[sensorId].push(parseFloat(value[selectValues[0]]["value"]));
+			sensorValuesSep[sensorId].push(parseFloat(result[selectValues[0]]["value"]));
 		}
 		else{
 			selectValues.forEach((selectValue) => {
-				sensors[sensorId][selectValue].push(parseFloat(value[selectValue]["value"]));
+				sensorValuesSep[sensorId][selectValue].push(parseFloat(result[selectValue]["value"]));
 			});
 		}
 	});
+
+	let returnValue = {'sensorValues':sensorValuesSep, 'datetimes':datetimes };
+
+	return returnValue;
 }
 
-function prepareResponseForGoogleCharts(info, selectValues, sensors, datetimes, allChartData){
+function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes){
+	let allChartData = [];
+
 	if (selectValues.length === 1){
 		let dataToZip = [datetimes];
 
-		info['sensors'].forEach((sensorId) => {
-			dataToZip.push(sensors[sensorId]);
+		selectedSensors.forEach((sensorId) => {
+			dataToZip.push(sensorValues[sensorId]);
 		})
 
 		let chartData = _.zip.apply(_,dataToZip);
@@ -599,7 +513,7 @@ function prepareResponseForGoogleCharts(info, selectValues, sensors, datetimes, 
 		allChartData.push(chartData);
 	}
 	else{
-		_.forEach(sensors, (sensorData, sensorId) =>{
+		_.forEach(sensorValues, (sensorData, sensorId) =>{
 			var dataToZip = [datetimes];
 
 			_.forEach(sensorData, (data, selectHeader) =>{
@@ -611,6 +525,67 @@ function prepareResponseForGoogleCharts(info, selectValues, sensors, datetimes, 
 			allChartData.push([sensorId, chartData]);
 		});
 	}
+
+	return allChartData;
+}
+
+function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes){
+	let anomDatetimes = [];
+	let anomValues = {}
+
+	selectedSensors.forEach((sensorId) => {
+		anomValues[sensorId] = [sensorId];
+	});
+
+	let primSensor = selectedSensors[0];
+	let restoSensores = selectedSensors.slice(1,selectedSensors.length);
+	let prevValues = {};
+	sensorValues[primSensor].forEach((value, i) => {
+		if (i > 1){
+			// console.log("Anteriores: " + JSON.stringify(prevValues));
+			// console.log("Actual: " + value);
+			var booleans = [];
+			if (sensorDir[primSensor] === 'up' && prevValues[primSensor] < value )
+				booleans.push(true);
+			else if (sensorDir[primSensor] === 'down' && prevValues[primSensor] > value )
+				booleans.push(true);
+			else if (prevValues[primSensor] !== value)
+				booleans.push(false);
+
+			restoSensores.forEach((sensorId) => {
+				// console.log("Actual: " + sensorValues[sensorId][i]);
+				if (sensorDir[sensorId] === 'up' && prevValues[sensorId] < sensorValues[sensorId][i] )
+					booleans.push(true);
+				else if (sensorDir[sensorId] === 'down' && prevValues[sensorId] > sensorValues[sensorId][i] )
+					booleans.push(true);
+				else if (prevValues[sensorId] !== sensorValues[sensorId][i])
+					booleans.push(false);
+			});
+			// console.log(booleans);
+			if (!(booleans.every(allTrue) || booleans.every(allFalse))) {
+				// console.log('Anomalía detectada');
+				anomValues[primSensor].push(value);
+				anomDatetimes.push(datetimes[i]);
+				restoSensores.forEach((sensorId) => {
+					anomValues[sensorId].push(sensorValues[sensorId][i]);
+				});
+			}
+			else{
+				// console.log("No hay anomalía");
+				// anomValues[primSensor].push(0);
+				// anomDatetimes.push(datetimes[i]);
+				// restoSensores.forEach((sensorId) => {
+				// 	anomValues[sensorId].push(0);
+				// });
+			}
+		}
+		prevValues[primSensor] = value;
+		restoSensores.forEach((sensorId) => {
+			prevValues[sensorId] = sensorValues[sensorId][i];
+		});
+	});
+
+	return {'anomValues':anomValues, 'anomDatetimes':anomDatetimes};
 }
 
 function allTrue(value){

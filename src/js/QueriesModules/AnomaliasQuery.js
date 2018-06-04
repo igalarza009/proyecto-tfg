@@ -62,7 +62,8 @@ export class AnomaliasQueryForm extends React.Component{
                         <p> Sensor {sensorId} ({sensorName}): </p>
                     </Col>
                     <Col>
-                        <Button floating className='white' onClick={() => this.handleClick(sensorId)}>
+                        <Button floating className='white'
+							onClick={() => this.handleClick(sensorId)}>
                             {arrowIcon}
                         </Button>
                     </Col>
@@ -81,7 +82,8 @@ export class AnomaliasQueryForm extends React.Component{
 					</Row>
                     {sensores}
 					<Row className='center-align'>
-						<Button className='blue darken-3' type='submit' name='action' onClick={() => {this.handleSubmit();}}>
+						<Button className='blue darken-3' type='submit' name='action'
+							onClick={() => {this.handleSubmit();}}>
 							Consultar <Icon right>bar_chart</Icon>
 		   			</Button>
 					</Row>

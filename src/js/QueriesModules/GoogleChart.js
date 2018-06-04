@@ -16,7 +16,6 @@ export class GoogleChart extends React.Component{
 			 	keepInBounds: true
 		 	},
 			hAxis: {
-				title: "Fecha y hora",
 				gridlines: {
 	            count: -1,
 	            units: {
