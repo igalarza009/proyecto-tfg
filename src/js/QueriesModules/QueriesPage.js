@@ -23,7 +23,7 @@ const sensorIconTooltips = {
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = virtuosoURL;
+const usedURL = RESTfulURLQuery;
 
 const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
 
@@ -157,32 +157,66 @@ export class SensorsInfo extends React.Component {
 			loadingQuery: true,
 		});
 
-		let chartType = "ColumnChart";
+		let chartType = "LineChart";
+		if (groupBy['groupBy']){
+			chartType = "ColumnChart";
+		}
 
-		const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
-
-		// console.log(query);
+		// const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
+		//
+		// // console.log(query);
+		//
+		// const querystring = require('querystring');
+		// // console.log(querystring.stringify({'query': query}));
+		// axios.post(usedURL,
+		// 	querystring.stringify({'query': query})
+		// )
+		// .then((response) => {
+		// 	console.log(response);
+		// 	let allChartData = prepareResponseData(response.data, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
+		// 	console.log(allChartData);
+		// 	// this.setState({
+		// 	// 	showChart: true,
+		// 	// 	allChartData: allChartData,
+		// 	// 	chartType: chartType,
+		// 	// });
+		// 	// var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
+		// })
+		// .catch((error) => {
+		// 	console.log(error);
+		// 	alert("An error occurred, check the console.log for more info.");
+		// 	this.newQuery();
+		// });
 
 		const querystring = require('querystring');
-		// console.log(querystring.stringify({'query': query}));
-		axios.post(usedURL,
-			querystring.stringify({'query': query})
-		)
-		.then((response) => {
-			console.log(response);
-			let allChartData = prepareResponseData(response.data, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
-			console.log(allChartData);
-			this.setState({
-				showChart: true,
-				allChartData: allChartData,
-				chartType: chartType,
+		let numberOfResponses = 0;
+		let sensorsResponse = {};
+
+		sensors.forEach((sensorId) => {
+			var query = Queries.getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy);
+			axios.post(usedURL,
+				querystring.stringify({'query': query})
+			)
+			.then((response) => {
+				console.log(response);
+				sensorsResponse[sensorId] = response.data["results"]["bindings"];
+				numberOfResponses++;
+				if (numberOfResponses === sensors.length){
+					console.log("finalizado!, podemos continuar");
+					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
+					console.log(sensorsResponse);
+					this.setState({
+						showChart: true,
+						allChartData: allChartData,
+						chartType: chartType,
+					});
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				alert("An error occurred, check the console.log for more info.");
+				this.newQuery();
 			});
-			// var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
-		})
-		.catch((error) => {
-			console.log(error);
-			alert("An error occurred, check the console.log for more info.");
-			this.newQuery();
 		});
 
 	}
@@ -195,33 +229,65 @@ export class SensorsInfo extends React.Component {
 
 		let chartType = "ColumnChart";
 
-		const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy);
-
-		// console.log(query);
-
+		// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy);
+		//
+		// // console.log(query);
+		//
+		// const querystring = require('querystring');
+		// // console.log(querystring.stringify({'query': query}));
+		// axios.post(usedURL,
+		// 	querystring.stringify({'query': query})
+		// )
+		// .then((response) => {
+		// 	console.log(response);
+		// 	let allChartData = prepareResponseData(response.data, {'sensors': askedSensors, 'type': 'otro'});
+		// 	console.log(allChartData);
+		//
+		// 	// let options = {'title':'Relación entre los valores de los sensores'};
+		//
+		// 	this.setState({
+		// 		showChart: true,
+		// 		allChartData: allChartData,
+		// 		chartType: chartType,
+		// 	});
+		// })
+		// .catch((error) => {
+		// 	console.log(error);
+		// 	alert("An error occurred, check the console.log for more info.");
+		// 	this.newQuery();
+		// });
 		const querystring = require('querystring');
-		// console.log(querystring.stringify({'query': query}));
-		axios.post(usedURL,
-			querystring.stringify({'query': query})
-		)
-		.then((response) => {
-			console.log(response);
-			let allChartData = prepareResponseData(response.data, {'sensors': askedSensors, 'type': 'otro'});
-			console.log(allChartData);
+		let numberOfResponses = 0;
+		let sensorsResponse = {};
 
-			// let options = {'title':'Relación entre los valores de los sensores'};
-
-			this.setState({
-				showChart: true,
-				allChartData: allChartData,
-				chartType: chartType,
+		askedSensors.forEach((sensorId) => {
+			var query = Queries.getOtherSensorQueryIndividual(knownSensors, sensorId, quitarAnomalias, orderBy);
+			// console.log(query);
+			axios.post(usedURL,
+				querystring.stringify({'query': query})
+			)
+			.then((response) => {
+				console.log(response);
+				sensorsResponse[sensorId] = response.data["results"]["bindings"];
+				numberOfResponses++;
+				if (numberOfResponses === askedSensors.length){
+					console.log("finalizado!, podemos continuar");
+					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'});
+					console.log(sensorsResponse);
+					this.setState({
+						showChart: true,
+						allChartData: allChartData,
+						chartType: chartType,
+					});
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				alert("An error occurred, check the console.log for more info.");
+				this.newQuery();
 			});
-		})
-		.catch((error) => {
-			console.log(error);
-			alert("An error occurred, check the console.log for more info.");
-			this.newQuery();
 		});
+
 	}
 
 	getAnomaliasQuery(sensorsDir){
@@ -234,27 +300,59 @@ export class SensorsInfo extends React.Component {
 
 		const selectedSensors = this.state.selectedSensors.slice();
 
-		const query = Queries.getInformationQuery(selectedSensors, {}, {}, {}, orderBy);
-		console.log(query);
-		// console.log("http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet" + "?query=" + encodeURIComponent(query));
+		// const query = Queries.getInformationQuery(selectedSensors, {}, {}, {}, orderBy);
+		// // console.log(query);
+		// // console.log("http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet" + "?query=" + encodeURIComponent(query));
+		// const querystring = require('querystring');
+		// axios.post(usedURL,
+		// 	querystring.stringify({'query': query})
+		// )
+		// .then((response) => {
+		// 	console.log(response);
+		// 	let allChartData = prepareResponseDataAnomalias(response.data, selectedSensors, sensorsDir);
+		// 	console.log(allChartData);
+		// 	// this.setState({
+		// 	// 	showChart: true,
+		// 	// 	allChartData: allChartData,
+		// 	// 	chartType: chartType,
+		// 	// });
+		// })
+		// .catch((error) => {
+		// 	console.log(error);
+		// 	alert("An error occurred, check the console.log for more info.");
+		// 	this.newQuery();
+		// });
+
 		const querystring = require('querystring');
-		axios.post(usedURL,
-			querystring.stringify({'query': query})
-		)
-		.then((response) => {
-			console.log(response);
-			let allChartData = prepareResponseDataAnomalias(response.data, selectedSensors, sensorsDir);
-			console.log(allChartData);
-			this.setState({
-				showChart: true,
-				allChartData: allChartData,
-				chartType: chartType,
+		let numberOfResponses = 0;
+		let sensorsResponse = {};
+
+
+		selectedSensors.forEach((sensorId) => {
+			var query = Queries.getInformationQueryIndividual(sensorId, {}, {}, {}, orderBy);
+			axios.post(usedURL,
+				querystring.stringify({'query': query})
+			)
+			.then((response) => {
+				console.log(response);
+				sensorsResponse[sensorId] = response.data["results"]["bindings"];
+				numberOfResponses++;
+				if (numberOfResponses === selectedSensors.length){
+					console.log("finalizado!, podemos continuar");
+					let allChartData = prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir);
+					console.log(sensorsResponse);
+					this.setState({
+						showChart: true,
+						allChartData: allChartData,
+						chartType: chartType,
+					});
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				alert("An error occurred, check the console.log for more info.");
+				this.newQuery();
 			});
-		})
-		.catch((error) => {
-			console.log(error);
-			alert("An error occurred, check the console.log for more info.");
-			this.newQuery();
 		});
 
 	}
@@ -303,7 +401,7 @@ export class SensorsInfo extends React.Component {
 			: (null);
 
 		const newQueryButton = (showChart)
-			? (<Button className='blue darken-3' onClick={() => {this.newQuery();}}> Neva pregunta </Button>)
+			? (<Button className='blue darken-3' onClick={() => {this.newQuery();}}> Nueva pregunta </Button>)
 			: (<img className='loading' alt='Cargando...' src={require('../../img/loading_bars.gif')}/>);
 
 		const loadingQueryCard = (loadingQuery)
@@ -393,21 +491,69 @@ function prepareResponseData(responseData, info){
 	return allChartData;
 }
 
-function prepareResponseDataAnomalias(response, selectedSensors, sensorDir){
-	const results = response["results"]["bindings"];
+function prepareResponseDataIndividual(sensorsResponse, info){
+	// const results = responseData["results"]["bindings"];
+	let selectedValues = [];
+	let selectDateTime = '';
+	if (info['type'] === 'infor'){
+		if (!info['groupBy']['groupByAll']){
+			if (info['groupBy']['groupBy']){
+				if (info['groupBy']['groupByDate'])
+					selectDateTime = 'resultDate';
+				else if (info['groupBy']['groupByHour'])
+					selectDateTime = 'resultHour';
+
+				if (info['groupBy']['avg'])
+					selectedValues.push('avgValue');
+
+				if (info['groupBy']['min'])
+					selectedValues.push('minValue');
+
+				if (info['groupBy']['max'])
+					selectedValues.push('maxValue');
+			}
+			else {
+				selectedValues.push('resultValue');
+				selectDateTime = "resultTime";
+			}
+		}
+	}
+	else{
+		selectedValues.push('resultValue');
+		selectDateTime = "resultTime";
+	}
+
+	let separateResults = parseSensorValues(sensorsResponse, info['sensors'], selectedValues, selectDateTime);
+
+	let sensorValues = separateResults['sensorValues'];
+	let datetimes = separateResults['datetimes'];
+
+	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes);
+
+	return allChartData;
+}
+
+function prepareResponseDataAnomalias(results, selectedSensors, sensorDir){
+	// const results = response["results"]["bindings"];
 
 	let selectValues = ["resultValue"];
-	let selectDateTime = ["resultTime"];
+	let selectDateTime = "resultTime";
 
-	let separateResults = sepResponseInArrays(results, selectedSensors, selectValues, selectDateTime);
+	let separateResults = parseSensorValues(results, selectedSensors, selectValues, selectDateTime);
 
 	let datetimes = separateResults['datetimes'];
 	let sensorValues = separateResults['sensorValues'];
+
+	console.log(datetimes);
+	console.log(sensorValues);
 
 	let anomValuesResult = getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes);
 
 	let anomDatetimes = anomValuesResult['anomDatetimes'];
 	let anomValues = anomValuesResult['anomValues'];
+
+	console.log(anomDatetimes);
+	console.log(anomValues);
 
 	let allChartData = prepareDataForGoogleCharts(selectedSensors, selectValues, anomValues, anomDatetimes);
 
@@ -498,6 +644,89 @@ function sepResponseInArrays(results, selectedSensors, selectValues, selectDateT
 	return returnValue;
 }
 
+function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selectDateTime){
+	let sensorValuesSep = {};
+	let datetimes = [];
+
+	if (selectDateTime === "resultHour"){
+		datetimes.push("Hora");
+	}
+	else if (selectDateTime === "resultDate"){
+		datetimes.push("Fecha");
+	}
+	else if (selectDateTime === "resultTime"){
+		datetimes.push("Fecha y hora");
+	}
+
+	if (selectValues.length === 1){
+		selectedSensors.forEach((sensorId) => {
+			sensorValuesSep[sensorId] = [sensorId];
+		});
+	}
+	else{
+		selectedSensors.forEach((sensorId) => {
+			sensorValuesSep[sensorId] = {};
+			selectValues.forEach((selectValue) => {
+				sensorValuesSep[sensorId][selectValue] = [selectValue];
+			})
+		});
+	}
+	_.forEach(sensorsResponse, (values, sensorId) => {
+		values.forEach((result) => {
+			var sensorNameValue = result["sensorName"]["value"];
+			var indexName = sensorNameValue.indexOf('#');
+			var sensorId = sensorNameValue.substring(indexName+7);
+			if (selectDateTime !== '' && selectedSensors[0] === sensorId){
+				var resultDateTimeValue = result[selectDateTime]["value"];
+				var datetime;
+				if (selectDateTime === 'resultDate'){
+					var indexFirstDash = resultDateTimeValue.indexOf('-');
+					var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
+					var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
+					var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
+					datetime = new Date(year, monthNumber-1, day);
+				}
+				else if (selectDateTime === 'resultHour'){
+					// var indexFirstSep = resultDateTimeValue.indexOf(':');
+					// var hour = parseInt(resultDateTimeValue.substring(0,indexFirstSep),10);
+					// var min = parseInt(resultDateTimeValue.substring(indexFirstSep+1, indexFirstSep+3), 10);
+					// var sec = parseInt(resultDateTimeValue.substring(indexFirstSep+4,indexFirstSep+6),10);
+					// var milsec = parseInt(resultDateTimeValue.substring(indexFirstSep+7,indexFirstSep+10),10);
+					datetime = resultDateTimeValue.substring(0,5);
+					// datetime = new Date (0, 0, 0, hour, min, sec, milsec);
+				}
+				else {
+					var indexFirstDash = resultDateTimeValue.indexOf('-');
+					var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
+					var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
+					var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
+					var indexTime = resultDateTimeValue.indexOf('T');
+					var hour = parseInt(resultDateTimeValue.substring(indexTime+1,indexTime+3),10);
+					var min = parseInt(resultDateTimeValue.substring(indexTime+4, indexTime+6), 10);
+					var sec = parseInt(resultDateTimeValue.substring(indexTime+7, indexTime+9),10);
+					var milsec = parseInt(resultDateTimeValue.substring(indexTime+10,indexTime+13),10);
+					// datetime = resultDateTimeValue;
+					// console.log(resultDateTimeValue);
+					// console.log(year + monthNumber-1 + day + hour + min + sec + milsec);
+					datetime = new Date(year, monthNumber-1, day, hour, min, sec, milsec);
+				}
+			datetimes.push(datetime);
+			}
+
+			if (selectValues.length === 1){
+				sensorValuesSep[sensorId].push(parseFloat(result[selectValues[0]]["value"]));
+			}
+			else{
+				selectValues.forEach((selectValue) => {
+					sensorValuesSep[sensorId][selectValue].push(parseFloat(result[selectValue]["value"]));
+				});
+			}
+		});
+	});
+
+	return {'sensorValues':sensorValuesSep, 'datetimes':datetimes };
+}
+
 function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes){
 	let allChartData = [];
 
@@ -506,11 +735,15 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 
 		selectedSensors.forEach((sensorId) => {
 			dataToZip.push(sensorValues[sensorId]);
-		})
+		});
 
 		let chartData = _.zip.apply(_,dataToZip);
 
-		allChartData.push(chartData);
+		console.log(chartData);
+
+		let reducedChartData = reduceChartPoints(chartData, 10000);
+
+		allChartData.push(reducedChartData);
 	}
 	else{
 		_.forEach(sensorValues, (sensorData, sensorId) =>{
@@ -522,7 +755,11 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 
 			var chartData = _.zip.apply(_,dataToZip);
 
-			allChartData.push([sensorId, chartData]);
+			console.log(chartData);
+
+			let reducedChartData = reduceChartPoints(chartData, 2000);
+
+			allChartData.push([sensorId, reducedChartData]);
 		});
 	}
 
@@ -573,7 +810,7 @@ function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes)
 			else{
 				// console.log("No hay anomalía");
 				// anomValues[primSensor].push(0);
-				// anomDatetimes.push(datetimes[i]);
+				anomDatetimes.push(datetimes[i]);
 				// restoSensores.forEach((sensorId) => {
 				// 	anomValues[sensorId].push(0);
 				// });
@@ -588,6 +825,57 @@ function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes)
 	return {'anomValues':anomValues, 'anomDatetimes':anomDatetimes};
 }
 
+// X axis must be Date
+function reduceChartPoints(chartData, maxPoints){
+	let valuesToAvg = [];
+	chartData[0].forEach((value,i) => {
+		valuesToAvg.push([]);
+	});
+	let reducedChartData = [];
+	let sliceLength = Math.round(chartData.length / maxPoints);
+	chartData.forEach((row, iRow) => {
+		if (iRow !== 0){
+			if (valuesToAvg[0].length < sliceLength){
+				row.forEach((value, iValue) => {
+					if (iValue === 0){
+						// console.log(value);
+						valuesToAvg[iValue].push(value.getTime());
+					}
+					else{
+						valuesToAvg[iValue].push(value);
+					}
+				});
+			}
+			else{
+				let newRow = [];
+				valuesToAvg.forEach((values, iRow) => {
+					if (iRow === 0){
+						newRow.push(new Date(Math.round(_.mean(values))));
+					}
+					else{
+						newRow.push(_.mean(values));
+					}
+				});
+				reducedChartData.push(newRow);
+				let newValuesToAvg = [];
+				chartData[0].forEach((value,i) => {
+					newValuesToAvg.push([]);
+				});
+				valuesToAvg = newValuesToAvg.slice();
+			}
+		}
+		else{
+			reducedChartData.push(row);
+		}
+	});
+
+	if (valuesToAvg[0].length > 0){
+
+	}
+
+	return reducedChartData;
+}
+
 function allTrue(value){
 	return value === true;
 }
@@ -595,3 +883,55 @@ function allTrue(value){
 function allFalse(value){
 	return value === false;
 }
+
+// 	let reducedValues = {};
+// 	selectedSensors.forEach((sensorId) => {
+// 		reducedValues[sensorId] = [];
+// 	});
+// 	let reducedDatetimes = [];
+//
+// 	let primSensorId = selectedSensors[0];
+// 	if (sensorValues[primSensorId].length > 2000){
+// 		let redMax = Math.round(sensorValues[primSensorId].length / 2000);
+// 		let valuesToAvg = {};
+// 		selectedSensors.forEach((sensorId) => {
+// 			valuesToAvg[sensorId] = [];
+// 		});
+// 		let timesToAvg = [];
+// 		sensorValues[primSensorId].forEach((value, i) => {
+// 			if (i!==0){
+// 				if (valuesToAvg[primSensorId].length < redMax){
+// 					// valuestoAvg[primSensorId].push(value);
+// 					selectedSensors.forEach((sensorId) => {
+// 						valuesToAvg[primSensorId].push(sensorValues[sensorId][i]);
+// 					});
+// 					if (valuesToAvg[primSensorId].length === 1){
+// 						timesToAvg.push(datetimes[i].getTime());
+// 					}
+// 					else if (valuesToAvg[primSensorId].length === redMax){
+// 						timesToAvg.push(datetimes[i].getTime());
+// 					}
+// 				}
+// 				else{
+// 					// reducedValues[primSensorId].push(_.mean(valuesToAvg[primSensorId]));
+// 					selectedSensors.forEach((sensorId) => {
+// 						reducedValues[sensorId].push(_.mean(valuesToAvg[sensorId]));
+// 					});
+// 					reducedDatetimes.push(new Date( Math.round(_.mean(timesToAvg))));
+// 					selectedSensors.forEach((sensorId) => {
+// 						valuesToAvg[sensorId] = [];
+// 					});
+// 					timesToAvg = [];
+// 				}
+// 			}
+// 			else{
+// 				selectedSensors.forEach((sensorId) => {
+// 					reducedValues[sensorId].push(sensorValues[sensorId][i]);
+// 				});
+// 				reducedDatetimes.push(datetimes[i]);
+// 			}
+// 		});
+//
+// 		console.log(reducedValues);
+// 		console.log(reducedDatetimes);
+// 	}

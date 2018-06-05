@@ -21,15 +21,25 @@ export class OtroSensorQueryForm extends React.Component{
 	static getDerivedStateFromProps(props, state){
         if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
 			let knownSensors = state.knownSensors;
+			let newKnownSensors = {};
+			let askedSensors = state.askedSensors;
+			let newAskedSensors = [];
 			let selectedSensors = props.selectedSensors;
 			selectedSensors.forEach((value,i) => {
-				if  (i !== 0 && !knownSensors[value]){
-					knownSensors[value] = 0;
+				if (askedSensors.indexOf(value) !==-1){
+					newAskedSensors.push(value);
+				}
+				else if (!knownSensors[value]){
+					newKnownSensors[value] = 0;
+				}
+				else{
+					newKnownSensors[value] = knownSensors[value];
 				}
 			});
 			return {
 				selectedSensors: selectedSensors,
-				knownSensors: knownSensors,
+				knownSensors: newKnownSensors,
+				askedSensors: newAskedSensors,
 			};
 		}
     }
@@ -39,20 +49,21 @@ export class OtroSensorQueryForm extends React.Component{
 		let askedSensors = this.state.askedSensors.slice();
 		let knownSensors = this.state.knownSensors;
 		const iAskedSensor = askedSensors.indexOf(value);
+		let newKnownSensors = knownSensors;
 		if ( iAskedSensor !== -1){
 			askedSensors.splice(iAskedSensor, 1);
-			knownSensors[value] = 0;
+			newKnownSensors[value] = 0;
 		}
 		else{
 			askedSensors.push(value);
-			_.remove(knownSensors, (val, key) => {
-				return key === value;
-			});
+			newKnownSensors = _.omit(knownSensors, [value]);
 		}
 		this.setState({
 			askedSensors: askedSensors,
-			knownSensors: knownSensors,
+			knownSensors: newKnownSensors,
 		});
+		console.log("askedSensors: " + JSON.stringify(askedSensors));
+		console.log("knownSensors: " + JSON.stringify(knownSensors));
 	}
 
 	handleValueChange(event, sensorId){

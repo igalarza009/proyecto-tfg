@@ -4,6 +4,7 @@ import {Button, Icon, Row, Col, Card, Input} from 'react-materialize'
 import M from 'materialize-css';
 import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import $ from 'jquery';
 
 var _ = require('lodash');
 const infoSensores = require('../../infoSensores.json');
@@ -20,7 +21,22 @@ export class InformationQueryForm extends React.Component{
 			groupBy: 'day',
 			filterValues: [],
 			values: {},
+			formArrowUp: [false, false, false, false],
 		};
+	}
+
+	componentDidMount(){
+		$(document).ready(function(){
+			$('.collapsible').collapsible();
+		});
+	}
+
+	handleOpenForm(index){
+		let formArrowUp = this.state.formArrowUp;
+		formArrowUp[index] = !this.state.formArrowUp[index];
+		this.setState({
+			formArrowUp: formArrowUp
+		});
 	}
 
 	handleFechaInicio(event, value){
@@ -190,6 +206,7 @@ export class InformationQueryForm extends React.Component{
 		const selectedSensors = this.props.selectedSensors;
 		const filterValues = this.state.filterValues;
 		const values = this.state.values;
+		const formArrowUp = this.state.formArrowUp;
 
 		const Slider = require('rc-slider');
 		const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -245,104 +262,265 @@ export class InformationQueryForm extends React.Component{
 			);
 		});
 
+		const formIcons = formArrowUp.map((value) => {
+			if (value){
+				return "keyboard_arrow_up";
+			}
+			else{
+				return "keyboard_arrow_down";
+			}
+		});
+
+		const formTitleColors = formArrowUp.map((value) => {
+			if (!value){
+				return "black-text";
+			}
+			else{
+				return "blue-text text-darken-3";
+			}
+		});
+
+		const formIconColors = formArrowUp.map((value) => {
+			if (!value){
+				return "material-icons black-text";
+			}
+			else{
+				return "material-icons blue-text text-darken-3";
+			}
+		});
+
 		return(
-			<Card>
-				<div className='form'>
-					<Row>
-						<p className='grey-text'>
-							Obtener una gráfica sobre los valores que toman los sensores selecionados.
-							Completa solo los campos deseados para aplicar filtros a la respuesta.
-						</p>
-					</Row>
-					<Row s={12}>
-						<p className='blue-text text-darken-3'>Filtrar resultados por fechas: </p>
-					</Row>
-					<Row className="center">
-						<Col s={12} l={6}>
-							<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
-								onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
-						</Col>
-						<Col s={12} l={6}>
-							<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}}
-								onChange={(e, value) => {this.handleFechaFin(e, value);}} />
-						</Col>
-					</Row>
-					<Row s={12}>
-						<p className='blue-text text-darken-3'>Filtrar resultados por horas: </p>
-					</Row>
-					<Row className='grey-text center'>
-						<Col s={12} l={6}>
-							Desde las... (HH:mm:ss)
-						</Col>
-						<Col s={12} l={6}>
-							Hasta las... (HH:mm:ss)
-						</Col>
-					</Row>
-					<Row className='center'>
-						<Col s={12} l={6}>
-							<input id="number" type="number" min="0" max="23"
-								onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
-							:
-							<input id="number" type="number" min="0" max="59"
-								onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
-							:
-							<input id="number" type="number" min="0" max="59"
-								onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
-							{/* <Input name='hora1' type='text'  label="Desde las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraInicio(e, value);}}/> */}
-						</Col>
-						<Col s={12} l={6}>
-							{/* <Input name='hora2' type='text'  label="Hasta las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraFin(e, value);}}/> */}
-							<input id="number" type="number" min="0" max="23"
-								onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
-							:
-							<input id="number" type="number" min="0" max="59"
-								onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
-							:
-							<input id="number" type="number" min="0" max="59"
-								onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
-						</Col>
-					</Row>
-					<Row s={12}>
-						<p className='blue-text text-darken-3'>Filtrar resultados por valores: </p>
-					</Row>
-					{filtrarValores}
-					<Row s={12}>
-						<p className='blue-text text-darken-3'>Agrupar resultados para mostrar: </p>
-					</Row>
-					<Row>
-						<Col s={12}>
-							<Input name='groupBy' type='checkbox' className='filled-in'
-								value='avg' label='Valor medio del sensor (AVG)'
-								onChange={(e) => {this.handleAggregates(e);}}
-							/>
-						</Col>
-						<Col s={12}>
-							<Input name='groupBy' type='checkbox' className='filled-in'
-								value='max' label='Valor máximo del sensor (MAX)'
-								onChange={(e) => {this.handleAggregates(e);}}
-							/>
-						</Col>
-						<Col s={12}>
-							<Input name='groupBy' type='checkbox' className='filled-in'
-								value='min' label='Valor mínimo del sensor (MIN)'
-								onChange={(e) => {this.handleAggregates(e);}}
-							/>
-						</Col>
-						<Col s={12}>
-							<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>
-								<option value='day'>Cada día</option>
-								<option value='hour'>Cada hora</option>
-								<option value='all'>Valor absoluto en todo el intervalo</option>
-							</Input>
-						</Col>
-					</Row>
-					<Row className='center-align'>
-						<Button className='blue darken-3' type='submit' name='action' onClick={() => {this.handleSubmit();}}>
-							Consultar <Icon right>bar_chart</Icon>
-		   			</Button>
-					</Row>
-				</div>
-			</Card>
+			// <Card>
+			// 	<div className='form'>
+			// 		<Row>
+			// 			<p className='grey-text'>
+			// 				Obtener una gráfica sobre los valores que toman los sensores selecionados.
+			// 				Completa solo los campos deseados para aplicar filtros a la respuesta.
+			// 			</p>
+			// 		</Row>
+			// 		<Row s={12}>
+			// 			<p className='blue-text text-darken-3'>Filtrar resultados por fechas: </p>
+			// 		</Row>
+			// 		<Row className="center">
+			// 			<Col s={12} l={6}>
+			// 				<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
+			// 					onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+			// 			</Col>
+			// 			<Col s={12} l={6}>
+			// 				<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}}
+			// 					onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+			// 			</Col>
+			// 		</Row>
+			// 		<Row s={12}>
+			// 			<p className='blue-text text-darken-3'>Filtrar resultados por horas: </p>
+			// 		</Row>
+			// 		<Row className='grey-text center'>
+			// 			<Col s={12} l={6}>
+			// 				Desde las... (HH:mm:ss)
+			// 			</Col>
+			// 			<Col s={12} l={6}>
+			// 				Hasta las... (HH:mm:ss)
+			// 			</Col>
+			// 		</Row>
+			// 		<Row className='center'>
+			// 			<Col s={12} l={6}>
+			// 				<input id="number" type="number" min="0" max="23"
+			// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
+			// 				:
+			// 				<input id="number" type="number" min="0" max="59"
+			// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
+			// 				:
+			// 				<input id="number" type="number" min="0" max="59"
+			// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
+			// 				{/* <Input name='hora1' type='text'  label="Desde las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraInicio(e, value);}}/> */}
+			// 			</Col>
+			// 			<Col s={12} l={6}>
+			// 				{/* <Input name='hora2' type='text'  label="Hasta las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraFin(e, value);}}/> */}
+			// 				<input id="number" type="number" min="0" max="23"
+			// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
+			// 				:
+			// 				<input id="number" type="number" min="0" max="59"
+			// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
+			// 				:
+			// 				<input id="number" type="number" min="0" max="59"
+			// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
+			// 			</Col>
+			// 		</Row>
+			// 		<Row s={12}>
+			// 			<p className='blue-text text-darken-3'>Filtrar resultados por valores: </p>
+			// 		</Row>
+			// 		{filtrarValores}
+			// 		<Row s={12}>
+			// 			<p className='blue-text text-darken-3'>Agrupar resultados para mostrar: </p>
+			// 		</Row>
+			// 		<Row>
+			// 			<Col s={12}>
+			// 				<Input name='groupBy' type='checkbox' className='filled-in'
+			// 					value='avg' label='Valor medio del sensor (AVG)'
+			// 					onChange={(e) => {this.handleAggregates(e);}}
+			// 				/>
+			// 			</Col>
+			// 			<Col s={12}>
+			// 				<Input name='groupBy' type='checkbox' className='filled-in'
+			// 					value='max' label='Valor máximo del sensor (MAX)'
+			// 					onChange={(e) => {this.handleAggregates(e);}}
+			// 				/>
+			// 			</Col>
+			// 			<Col s={12}>
+			// 				<Input name='groupBy' type='checkbox' className='filled-in'
+			// 					value='min' label='Valor mínimo del sensor (MIN)'
+			// 					onChange={(e) => {this.handleAggregates(e);}}
+			// 				/>
+			// 			</Col>
+			// 			<Col s={12}>
+			// 				<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>
+			// 					<option value='day'>Cada día</option>
+			// 					<option value='hour'>Cada hora</option>
+			// 					<option value='all'>Valor absoluto en todo el intervalo</option>
+			// 				</Input>
+			// 			</Col>
+			// 		</Row>
+			// 		<Row className='center-align'>
+			// 			<Button className='blue darken-3' type='submit' name='action' onClick={() => {this.handleSubmit();}}>
+			// 				Consultar <Icon right>bar_chart</Icon>
+		   	// 		</Button>
+			// 		</Row>
+			// 	</div>
+			// </Card>
+				<ul className="collapsible" data-collapsible="expandable">
+					<li>
+						<div className="collapsible-header no-pointer grey-text">
+							<div className="form-collap">
+								Obtener una gráfica sobre los valores que toman los sensores selecionados.
+							</div>
+						</div>
+					</li>
+					<li>
+						<div className="collapsible-header" onClick={() => {this.handleOpenForm(0);}}>
+							<i className={formIconColors[0]}>{formIcons[0]}</i>
+							<div className={formTitleColors[0]}>
+								 Filtrar resultados por fechas
+							</div>
+						 </div>
+						 <div className="collapsible-body">
+							 <span className="center">
+							 	<Row>
+		 						 	<Col s={12} l={6}>
+		 								<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
+		 						 			onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+		 						 	</Col>
+		 						 	<Col s={12} l={6}>
+		 						 		<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}}
+		 						 			onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+		 						 	</Col>
+								</Row>
+							</span>
+						</div>
+					</li>
+					<li>
+						<div className="collapsible-header" onClick={() => {this.handleOpenForm(1);}}>
+							<i className={formIconColors[1]}>{formIcons[1]}</i>
+							<div className={formTitleColors[1]}>
+								 Filtrar resultados por horas
+							</div>
+						</div>
+						<div className="collapsible-body">
+							<span className="center">
+								<Row className='grey-text center'>
+		 							<Col s={12} l={6}>
+		 								Desde las... (HH:mm:ss)
+		 							</Col>
+		 							<Col s={12} l={6}>
+		 								Hasta las... (HH:mm:ss)
+		 							</Col>
+		 						</Row>
+		 						<Row className='center'>
+		 							<Col s={12} l={6}>
+		 								<input id="number" type="number" min="0" max="23"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
+		 							</Col>
+		 							<Col s={12} l={6}>
+		 								<input id="number" type="number" min="0" max="23"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
+		 							</Col>
+		 						</Row>
+							</span>
+						</div>
+					</li>
+					<li>
+						<div className="collapsible-header" onClick={() => {this.handleOpenForm(2);}}>
+							<i className={formIconColors[2]}>{formIcons[2]}</i>
+							<div className={formTitleColors[2]}>
+								 Filtrar resultados por valores
+							</div>
+						</div>
+						<div className="collapsible-body">
+							<span className="center">
+								{filtrarValores}
+							</span>
+						</div>
+					</li>
+					<li>
+						<div className="collapsible-header" onClick={() => {this.handleOpenForm(3);}}>
+							<i className={formIconColors[3]}>{formIcons[3]}</i>
+							<div className={formTitleColors[3]}>
+								 Agrupar resultados para mostrar
+							</div>
+						</div>
+						<div className="collapsible-body">
+							<span className="center">
+								<Row>
+									<Col s={12}>
+								 		<Input name='groupBy' type='checkbox' className='filled-in'
+											value='avg' label='Valor medio del sensor (AVG)'
+											onChange={(e) => {this.handleAggregates(e);}}
+										/>
+									</Col>
+									<Col s={12}>
+										<Input name='groupBy' type='checkbox' className='filled-in'
+											value='max' label='Valor máximo del sensor (MAX)'
+											onChange={(e) => {this.handleAggregates(e);}}
+										/>
+									</Col>
+									<Col s={12}>
+										<Input name='groupBy' type='checkbox' className='filled-in'
+											value='min' label='Valor mínimo del sensor (MIN)'
+											onChange={(e) => {this.handleAggregates(e);}}
+										/>
+									</Col>
+									<Col s={12}>
+										<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>
+											<option value='day'>Cada día</option>
+											<option value='hour'>Cada hora</option>
+											<option value='all'>Valor absoluto en todo el intervalo</option>
+										</Input>
+									</Col>
+								</Row>
+							</span>
+						</div>
+					</li>
+					<li>
+						<div className="collapsible-header no-pointer blue-text text-darken-3">
+							<Row className='center-align form-collap'>
+								<Button className='blue darken-3 topMargin' type='submit' name='action' onClick={() => {this.handleSubmit();}}>
+									Consultar <Icon right>bar_chart</Icon>
+						   	 	</Button>
+							 </Row>
+						</div>
+					</li>
+				</ul>
 		)
 	}
 }

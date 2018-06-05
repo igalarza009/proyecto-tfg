@@ -6,9 +6,9 @@
 	cursor: pointer;
 }
 
-/*.topMargin{
-	margin-top: 30px;
-}*/
+.topMargin{
+	margin-top: 4%;
+}
 
 .margin-top{
 	margin-top: 15px;
@@ -48,6 +48,10 @@
 
 .no-pointer{
 	cursor: context-menu;
+}
+
+.collapsible-body{
+	background-color: white  ;
 }
 
 /*--------------- DATE PICKER -------------*/
@@ -290,6 +294,13 @@
 
 .form{
 	margin-left: 5%;
+}
+
+.form-collap{
+	padding-left: 5%;
+	padding-right: 5%;
+	padding-top:2%;
+	padding-bottom: 2%;
 }
 
 .label{
