@@ -157,9 +157,9 @@ export class SensorsInfo extends React.Component {
 			loadingQuery: true,
 		});
 
-		let chartType = "LineChart";
+		let chartType = "Line";
 		if (groupBy['groupBy']){
-			chartType = "ColumnChart";
+			chartType = "Bar";
 		}
 
 		// const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
@@ -194,6 +194,7 @@ export class SensorsInfo extends React.Component {
 
 		sensors.forEach((sensorId) => {
 			var query = Queries.getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy);
+			// console.log(query);
 			axios.post(usedURL,
 				querystring.stringify({'query': query})
 			)
@@ -203,8 +204,8 @@ export class SensorsInfo extends React.Component {
 				numberOfResponses++;
 				if (numberOfResponses === sensors.length){
 					console.log("finalizado!, podemos continuar");
-					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
 					console.log(sensorsResponse);
+					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
 					this.setState({
 						showChart: true,
 						allChartData: allChartData,
@@ -741,9 +742,35 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 
 		console.log(chartData);
 
-		let reducedChartData = reduceChartPoints(chartData, 10000);
+		let reducedChartData = reduceChartPoints(chartData, 2000);
 
-		allChartData.push(reducedChartData);
+		let chartFullData = {};
+
+		chartFullData['title'] = "---Tipo pregunta---: ";
+		selectedSensors.forEach((sensorId, i) => {
+			if (i !== selectedSensors.length){
+				chartFullData['title'] += sensorId + ", ";
+			}
+			else{
+				chartFullData['title'] += sensorId;
+			}
+		})
+
+		chartFullData['y-axis'] = [];
+		reducedChartData[0].forEach((rowValue, i) => {
+			if (i !== 0){
+				var sensor = _.find(infoSensores, ['indicatorId', rowValue]);
+				var axisTitle = sensor['observedProperty'];
+				var unit = sensor['measureUnit'];
+				var axisLabel = axisTitle + " (" + unit + ")"
+				var axisData = [axisTitle, axisLabel];
+				chartFullData['y-axis'].push(axisData);
+			}
+		});
+
+		chartFullData['data'] = reducedChartData;
+
+		allChartData.push(chartFullData);
 	}
 	else{
 		_.forEach(sensorValues, (sensorData, sensorId) =>{
@@ -759,7 +786,19 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 
 			let reducedChartData = reduceChartPoints(chartData, 2000);
 
-			allChartData.push([sensorId, reducedChartData]);
+			let chartFullData = {};
+
+			chartFullData['title'] = "Información del sensor: "+ sensorId;
+
+			var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			var axisTitle = sensor['observedProperty'];
+			var unit = sensor['measureUnit'];
+			var axisLabel = axisTitle + " (" + unit + ")"
+			chartFullData['y-axis'] = [axisTitle, axisLabel];
+
+			chartFullData['data'] = reducedChartData;
+
+			allChartData.push(chartFullData);
 		});
 	}
 
@@ -827,50 +866,65 @@ function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes)
 
 // X axis must be Date
 function reduceChartPoints(chartData, maxPoints){
-	let valuesToAvg = [];
-	chartData[0].forEach((value,i) => {
-		valuesToAvg.push([]);
-	});
+
 	let reducedChartData = [];
-	let sliceLength = Math.round(chartData.length / maxPoints);
-	chartData.forEach((row, iRow) => {
-		if (iRow !== 0){
-			if (valuesToAvg[0].length < sliceLength){
-				row.forEach((value, iValue) => {
-					if (iValue === 0){
-						// console.log(value);
-						valuesToAvg[iValue].push(value.getTime());
-					}
-					else{
-						valuesToAvg[iValue].push(value);
-					}
-				});
+	if (chartData.length > maxPoints){
+		let valuesToAvg = [];
+		chartData[0].forEach((value,i) => {
+			valuesToAvg.push([]);
+		});
+		const sliceLength = Math.ceil(chartData.length / maxPoints);
+		chartData.forEach((row, iRow) => {
+			if (iRow !== 0){
+				if (valuesToAvg[0].length < sliceLength){
+					row.forEach((value, iValue) => {
+						if (iValue === 0){
+							// console.log(value);
+							valuesToAvg[iValue].push(value.getTime());
+						}
+						else{
+							valuesToAvg[iValue].push(value);
+						}
+					});
+				}
+				else{
+					var newRow = [];
+					valuesToAvg.forEach((values, iRow) => {
+						if (iRow === 0){
+							newRow.push(new Date(Math.round(_.mean(values))));
+						}
+						else{
+							newRow.push(_.mean(values));
+						}
+					});
+					reducedChartData.push(newRow);
+					let newValuesToAvg = [];
+					chartData[0].forEach((value,i) => {
+						newValuesToAvg.push([]);
+					});
+					valuesToAvg = newValuesToAvg.slice();
+				}
 			}
 			else{
-				let newRow = [];
-				valuesToAvg.forEach((values, iRow) => {
-					if (iRow === 0){
-						newRow.push(new Date(Math.round(_.mean(values))));
-					}
-					else{
-						newRow.push(_.mean(values));
-					}
-				});
-				reducedChartData.push(newRow);
-				let newValuesToAvg = [];
-				chartData[0].forEach((value,i) => {
-					newValuesToAvg.push([]);
-				});
-				valuesToAvg = newValuesToAvg.slice();
+				reducedChartData.push(row);
 			}
-		}
-		else{
-			reducedChartData.push(row);
-		}
-	});
+		});
 
-	if (valuesToAvg[0].length > 0){
-
+		if (valuesToAvg[0].length > 0){
+			var newRow = [];
+			valuesToAvg.forEach((values, iRow) => {
+				if (iRow === 0){
+					newRow.push(new Date(Math.round(_.mean(values))));
+				}
+				else{
+					newRow.push(_.mean(values));
+				}
+			});
+			reducedChartData.push(newRow);
+		}
+	}
+	else{
+		reducedChartData = chartData;
 	}
 
 	return reducedChartData;
