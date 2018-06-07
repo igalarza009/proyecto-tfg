@@ -13,6 +13,8 @@ export class AnomaliasQueryForm extends React.Component{
 		super(props);
 		this.state = {
             sensorDir: {},
+			calParMotor: false,
+			parMotorId: '79PWN7',
 		};
 	}
 
@@ -27,6 +29,14 @@ export class AnomaliasQueryForm extends React.Component{
             sensorDir: sensorDir,
         };
     }
+
+	handleParMotorChecked(event){
+		const checked = event.target.checked;
+		this.setState({
+			calParMotor: checked,
+		});
+		console.log(checked);
+	}
 
     handleClick(sensorId){
 	      let sensorDir = this.state.sensorDir;
@@ -43,12 +53,16 @@ export class AnomaliasQueryForm extends React.Component{
 
 	handleSubmit(){
 		const sensorDir = this.state.sensorDir;
-		this.props.getAnomaliasQuery(sensorDir);
+		const calParMotor = this.state.calParMotor;
+		const parMotorId = this.state.parMotorId;
+
+		this.props.getAnomaliasQuery(sensorDir, {'parMotorId': parMotorId, 'calParMotor': calParMotor});
 	}
 
 	render(){
         const sensorDir = this.state.sensorDir;
         const selectedSensors = this.props.selectedSensors;
+		const parMotorId = this.state.parMotorId;
 
         const sensores = selectedSensors.map((sensorId, i) => {
             const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
@@ -56,6 +70,14 @@ export class AnomaliasQueryForm extends React.Component{
             const arrowIcon = (sensorDir[sensorId] === 'up')
                 ? (<Icon className='blue-text text-darken-3'> arrow_upward </Icon>)
                 : (<Icon className='blue-text text-darken-3'> arrow_downward </Icon>);
+			const parMotor = (sensorId === parMotorId)
+				? (<Col s={12}>
+						<Input name='filterValue' type='checkbox' className='filled-in'
+							label="Calcular Par Motor"
+							onChange={(e) => {this.handleParMotorChecked(e);}}
+						/>
+					</Col>)
+				: (null);
             return(
                 <Row key={this.props.selectedSensors[i]} className="valign-wrapper">
                     <Col>
@@ -67,6 +89,7 @@ export class AnomaliasQueryForm extends React.Component{
                             {arrowIcon}
                         </Button>
                     </Col>
+					{parMotor}
                 </Row>
             );
         });

@@ -5,50 +5,33 @@ import {Card} from 'react-materialize'
 import M from 'materialize-css';
 import {Chart} from 'react-google-charts';
 
+const material = true;
+
 export class GoogleChart extends React.Component{
+
 	constructor(props) {
-	    super(props);
-	    this.state = {
-	    //   options: {
-	    //     title: 'Una gráfica',
-		// 	explorer: {
-		// 	 	axis: 'horizontal',
-		// 	 	keepInBounds: true
-		//  	},
-		// 	series: {
-	    //       // Gives each series an axis name that matches the Y-axis below.
-	    //       0: {axis: 'Temps'},
-	    //       1: {axis: 'Temps'},
-		// 	  2: {axis: 'Daylight'}
-	    //     },
-	    //     axes: {
-	    //       // Adds labels to each axis; they don't have to match the axis names.
-	    //       y: {
-	    //         Temps: {label: 'Temps (Celsius)'},
-	    //         Daylight: {label: 'Daylight'},
-	    //       }
-		//   },
-		// 	hAxis: {
-		// 		gridlines: {
-		//            count: -1,
-		//            units: {
-		//               days: {format: ['MMM dd']},
-		//               hours: {format: ['HH:mm', 'ha']},
-	    //         }
-	    //       },
-		// 	}
-	    //   },
-	    //   data: [
-	    //     ['Age', 'Weight'],
-	    //     [8, 12],
-	    //     [4, 5.5],
-	    //     [11, 14],
-	    //     [4, 5],
-	    //     [3, 3.5],
-	    //     [6.5, 7],
-	    //   ],
-	    };
-  	}
+	   super(props);
+	   const self = this;
+	   this.state = {
+		 convertFunc: getConvertOptionsFunc(self.props.chartType)
+	   };
+	   this.chartEvents = [
+		 {
+		   eventName: 'ready',
+		   callback(Chart) {
+			 const convertFunc = getConvertOptionsFunc(self.props.chartType) || (t => t);
+			 self.setState({convertFunc});
+		   },
+		 },
+		 {
+		  eventName: 'select',
+		  callback(Chart) {
+			  // Returns Chart so you can access props and  the ChartWrapper object from chart.wrapper
+			console.log('Selected ', Chart.chart.getSelection());
+		  },
+	  	},
+	   ]
+	 }
 
 	render(){
 
@@ -62,6 +45,7 @@ export class GoogleChart extends React.Component{
 
 		const charts = this.props.allChartData.map((chartData, i) => {
 			var title = chartData['title'];
+			var subtitle = chartData['subtitle'];
 			var data = chartData['data'];
 			var series = {};
 			var axes = {'y':{}};
@@ -72,28 +56,54 @@ export class GoogleChart extends React.Component{
 					axes['y'][axisValues[0]] = {'label': axisValues[1]};
 				}
 			});
-			// chart: {
-	        //     title: 'Company Performance',
-	        //     subtitle: 'Sales, Expenses, and Profit: 2014-2017',
-	        //   },
 
 			var options = {};
-			options['chart'] = {};
-			opootions['chart']['title'] = title;
-			options['explorer'] = {'axis': 'horizontal','keepInBounds': true};
-			options['series'] = series;
-			options['axes'] = axes;
+
+			//For material
+			if (material) {
+				options['chart'] = {};
+				options['chart']['title'] = title;
+				options['chart']['subtitle'] = subtitle;
+				options['hAxis'] = {
+					'gridlines': {
+			          // 'count': -1,
+			           'units': {
+			              'days': {'format': ['MMM dd']},
+			              'hours': {'format': ['HH:mm', 'ha']}
+					  }
+				  }
+		       };
+				options['series'] = series;
+				options['axes'] = axes;
+			}
+			else{
+				// For classic
+				options['title'] = title;
+				options['hAxis'] = {
+					'gridlines': {
+			          // 'count': -1,
+			           'units': {
+			              'days': {'format': ['MMM dd']},
+			              'hours': {'format': ['HH:mm', 'ha']}
+					  }
+				  }
+			   };
+				options['explorer'] = {'axis': 'horizontal','keepInBounds': true};
+			}
+
+			const convertFunc = this.state.convertFunc;
+    		const finalOptions = convertFunc ? convertFunc(options) : options;
 
 			return(
 				<Card key={i}>
 				   <Chart
 						chartType={this.props.chartType}
 						data={data}
-						options={options}
+						options={finalOptions}
 						graph_id={i}
 						width="100%"
 						height="400px"
-						legend_toggle
+						chartEvents={this.state.chartEvents}
 					/>
 				</Card>
 			);
@@ -105,4 +115,10 @@ export class GoogleChart extends React.Component{
 			</div>
 		)
 	}
+}
+
+function getConvertOptionsFunc(chartType) {
+  return window.google && window.google.charts && window.google.charts[chartType]
+    ? window.google.charts[chartType].convertOptions
+    : null;
 }

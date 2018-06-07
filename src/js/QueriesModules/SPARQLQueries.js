@@ -253,7 +253,7 @@ export function getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias,
 	return finalQuery;
 }
 
-export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, quitarAnomalias, orderBy){
+export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filterValues, orderBy){
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
 		'prefix sosa: <http://www.w3.org/ns/sosa/> '+
@@ -284,8 +284,17 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, quita
 				'<#sensor' + sensorName + '> sosa:madeObservation ?' + calObsName + ' . ' +
 				'?' + calObsName + ' sosa:hasResult/sosa:hasSimpleResult ?calResultValue . ';
 
-			if (quitarAnomalias){
-				where += 'filter(?calResultValue < 3000 && ?calResultValue > 0) . ';
+			if (filterValues['filter'] && filterValues['values'][sensorName]){
+					where += 'filter(?calResultValue  ';
+					let sensorFilterValues = filterValues['values'][sensorName];
+					if (typeof(sensorFilterValues[0]) === "boolean"){
+						where += '= "' + sensorFilterValues[0] + '"^^xsd:boolean ';
+					}
+					else{
+						where += '>= "' + sensorFilterValues[0] + '"^^xsd:double && ' +
+								'?calResultValue <= "' + sensorFilterValues[1] + '"^^xsd:double ';
+					}
+					where += ' ) .';
 			}
 
 			where += ' } } ' ;

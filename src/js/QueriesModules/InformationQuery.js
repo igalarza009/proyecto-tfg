@@ -80,7 +80,7 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			values: values,
 		});
-		console.log(values);
+		// console.log(values);
 	}
 
 	handleRange(range, sensorId){
@@ -89,7 +89,7 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			values: values,
 		});
-		console.log(values);
+		// console.log(values);
 
 	}
 
@@ -428,13 +428,29 @@ export class InformationQueryForm extends React.Component{
 							<span className="center">
 								<Row className='grey-text center'>
 		 							<Col s={12} l={6}>
-		 								Desde las... (HH:mm:ss)
+		 								<p> Desde las... (HH:mm:ss) </p>
+										<input id="number" type="number" min="0" max="23"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
 		 							</Col>
 		 							<Col s={12} l={6}>
-		 								Hasta las... (HH:mm:ss)
+		 								<p> Hasta las... (HH:mm:ss) </p>
+										<input id="number" type="number" min="0" max="23"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
+		 								:
+		 								<input id="number" type="number" min="0" max="59"
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
 		 							</Col>
 		 						</Row>
-		 						<Row className='center'>
+		 						{/* <Row className='center'>
 		 							<Col s={12} l={6}>
 		 								<input id="number" type="number" min="0" max="23"
 		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
@@ -455,7 +471,7 @@ export class InformationQueryForm extends React.Component{
 		 								<input id="number" type="number" min="0" max="59"
 		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
 		 							</Col>
-		 						</Row>
+		 						</Row> */}
 							</span>
 						</div>
 					</li>

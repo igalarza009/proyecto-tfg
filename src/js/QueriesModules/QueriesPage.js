@@ -9,6 +9,16 @@ import {PruebaTabsMat} from './SelectQueryTabs.js'
 
 var _ = require('lodash');
 
+const virtuosoURL = 'http://localhost:8890/sparql';
+const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
+const usedURL = RESTfulURLQuery;
+
+const lineChartName = 'Line';
+const barChartName = 'Bar';
+const scatterChartName = 'Scatter';
+
+const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
+
 const infoSensores = require('../../infoSensores.json');
 const sensorIconNames = ['tempIcon', 'resistIcon', 'ventIcon', 'rpmIcon', 'consumoIcon', 'presionIcon', 'tempFundidoIcon'];
 const sensorIconTooltips = {
@@ -20,12 +30,6 @@ const sensorIconTooltips = {
 	'presionIcon':'Presión',
 	'tempFundidoIcon':'Temperatura de fundido'
 };
-
-const virtuosoURL = 'http://localhost:8890/sparql';
-const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = RESTfulURLQuery;
-
-const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
 
 export class SensorsInfo extends React.Component {
 	constructor(props){
@@ -157,9 +161,9 @@ export class SensorsInfo extends React.Component {
 			loadingQuery: true,
 		});
 
-		let chartType = "Line";
+		let chartType = lineChartName;
 		if (groupBy['groupBy']){
-			chartType = "Bar";
+			chartType = barChartName;
 		}
 
 		// const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
@@ -222,13 +226,13 @@ export class SensorsInfo extends React.Component {
 
 	}
 
-	getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias){
+	getOtherSensorQuery(knownSensors, askedSensors, filterValues){
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
 		});
 
-		let chartType = "ColumnChart";
+		let chartType = barChartName;
 
 		// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy);
 		//
@@ -262,7 +266,7 @@ export class SensorsInfo extends React.Component {
 		let sensorsResponse = {};
 
 		askedSensors.forEach((sensorId) => {
-			var query = Queries.getOtherSensorQueryIndividual(knownSensors, sensorId, quitarAnomalias, orderBy);
+			var query = Queries.getOtherSensorQueryIndividual(knownSensors, sensorId, filterValues, orderBy);
 			// console.log(query);
 			axios.post(usedURL,
 				querystring.stringify({'query': query})
@@ -273,8 +277,9 @@ export class SensorsInfo extends React.Component {
 				numberOfResponses++;
 				if (numberOfResponses === askedSensors.length){
 					console.log("finalizado!, podemos continuar");
-					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'});
 					console.log(sensorsResponse);
+					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'});
+					console.log(allChartData);
 					this.setState({
 						showChart: true,
 						allChartData: allChartData,
@@ -291,13 +296,13 @@ export class SensorsInfo extends React.Component {
 
 	}
 
-	getAnomaliasQuery(sensorsDir){
+	getAnomaliasQuery(sensorsDir, parMotor){
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
 		});
 
-		let chartType = "ScatterChart";
+		let chartType = scatterChartName;
 
 		const selectedSensors = this.state.selectedSensors.slice();
 
@@ -340,8 +345,8 @@ export class SensorsInfo extends React.Component {
 				numberOfResponses++;
 				if (numberOfResponses === selectedSensors.length){
 					console.log("finalizado!, podemos continuar");
-					let allChartData = prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir);
-					console.log(sensorsResponse);
+					let allChartData = prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor);
+					console.log(allChartData);
 					this.setState({
 						showChart: true,
 						allChartData: allChartData,
@@ -397,7 +402,7 @@ export class SensorsInfo extends React.Component {
 		          	moreThanOneSensor={moreThanOneSensor}
 		          	getInformationQuery={(s,g,f,fv) => {this.getInformationQuery(s,g,f,fv);}}
 		          	getOtherSensorQuery={(k,a,q) => {this.getOtherSensorQuery(k,a,q);}}
-					getAnomaliasQuery={(s) => {this.getAnomaliasQuery(s);}}
+					getAnomaliasQuery={(s,p) => {this.getAnomaliasQuery(s,p);}}
 		        />)
 			: (null);
 
@@ -520,27 +525,32 @@ function prepareResponseDataIndividual(sensorsResponse, info){
 		}
 	}
 	else{
+		console.log("Estoy en el else");
 		selectedValues.push('resultValue');
 		selectDateTime = "resultTime";
 	}
 
-	let separateResults = parseSensorValues(sensorsResponse, info['sensors'], selectedValues, selectDateTime);
+	let parsedResults = parseSensorValues(sensorsResponse, info['sensors'], selectedValues, selectDateTime, {});
 
-	let sensorValues = separateResults['sensorValues'];
-	let datetimes = separateResults['datetimes'];
+	console.log(parsedResults);
 
-	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes);
+	let sensorValues = parsedResults['sensorValues'];
+	let datetimes = parsedResults['datetimes'];
+
+	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']});
+
+	console.log(allChartData);
 
 	return allChartData;
 }
 
-function prepareResponseDataAnomalias(results, selectedSensors, sensorDir){
+function prepareResponseDataAnomalias(results, selectedSensors, sensorDir, parMotor){
 	// const results = response["results"]["bindings"];
 
 	let selectValues = ["resultValue"];
 	let selectDateTime = "resultTime";
 
-	let separateResults = parseSensorValues(results, selectedSensors, selectValues, selectDateTime);
+	let separateResults = parseSensorValues(results, selectedSensors, selectValues, selectDateTime, parMotor);
 
 	let datetimes = separateResults['datetimes'];
 	let sensorValues = separateResults['sensorValues'];
@@ -556,7 +566,7 @@ function prepareResponseDataAnomalias(results, selectedSensors, sensorDir){
 	console.log(anomDatetimes);
 	console.log(anomValues);
 
-	let allChartData = prepareDataForGoogleCharts(selectedSensors, selectValues, anomValues, anomDatetimes);
+	let allChartData = prepareDataForGoogleCharts(selectedSensors, selectValues, anomValues, anomDatetimes, {'parMotor': parMotor, 'type': 'anom'});
 
 	return allChartData;
 }
@@ -645,7 +655,7 @@ function sepResponseInArrays(results, selectedSensors, selectValues, selectDateT
 	return returnValue;
 }
 
-function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selectDateTime){
+function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selectDateTime, parMotor){
 	let sensorValuesSep = {};
 	let datetimes = [];
 
@@ -715,7 +725,14 @@ function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selec
 			}
 
 			if (selectValues.length === 1){
-				sensorValuesSep[sensorId].push(parseFloat(result[selectValues[0]]["value"]));
+				if (parMotor['parMotorId'] && parMotor['parMotorId'] === sensorId && parMotor['calParMotor'] === true){ // [79PWN7] * 0.00302) * 3.84
+					console.log("Calcular Par Motor.");
+					let parMotorValue = (parseFloat(result[selectValues[0]]["value"]) * 0.00302) * 3.84;
+					sensorValuesSep[sensorId].push(parMotorValue);
+				}
+				else{
+					sensorValuesSep[sensorId].push(parseFloat(result[selectValues[0]]["value"]));
+				}
 			}
 			else{
 				selectValues.forEach((selectValue) => {
@@ -728,10 +745,12 @@ function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selec
 	return {'sensorValues':sensorValuesSep, 'datetimes':datetimes };
 }
 
-function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes){
+function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes, info){
+	//info: parMotor, type
 	let allChartData = [];
 
 	if (selectValues.length === 1){
+		console.log("Hola 1");
 		let dataToZip = [datetimes];
 
 		selectedSensors.forEach((sensorId) => {
@@ -746,25 +765,42 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 
 		let chartFullData = {};
 
-		chartFullData['title'] = "---Tipo pregunta---: ";
+		let title;
+		if (info['type']==='infor'){
+			title = 'Información general.';
+		}
+		else if (info['type']==='otro'){
+			title = 'Relación entre sensores.';
+		}
+		else{
+			title = 'Búsqueda de anomalías.';
+		}
+		chartFullData['title'] = title;
+
+		chartFullData['subtitle'] = "";
 		selectedSensors.forEach((sensorId, i) => {
-			if (i !== selectedSensors.length){
-				chartFullData['title'] += sensorId + ", ";
+			if (i !== (selectedSensors.length - 1)){
+				chartFullData['subtitle'] += sensorId + ", ";
 			}
 			else{
-				chartFullData['title'] += sensorId;
+				chartFullData['subtitle'] += sensorId;
 			}
 		})
 
 		chartFullData['y-axis'] = [];
 		reducedChartData[0].forEach((rowValue, i) => {
 			if (i !== 0){
-				var sensor = _.find(infoSensores, ['indicatorId', rowValue]);
-				var axisTitle = sensor['observedProperty'];
-				var unit = sensor['measureUnit'];
-				var axisLabel = axisTitle + " (" + unit + ")"
-				var axisData = [axisTitle, axisLabel];
-				chartFullData['y-axis'].push(axisData);
+				if (info['parMotor'] && info['parMotor']['parMotorId'] === rowValue && info['parMotor']['calParMotor'] === true){
+					chartFullData['y-axis'].push(['ParMotor', 'Par Motor']);
+				}
+				else{
+					var sensor = _.find(infoSensores, ['indicatorId', rowValue]);
+					var axisTitle = sensor['observedProperty'];
+					var unit = sensor['measureUnit'];
+					var axisLabel = axisTitle + " (" + unit + ")"
+					var axisData = [axisTitle, axisLabel];
+					chartFullData['y-axis'].push(axisData);
+				}
 			}
 		});
 
@@ -773,6 +809,7 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 		allChartData.push(chartFullData);
 	}
 	else{
+		console.log("Hola 1");
 		_.forEach(sensorValues, (sensorData, sensorId) =>{
 			var dataToZip = [datetimes];
 
@@ -846,14 +883,14 @@ function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes)
 					anomValues[sensorId].push(sensorValues[sensorId][i]);
 				});
 			}
-			else{
-				// console.log("No hay anomalía");
-				// anomValues[primSensor].push(0);
-				anomDatetimes.push(datetimes[i]);
-				// restoSensores.forEach((sensorId) => {
-				// 	anomValues[sensorId].push(0);
-				// });
-			}
+		}
+		else{
+			// console.log("No hay anomalía");
+			// anomValues[primSensor].push(0);
+			anomDatetimes.push(datetimes[i]);
+			// restoSensores.forEach((sensorId) => {
+			// 	anomValues[sensorId].push(0);
+			// });
 		}
 		prevValues[primSensor] = value;
 		restoSensores.forEach((sensorId) => {
@@ -873,7 +910,7 @@ function reduceChartPoints(chartData, maxPoints){
 		chartData[0].forEach((value,i) => {
 			valuesToAvg.push([]);
 		});
-		const sliceLength = Math.ceil(chartData.length / maxPoints);
+		const sliceLength = Math.ceil(chartData.length / maxPoints); // * (chartData[0].length - 1)
 		chartData.forEach((row, iRow) => {
 			if (iRow !== 0){
 				if (valuesToAvg[0].length < sliceLength){

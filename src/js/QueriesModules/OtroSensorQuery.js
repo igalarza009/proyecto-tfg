@@ -3,6 +3,8 @@ import '../../index.css';
 import {Button, Icon, Row, Col, Card, Input} from 'react-materialize'
 import M from 'materialize-css';
 import $ from 'jquery';
+import Slider, { Range } from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
 const infoSensores = require('../../infoSensores.json');
@@ -15,16 +17,20 @@ export class OtroSensorQueryForm extends React.Component{
 			selectedSensors: [this.props.selectedSensors],
 			askedSensors: [this.props.selectedSensors[0]],
 			quitarAnomalias: false,
+			filterValues: [],
+			values: {},
 		};
 	}
 
 	static getDerivedStateFromProps(props, state){
         if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
-			let knownSensors = state.knownSensors;
+			const knownSensors = state.knownSensors;
 			let newKnownSensors = {};
-			let askedSensors = state.askedSensors;
+			const askedSensors = state.askedSensors;
 			let newAskedSensors = [];
-			let selectedSensors = props.selectedSensors;
+			const filterValues = state.filterValues;
+			let newFilterValues = [];
+			const selectedSensors = props.selectedSensors;
 			selectedSensors.forEach((value,i) => {
 				if (askedSensors.indexOf(value) !==-1){
 					newAskedSensors.push(value);
@@ -35,11 +41,15 @@ export class OtroSensorQueryForm extends React.Component{
 				else{
 					newKnownSensors[value] = knownSensors[value];
 				}
+				if (filterValues[value]){
+					newFilterValues.push(value);
+				}
 			});
 			return {
 				selectedSensors: selectedSensors,
 				knownSensors: newKnownSensors,
 				askedSensors: newAskedSensors,
+				filterValues: newFilterValues,
 			};
 		}
     }
@@ -101,18 +111,67 @@ export class OtroSensorQueryForm extends React.Component{
 		});
 	}
 
+	handleRange(range, sensorId){
+		let values = this.state.values;
+		values[sensorId] = range;
+		this.setState({
+			values: values,
+		});
+		// console.log(values);
+
+	}
+
+	handleFilterValueChecked(event, sensorId, min, max){
+		let values = this.state.values;
+		let checked = event.target.checked;
+		let filterValues = this.state.filterValues;
+		if (checked){
+			filterValues.push(sensorId);
+			if (!values[sensorId]){
+				values[sensorId] = [min, max];
+			}
+		}
+		else{
+			let iSensor = filterValues.indexOf(sensorId);
+			filterValues.splice(iSensor,1);
+		}
+		this.setState({
+			values: values,
+			filterValues: filterValues,
+		});
+		console.log(filterValues);
+		console.log(values);
+	}
+
 	handleSubmit(){
 		const knownSensors = this.state.knownSensors;
 		const askedSensors = this.state.askedSensors.slice();
-		const quitarAnomalias = this.state.quitarAnomalias;
+		const values = this.state.values;
+		const stateFilterValues = this.state.filterValues;
+		// const quitarAnomalias = this.state.quitarAnomalias;
 
-		this.props.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias);
+		let filterValues = {'filter': false, 'values': {}};
+
+		if (stateFilterValues.length > 0){
+			filterValues['filter'] = true;
+			stateFilterValues.forEach((sensorId) => {
+				filterValues['values'][sensorId] = values[sensorId];
+			});
+		}
+
+		this.props.getOtherSensorQuery(knownSensors, askedSensors, filterValues);
 	}
 
 	render(){
 		const selectedSensors = this.state.selectedSensors.slice();
 		const askedSensors = this.state.askedSensors.slice();
 		const knownSensors = this.state.knownSensors;
+		const filterValues = this.state.filterValues;
+		const values = this.state.values;
+
+		const Slider = require('rc-slider');
+		const createSliderWithTooltip = Slider.createSliderWithTooltip;
+		const Range = createSliderWithTooltip(Slider.Range);
 
 		const checkboxesSensores = selectedSensors.map((sensorId, i) => {
 			const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
@@ -131,13 +190,51 @@ export class OtroSensorQueryForm extends React.Component{
 
 		let restoSensores = selectedSensors.map((sensorId, i) => {
 			if (askedSensors.indexOf(sensorId) === -1){
-				let sensor = _.find(infoSensores, ['indicatorId', sensorId]);
-				let sensorName = sensorId + ' (' + sensor.name + ')';
+				const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+				const sensorName = sensorId + ' (' + sensor.name + ')';
+				const minValue = sensor["minValue"];
+				const maxValue = sensor["maxValue"];
+				const disabled = (filterValues.indexOf(sensorId) === -1)
+					? (true)
+					: (false);
+				const defaultRange = (!values[sensorId])
+					? ([minValue, maxValue])
+					: ([values[sensorId][0], values[sensorId][1]]);
 				const valueInput = (isNaN(knownSensors[sensorId]))
-					? (null)
-					: (<Input s={3} label="Valor"
-							onChange={(e) => {this.handleValueChange(e,sensorId);}}
-						/>);
+						? (null)
+						: (<Input s={3} label="Valor"
+								onChange={(e) => {this.handleValueChange(e,sensorId);}}
+							/>);
+				const valuePickerType = (sensor['resultType'] === 'DoubleValueResult')
+						? (<Range
+								min={minValue} max={maxValue}
+								defaultValue={defaultRange}
+								disabled={disabled}
+								onAfterChange={(e) => {this.handleRange(e,sensorId);}}
+							/>)
+						: (<div className="switch">
+								<label>
+									Off
+									<input type="checkbox" disabled={disabled}
+										onChange={(e) => {this.handleSwitch(e,sensorId);}}
+									/>
+									<span className="lever"></span>
+									On
+								</label>
+							</div>);
+				const showFilterValues = (isNaN(knownSensors[sensorId]))
+						? (<div>
+								<Col s={12}>
+									<Input name='filterValue' type='checkbox' className='filled-in'
+										label="Filtrar valores para evitar anomalías"
+										onChange={(e) => {this.handleFilterValueChecked(e,sensorId,minValue,maxValue);}}
+									/>
+								</Col>
+								<Col s={10} offset="s1">
+									{valuePickerType}
+								</Col>
+							</div>)
+						: (null);
 				return(
 					<Row key={sensorId}>
 						<Col s={12}>
@@ -151,6 +248,7 @@ export class OtroSensorQueryForm extends React.Component{
 							<option value='max'>Valor máximo</option>
 						</Input>
 						{valueInput}
+						{showFilterValues}
 					</Row>
 				);
 			}
@@ -182,9 +280,9 @@ export class OtroSensorQueryForm extends React.Component{
 						</p>
 					</Row>
 					{restoSensores}
-					<Row>
+					{/* <Row>
 						<p className='blue-text text-darken-3'>
-							¿Eliminar anomalías? (solo se mostrarán valores entre 1 y 3000)
+							Filtrar rango valores para evitar anomalías
 						</p>
 					</Row>
 					<Row>
@@ -193,7 +291,7 @@ export class OtroSensorQueryForm extends React.Component{
 							label='Eliminar anomalías' className='filled-in'
 							onChange={(e) => {this.handleElimAnom(e);}}
 						/>
-					</Row>
+					</Row> */}
 					<Row className='center-align'>
 						<Button className='blue darken-3' type='submit'
 							name='action' onClick={() => {this.handleSubmit();}}
