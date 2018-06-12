@@ -11,11 +11,13 @@ var _ = require('lodash');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = RESTfulURLQuery;
+const usedURL = virtuosoURL;
 
 const lineChartName = 'Line';
 const barChartName = 'Bar';
 const scatterChartName = 'Scatter';
+
+const maxChartPoints = 4500;
 
 const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
 
@@ -304,7 +306,12 @@ export class SensorsInfo extends React.Component {
 
 		let chartType = scatterChartName;
 
-		const selectedSensors = this.state.selectedSensors.slice();
+		// const selectedSensors = this.state.selectedSensors.slice();
+		let selectedSensors = [];
+
+		_.forEach(sensorsDir, (value, key) => {
+			selectedSensors.push(key);
+		});
 
 		// const query = Queries.getInformationQuery(selectedSensors, {}, {}, {}, orderBy);
 		// // console.log(query);
@@ -411,12 +418,11 @@ export class SensorsInfo extends React.Component {
 			: (<img className='loading' alt='Cargando...' src={require('../../img/loading_bars.gif')}/>);
 
 		const loadingQueryCard = (loadingQuery)
-			? (<Card className='center valign-wrapper' title='Resumen de la pregunta'>
+			&& (<Card className='center valign-wrapper' title='Resumen de la pregunta'>
 					<p> ... resumen de la pregunta realizada ... </p>
 					<br/>
 					{newQueryButton}
-				</Card>)
-			: (null)
+				</Card>);
 
 		let chartCard = null;
 		if (loadingQuery){
@@ -761,7 +767,7 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 
 		console.log(chartData);
 
-		let reducedChartData = reduceChartPoints(chartData, 2000);
+		let reducedChartData = reduceChartPoints(chartData, maxChartPoints);
 
 		let chartFullData = {};
 
@@ -821,7 +827,7 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 
 			console.log(chartData);
 
-			let reducedChartData = reduceChartPoints(chartData, 2000);
+			let reducedChartData = reduceChartPoints(chartData, maxChartPoints);
 
 			let chartFullData = {};
 
@@ -910,7 +916,7 @@ function reduceChartPoints(chartData, maxPoints){
 		chartData[0].forEach((value,i) => {
 			valuesToAvg.push([]);
 		});
-		const sliceLength = Math.ceil(chartData.length / maxPoints); // * (chartData[0].length - 1)
+		const sliceLength = Math.ceil(chartData.length / maxPoints) * (chartData[0].length - 1); // * (chartData[0].length - 1)
 		chartData.forEach((row, iRow) => {
 			if (iRow !== 0){
 				if (valuesToAvg[0].length < sliceLength){

@@ -14,6 +14,10 @@
 	margin-top: 15px;
 }
 
+.margin-bottom{
+	margin-bottom: 10px;
+}
+
 /*.form-info{
 	color: blue;
 }*/
@@ -373,6 +377,18 @@ input[type="checkbox"].filled-in {
 
 .rc-slider-disabled .rc-slider-handle{
 	border-color: #ccc !important;
+}
+
+[type="radio"]:checked+label{
+	color:black;
+}
+
+[type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:before, [type="radio"].with-gap:checked+label:after{
+	border: 2px solid #1565c0;
+}
+
+[type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:after{
+	background-color: #1565c0;
 }
 
 /*

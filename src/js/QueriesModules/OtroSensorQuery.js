@@ -14,7 +14,7 @@ export class OtroSensorQueryForm extends React.Component{
 		super(props);
 		this.state = {
 			knownSensors:{},
-			selectedSensors: [this.props.selectedSensors],
+			selectedSensors: this.props.selectedSensors,
 			askedSensors: [this.props.selectedSensors[0]],
 			quitarAnomalias: false,
 			filterValues: [],
@@ -51,6 +51,9 @@ export class OtroSensorQueryForm extends React.Component{
 				askedSensors: newAskedSensors,
 				filterValues: newFilterValues,
 			};
+		}
+		else{
+			return null;
 		}
     }
 

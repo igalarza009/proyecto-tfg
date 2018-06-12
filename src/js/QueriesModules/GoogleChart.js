@@ -48,10 +48,14 @@ export class GoogleChart extends React.Component{
 			var subtitle = chartData['subtitle'];
 			var data = chartData['data'];
 			var series = {};
+			var seriesNotMat = {};
 			var axes = {'y':{}};
+			var vAxes = {};
 
 			chartData['y-axis'].forEach((axisValues, i) => {
 				series[i] = {'axis': axisValues[0]};
+				seriesNotMat[i] = {'targetAxisIndex': i};
+				vAxes[i] = {'title': axisValues[1]};
 				if (!axes['y'][axisValues[0]]){
 					axes['y'][axisValues[0]] = {'label': axisValues[1]};
 				}
@@ -64,20 +68,33 @@ export class GoogleChart extends React.Component{
 				options['chart'] = {};
 				options['chart']['title'] = title;
 				options['chart']['subtitle'] = subtitle;
-				options['hAxis'] = {
-					'gridlines': {
-			          // 'count': -1,
-			           'units': {
-			              'days': {'format': ['MMM dd']},
-			              'hours': {'format': ['HH:mm', 'ha']}
-					  }
-				  }
-		       };
+				// options['hAxis'] = {
+				// 	'gridlines': {
+			   //        // 'count': -1,
+			   //         'units': {
+			   //            'days': {'format': ['MMM dd']},
+			   //            'hours': {'format': ['HH:mm', 'ha']}
+				// 	  }
+				//   }
+		       // };
 				options['series'] = series;
 				options['axes'] = axes;
 			}
 			else{
 				// For classic
+				// {
+			//  displayZoomButtons: false,
+			//  series: {
+			// 		  0: {targetAxisIndex: 0},
+			// 		   1: {targetAxisIndex: 1}
+			// 		 },
+			// vAxes: {
+			// 		// Adds titles to each axis.
+			// 		   0: {title: 'Error ( % )'},
+			// 		   1: {title: 'Reduction ratio ( % )'}
+			// 		 },
+		   // }}/>
+
 				options['title'] = title;
 				options['hAxis'] = {
 					'gridlines': {
@@ -87,7 +104,9 @@ export class GoogleChart extends React.Component{
 			              'hours': {'format': ['HH:mm', 'ha']}
 					  }
 				  }
-			   };
+			   	};
+			   	options['series'] = seriesNotMat;
+			   	options['vAxes'] = vAxes;
 				options['explorer'] = {'axis': 'horizontal','keepInBounds': true};
 			}
 

@@ -7,28 +7,61 @@ import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
 const infoSensores = require('../../infoSensores.json');
+const paresValores = require('../../paresValores.json');
+
+const parMotorId = '79PWN7';
 
 export class AnomaliasQueryForm extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
+			selectedSensors: this.props.selectedSensors,
             sensorDir: {},
 			calParMotor: false,
-			parMotorId: '79PWN7',
+			relType: 'custom',
 		};
 	}
 
     static getDerivedStateFromProps(props, state){
-        let sensorDir = state.sensorDir;
-        props.selectedSensors.forEach((sensorId) => {
-            if (!sensorDir[sensorId]){
-                sensorDir[sensorId] = 'up';
-            }
-        })
-        return {
-            sensorDir: sensorDir,
-        };
+		if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
+			const relType = state.relType;
+			if (relType === 'custom'){
+				const sensorDir = state.sensorDir;
+				let newSensorDir = {};
+		        props.selectedSensors.forEach((sensorId) => {
+		            if (!sensorDir[sensorId]){
+		                newSensorDir[sensorId] = 'up';
+		            }
+					else{
+						newSensorDir[sensorId] = sensorDir[sensorId];
+					}
+		        })
+		        return {
+		            sensorDir: newSensorDir,
+					selectedSensors: props.selectedSensors
+		        };
+			}
+			else{
+				return {
+					selectedSensors: props.selectedSensors
+				};
+			}
+		}
+		else{
+			return null;
+		}
     }
+
+	resetValues(){
+		let sensorDir = {};
+		this.state.selectedSensors.forEach((sensorId) => {
+            sensorDir[sensorId] = 'up';
+        });
+        this.setState({
+            sensorDir: sensorDir,
+			calParMotor: false,
+        });
+	}
 
 	handleParMotorChecked(event){
 		const checked = event.target.checked;
@@ -49,12 +82,51 @@ export class AnomaliasQueryForm extends React.Component{
           this.setState({
              sensorDir: sensorDir,
           });
+
+		  console.log(sensorDir);
+	}
+
+	handleRadioChange(event, i){
+		// const value = event.target.value;
+		// alert("selected radio " + i);
+		const selectedRel = paresValores[i];
+		let sensorDir = {};
+		let calParMotor = false;
+		_.forEach(selectedRel, (value, key) => {
+			if (key === 'ParMotor'){
+				sensorDir[parMotorId] = value;
+				calParMotor = true;
+			}
+			else{
+				sensorDir[key] = value;
+			}
+		});
+
+		this.setState({
+			sensorDir: sensorDir,
+			calParMotor: calParMotor,
+		});
+
+		console.log(sensorDir);
+		console.log(calParMotor);
+	}
+
+	handleSelectChange(event){
+		const value = event.target.value;
+		if (value === 'custom'){
+			this.resetValues();
+		}
+		this.setState({
+			relType: value,
+		});
 	}
 
 	handleSubmit(){
 		const sensorDir = this.state.sensorDir;
 		const calParMotor = this.state.calParMotor;
-		const parMotorId = this.state.parMotorId;
+
+		console.log(sensorDir);
+		console.log(calParMotor);
 
 		this.props.getAnomaliasQuery(sensorDir, {'parMotorId': parMotorId, 'calParMotor': calParMotor});
 	}
@@ -63,6 +135,7 @@ export class AnomaliasQueryForm extends React.Component{
         const sensorDir = this.state.sensorDir;
         const selectedSensors = this.props.selectedSensors;
 		const parMotorId = this.state.parMotorId;
+		const relType = this.state.relType;
 
         const sensores = selectedSensors.map((sensorId, i) => {
             const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
@@ -94,21 +167,71 @@ export class AnomaliasQueryForm extends React.Component{
             );
         });
 
+		const predefRel = paresValores.map((object, iRel) => {
+			let sensorIds = [];
+			let sensorIdDirs = [];
+			_.forEach(object, (value, key) => {
+				sensorIds.push(key);
+				sensorIdDirs.push(value);
+			});
+			const sensorRels = sensorIdDirs.map((value, iPar) => {
+				const arrowDir = (value === 'up') ? "arrow_upward" : "arrow_downward";
+				const icon = (<Icon>{arrowDir}</Icon>);
+				const sensorId = sensorIds[iPar];
+				const key = "keyRel" + iRel + "par" + iPar;
+				return(
+					(<p key={key}>Sensor {sensorId} {icon}</p>)
+				);
+			});
+			const id = "sensorRel" + iRel;
+			return(
+				<Col s={12} l={6} key={id} className="margin-bottom">
+					<input name="predefRel" className="with-gap" type="radio" id={id} onChange={(e) => {this.handleRadioChange(e,iRel);}}/>
+					<label htmlFor={id} className="valign-wrapper">
+						{sensorRels}
+					</label>
+				</Col>
+			);
+		});
+
+		const selectedRelType = (relType === 'custom')
+			? (<div>
+					<Row>
+						<p className='grey-text'>
+							Especificar la relación esperada entre los sensores,
+							especificando el aumento o decrecimiento que se debería dar en sus valores.
+						</p>
+					</Row>
+					{sensores}
+				</div>)
+			: (<div>
+					<Row>
+						<Col s={12}>
+							<p className='grey-text'>
+								Elegir una de las relaciones entre sensores predefinidas.
+							</p>
+						</Col>
+					</Row>
+					<Row>
+						{predefRel}
+					</Row>
+				</div>);
+
 		return(
 			<Card>
 				<div className='form'>
 					<Row>
-						<p className='grey-text'>
-                            Especificar la relación esperada entre los sensores,
-                            especificando el aumento o decrecimiento que se debería dar en sus valores.
-						</p>
+						<Input s={12} l={6} type='select' defaultValue='custom' onChange={(e) => {this.handleSelectChange(e);}}>
+							<option value='custom'>Relación personalizada</option>
+							<option value='predef'>Relaciones predefinidas</option>
+						</Input>
 					</Row>
-                    {sensores}
+					{selectedRelType}
 					<Row className='center-align'>
 						<Button className='blue darken-3' type='submit' name='action'
 							onClick={() => {this.handleSubmit();}}>
 							Consultar <Icon right>bar_chart</Icon>
-		   			</Button>
+		   				</Button>
 					</Row>
 				</div>
 			</Card>
