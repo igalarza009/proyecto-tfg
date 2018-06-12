@@ -11,7 +11,7 @@ var _ = require('lodash');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = virtuosoURL;
+const usedURL = RESTfulURLQuery;
 
 const lineChartName = 'Line';
 const barChartName = 'Bar';
@@ -168,64 +168,45 @@ export class SensorsInfo extends React.Component {
 			chartType = barChartName;
 		}
 
-		// const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
-		//
-		// // console.log(query);
-		//
-		// const querystring = require('querystring');
-		// // console.log(querystring.stringify({'query': query}));
-		// axios.post(usedURL,
-		// 	querystring.stringify({'query': query})
-		// )
-		// .then((response) => {
-		// 	console.log(response);
-		// 	let allChartData = prepareResponseData(response.data, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
-		// 	console.log(allChartData);
-		// 	// this.setState({
-		// 	// 	showChart: true,
-		// 	// 	allChartData: allChartData,
-		// 	// 	chartType: chartType,
-		// 	// });
-		// 	// var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
-		// })
-		// .catch((error) => {
-		// 	console.log(error);
-		// 	alert("An error occurred, check the console.log for more info.");
-		// 	this.newQuery();
-		// });
-
 		const querystring = require('querystring');
 		let numberOfResponses = 0;
 		let sensorsResponse = {};
 
-		sensors.forEach((sensorId) => {
-			var query = Queries.getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy);
-			// console.log(query);
-			axios.post(usedURL,
-				querystring.stringify({'query': query})
-			)
-			.then((response) => {
-				console.log(response);
-				sensorsResponse[sensorId] = response.data["results"]["bindings"];
-				numberOfResponses++;
-				if (numberOfResponses === sensors.length){
-					console.log("finalizado!, podemos continuar");
-					console.log(sensorsResponse);
-					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
-					this.setState({
-						showChart: true,
-						allChartData: allChartData,
-						chartType: chartType,
-					});
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				alert("An error occurred, check the console.log for more info.");
-				this.newQuery();
-			});
-		});
+		this.recursiveInforCall(sensors, groupBy, filter, filterValues, numberOfResponses, sensorsResponse, chartType);
 
+	}
+
+	recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse, chartType){
+		const querystring = require('querystring');
+		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], groupBy, filter, filterValues, orderBy);
+		axios.post(usedURL,
+			querystring.stringify({'query': query})
+		)
+		.then((response) => {
+			console.log(response);
+			const sensorId = selectedSensors[nResponses];
+			sensorsResponse[sensorId] = response.data["results"]["bindings"];
+			nResponses++;
+			if (nResponses === selectedSensors.length){
+				console.log("finalizado!, podemos continuar");
+				let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
+				console.log(allChartData);
+				this.setState({
+					showChart: true,
+					allChartData: allChartData,
+					chartType: chartType,
+				});
+			}
+			else{
+				console.log("New axios call with nResponse: " + nResponses);
+				this.recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse, chartType);
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+			alert("An error occurred, check the console.log for more info.");
+			this.newQuery();
+		});
 	}
 
 	getOtherSensorQuery(knownSensors, askedSensors, filterValues){
@@ -236,66 +217,44 @@ export class SensorsInfo extends React.Component {
 
 		let chartType = barChartName;
 
-		// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy);
-		//
-		// // console.log(query);
-		//
-		// const querystring = require('querystring');
-		// // console.log(querystring.stringify({'query': query}));
-		// axios.post(usedURL,
-		// 	querystring.stringify({'query': query})
-		// )
-		// .then((response) => {
-		// 	console.log(response);
-		// 	let allChartData = prepareResponseData(response.data, {'sensors': askedSensors, 'type': 'otro'});
-		// 	console.log(allChartData);
-		//
-		// 	// let options = {'title':'Relación entre los valores de los sensores'};
-		//
-		// 	this.setState({
-		// 		showChart: true,
-		// 		allChartData: allChartData,
-		// 		chartType: chartType,
-		// 	});
-		// })
-		// .catch((error) => {
-		// 	console.log(error);
-		// 	alert("An error occurred, check the console.log for more info.");
-		// 	this.newQuery();
-		// });
 		const querystring = require('querystring');
 		let numberOfResponses = 0;
 		let sensorsResponse = {};
 
-		askedSensors.forEach((sensorId) => {
-			var query = Queries.getOtherSensorQueryIndividual(knownSensors, sensorId, filterValues, orderBy);
-			// console.log(query);
-			axios.post(usedURL,
-				querystring.stringify({'query': query})
-			)
-			.then((response) => {
-				console.log(response);
-				sensorsResponse[sensorId] = response.data["results"]["bindings"];
-				numberOfResponses++;
-				if (numberOfResponses === askedSensors.length){
-					console.log("finalizado!, podemos continuar");
-					console.log(sensorsResponse);
-					let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'});
-					console.log(allChartData);
-					this.setState({
-						showChart: true,
-						allChartData: allChartData,
-						chartType: chartType,
-					});
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				alert("An error occurred, check the console.log for more info.");
-				this.newQuery();
-			});
-		});
+		this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, numberOfResponses, sensorsResponse, chartType);
+	}
 
+	recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, nResponses, sensorsResponse, chartType){
+		const querystring = require('querystring');
+		var query = Queries.getOtherSensorQueryIndividual(knownSensors, askedSensors[nResponses], filterValues, orderBy);
+		axios.post(usedURL,
+			querystring.stringify({'query': query})
+		)
+		.then((response) => {
+			console.log(response);
+			const sensorId = askedSensors[nResponses];
+			sensorsResponse[sensorId] = response.data["results"]["bindings"];
+			nResponses++;
+			if (nResponses === askedSensors.length){
+				console.log("finalizado!, podemos continuar");
+				let allChartData = prepareResponseDataIndividual(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'});
+				console.log(allChartData);
+				this.setState({
+					showChart: true,
+					allChartData: allChartData,
+					chartType: chartType,
+				});
+			}
+			else{
+				console.log("New axios call with nResponse: " + nResponses);
+				this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, nResponses, sensorsResponse, chartType);
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+			alert("An error occurred, check the console.log for more info.");
+			this.newQuery();
+		});
 	}
 
 	getAnomaliasQuery(sensorsDir, parMotor){
@@ -313,61 +272,44 @@ export class SensorsInfo extends React.Component {
 			selectedSensors.push(key);
 		});
 
-		// const query = Queries.getInformationQuery(selectedSensors, {}, {}, {}, orderBy);
-		// // console.log(query);
-		// // console.log("http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet" + "?query=" + encodeURIComponent(query));
-		// const querystring = require('querystring');
-		// axios.post(usedURL,
-		// 	querystring.stringify({'query': query})
-		// )
-		// .then((response) => {
-		// 	console.log(response);
-		// 	let allChartData = prepareResponseDataAnomalias(response.data, selectedSensors, sensorsDir);
-		// 	console.log(allChartData);
-		// 	// this.setState({
-		// 	// 	showChart: true,
-		// 	// 	allChartData: allChartData,
-		// 	// 	chartType: chartType,
-		// 	// });
-		// })
-		// .catch((error) => {
-		// 	console.log(error);
-		// 	alert("An error occurred, check the console.log for more info.");
-		// 	this.newQuery();
-		// });
-
-		const querystring = require('querystring');
 		let numberOfResponses = 0;
 		let sensorsResponse = {};
 
+		console.log("First axios call with nResponses: " + numberOfResponses);
+		this.recursiveAnomCall(selectedSensors, numberOfResponses, sensorsResponse, sensorsDir, parMotor, chartType);
+	}
 
-		selectedSensors.forEach((sensorId) => {
-			var query = Queries.getInformationQueryIndividual(sensorId, {}, {}, {}, orderBy);
-			axios.post(usedURL,
-				querystring.stringify({'query': query})
-			)
-			.then((response) => {
-				console.log(response);
-				sensorsResponse[sensorId] = response.data["results"]["bindings"];
-				numberOfResponses++;
-				if (numberOfResponses === selectedSensors.length){
-					console.log("finalizado!, podemos continuar");
-					let allChartData = prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor);
-					console.log(allChartData);
-					this.setState({
-						showChart: true,
-						allChartData: allChartData,
-						chartType: chartType,
-					});
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				alert("An error occurred, check the console.log for more info.");
-				this.newQuery();
-			});
+	recursiveAnomCall(selectedSensors, nResponses, sensorsResponse, sensorsDir, parMotor, chartType){
+		const querystring = require('querystring');
+		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], {}, {}, {}, orderBy);
+		axios.post(usedURL,
+			querystring.stringify({'query': query})
+		)
+		.then((response) => {
+			console.log(response);
+			const sensorId = selectedSensors[nResponses];
+			sensorsResponse[sensorId] = response.data["results"]["bindings"];
+			nResponses++;
+			if (nResponses === selectedSensors.length){
+				console.log("finalizado!, podemos continuar");
+				let allChartData = prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor);
+				console.log(allChartData);
+				this.setState({
+					showChart: true,
+					allChartData: allChartData,
+					chartType: chartType,
+				});
+			}
+			else{
+				console.log("New axios call with nResponse: " + nResponses);
+				this.recursiveAnomCall(selectedSensors, nResponses, sensorsResponse, sensorsDir, parMotor, chartType);
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+			alert("An error occurred, check the console.log for more info.");
+			this.newQuery();
 		});
-
 	}
 
 	newQuery(){
@@ -732,7 +674,7 @@ function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selec
 
 			if (selectValues.length === 1){
 				if (parMotor['parMotorId'] && parMotor['parMotorId'] === sensorId && parMotor['calParMotor'] === true){ // [79PWN7] * 0.00302) * 3.84
-					console.log("Calcular Par Motor.");
+					// console.log("Calcular Par Motor.");
 					let parMotorValue = (parseFloat(result[selectValues[0]]["value"]) * 0.00302) * 3.84;
 					sensorValuesSep[sensorId].push(parMotorValue);
 				}
