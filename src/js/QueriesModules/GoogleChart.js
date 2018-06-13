@@ -13,7 +13,7 @@ export class GoogleChart extends React.Component{
 	   super(props);
 	   const self = this;
 	   this.state = {
-		 convertFunc: getConvertOptionsFunc(self.props.chartType)
+		 convertFunc: getConvertOptionsFunc(this.props.chartType)
 	   };
 	   this.chartEvents = [
 		 {
@@ -23,13 +23,13 @@ export class GoogleChart extends React.Component{
 			 self.setState({convertFunc});
 		   },
 		 },
-		 {
-		  eventName: 'select',
-		  callback(Chart) {
-			  // Returns Chart so you can access props and  the ChartWrapper object from chart.wrapper
-			console.log('Selected ', Chart.chart.getSelection());
-		  },
-	  	},
+		 // {
+		 //  eventName: 'select',
+		 //  callback(Chart) {
+			//   // Returns Chart so you can access props and  the ChartWrapper object from chart.wrapper
+			// console.log('Selected ', Chart.chart.getSelection());
+		 //  },
+	  	// },
 	   ]
 	 }
 
@@ -52,6 +52,17 @@ export class GoogleChart extends React.Component{
 			var axes = {'y':{}};
 			var vAxes = {};
 
+		// series: {
+          //   0: { axis: 'distance' }, // Bind series 0 to an axis named 'distance'.
+          //   1: { axis: 'brightness' } // Bind series 1 to an axis named 'brightness'.
+          // },
+          // axes: {
+          //   x: {
+          //     distance: {label: 'parsecs'}, // Bottom x-axis.
+          //     brightness: {side: 'top', label: 'apparent magnitude'} // Top x-axis.
+          //   }
+          // }
+
 			chartData['y-axis'].forEach((axisValues, i) => {
 				series[i] = {'axis': axisValues[0]};
 				seriesNotMat[i] = {'targetAxisIndex': i};
@@ -68,17 +79,13 @@ export class GoogleChart extends React.Component{
 				options['chart'] = {};
 				options['chart']['title'] = title;
 				options['chart']['subtitle'] = subtitle;
-				// options['hAxis'] = {
-				// 	'gridlines': {
-			   //        // 'count': -1,
-			   //         'units': {
-			   //            'days': {'format': ['MMM dd']},
-			   //            'hours': {'format': ['HH:mm', 'ha']}
-				// 	  }
-				//   }
-		       // };
+				options['hAxis'] = {
+					format: 'MMM dd, HH:mm:ss'
+				};
 				options['series'] = series;
 				options['axes'] = axes;
+				// options['axes']['x'] = {
+				// 	// format: 'M/d/yyy'
 			}
 			else{
 				// For classic
@@ -97,20 +104,15 @@ export class GoogleChart extends React.Component{
 
 				options['title'] = title;
 				options['hAxis'] = {
-					'gridlines': {
-			          // 'count': -1,
-			           'units': {
-			              'days': {'format': ['MMM dd']},
-			              'hours': {'format': ['HH:mm', 'ha']}
-					  }
-				  }
-			   	};
+					format: 'M/d/yy'
+				};
 			   	options['series'] = seriesNotMat;
 			   	options['vAxes'] = vAxes;
 				options['explorer'] = {'axis': 'horizontal','keepInBounds': true};
 			}
 
 			const convertFunc = this.state.convertFunc;
+			console.log(convertFunc);
     		const finalOptions = convertFunc ? convertFunc(options) : options;
 
 			return(
@@ -122,7 +124,7 @@ export class GoogleChart extends React.Component{
 						graph_id={i}
 						width="100%"
 						height="400px"
-						chartEvents={this.state.chartEvents}
+						chartEvents={convertFunc ? null : this.chartEvents}
 					/>
 				</Card>
 			);
@@ -137,7 +139,8 @@ export class GoogleChart extends React.Component{
 }
 
 function getConvertOptionsFunc(chartType) {
-  return window.google && window.google.charts && window.google.charts[chartType]
-    ? window.google.charts[chartType].convertOptions
-    : null;
+	console.log(window.google);
+	return window.google && window.google.charts && window.google.charts[chartType]
+	    ? window.google.charts[chartType].convertOptions
+	    : null;
 }

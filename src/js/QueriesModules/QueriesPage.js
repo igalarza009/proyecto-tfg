@@ -402,49 +402,6 @@ export class SensorsInfo extends React.Component {
 	}
 }
 
-// info: (sensors, groupBy, filter, orderBy, type)
-function prepareResponseData(responseData, info){
-	const results = responseData["results"]["bindings"];
-	let selectedValues = [];
-	let selectDateTime = '';
-	if (info['type'] === 'infor'){
-		if (!info['groupBy']['groupByAll']){
-			if (info['groupBy']['groupBy']){
-				if (info['groupBy']['groupByDate'])
-					selectDateTime = 'resultDate';
-				else if (info['groupBy']['groupByHour'])
-					selectDateTime = 'resultHour';
-
-				if (info['groupBy']['avg'])
-					selectedValues.push('avgValue');
-
-				if (info['groupBy']['min'])
-					selectedValues.push('minValue');
-
-				if (info['groupBy']['max'])
-					selectedValues.push('maxValue');
-			}
-			else {
-				selectedValues.push('resultValue');
-				selectDateTime = "resultTime";
-			}
-		}
-	}
-	else{
-		selectedValues.push('resultValue');
-		selectDateTime = "resultTime";
-	}
-
-	let separateResults = sepResponseInArrays(results, info['sensors'], selectedValues, selectDateTime);
-
-	let sensorValues = separateResults['sensorValues'];
-	let datetimes = separateResults['datetimes'];
-
-	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes);
-
-	return allChartData;
-}
-
 function prepareResponseDataIndividual(sensorsResponse, info){
 	// const results = responseData["results"]["bindings"];
 	let selectedValues = [];
@@ -473,7 +430,6 @@ function prepareResponseDataIndividual(sensorsResponse, info){
 		}
 	}
 	else{
-		console.log("Estoy en el else");
 		selectedValues.push('resultValue');
 		selectDateTime = "resultTime";
 	}
@@ -503,104 +459,18 @@ function prepareResponseDataAnomalias(results, selectedSensors, sensorDir, parMo
 	let datetimes = separateResults['datetimes'];
 	let sensorValues = separateResults['sensorValues'];
 
-	console.log(datetimes);
-	console.log(sensorValues);
+	console.log(separateResults);
 
-	let anomValuesResult = getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes);
+	let anomValuesResult = getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes, parMotor);
 
 	let anomDatetimes = anomValuesResult['anomDatetimes'];
 	let anomValues = anomValuesResult['anomValues'];
 
-	console.log(anomDatetimes);
-	console.log(anomValues);
+	console.log(anomValuesResult);
 
 	let allChartData = prepareDataForGoogleCharts(selectedSensors, selectValues, anomValues, anomDatetimes, {'parMotor': parMotor, 'type': 'anom'});
 
 	return allChartData;
-}
-
-function sepResponseInArrays(results, selectedSensors, selectValues, selectDateTime){
-	let sensorValuesSep = {};
-	let datetimes = [];
-
-	if (selectDateTime === "resultHour"){
-		datetimes.push("Hora");
-	}
-	else if (selectDateTime === "resultDate"){
-		datetimes.push("Fecha");
-	}
-	else if (selectDateTime === "resultTime"){
-		datetimes.push("Fecha y hora");
-	}
-
-	if (selectValues.length === 1){
-		selectedSensors.forEach((sensorId) => {
-			sensorValuesSep[sensorId] = [sensorId];
-		});
-	}
-	else{
-		selectedSensors.forEach((sensorId) => {
-			sensorValuesSep[sensorId] = {};
-			selectValues.forEach((selectValue) => {
-				sensorValuesSep[sensorId][selectValue] = [selectValue];
-			})
-		});
-	}
-
-	results.forEach((result) => {
-		var sensorNameValue = result["sensorName"]["value"];
-		var indexName = sensorNameValue.indexOf('#');
-		var sensorId = sensorNameValue.substring(indexName+7);
-		if (selectDateTime !== '' && selectedSensors[0] === sensorId){
-			var resultDateTimeValue = result[selectDateTime]["value"];
-			var datetime;
-			if (selectDateTime === 'resultDate'){
-				var indexFirstDash = resultDateTimeValue.indexOf('-');
-				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
-				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
-				var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
-				datetime = new Date(year, monthNumber-1, day);
-			}
-			else if (selectDateTime === 'resultHour'){
-				// var indexFirstSep = resultDateTimeValue.indexOf(':');
-				// var hour = parseInt(resultDateTimeValue.substring(0,indexFirstSep),10);
-				// var min = parseInt(resultDateTimeValue.substring(indexFirstSep+1, indexFirstSep+3), 10);
-				// var sec = parseInt(resultDateTimeValue.substring(indexFirstSep+4,indexFirstSep+6),10);
-				// var milsec = parseInt(resultDateTimeValue.substring(indexFirstSep+7,indexFirstSep+10),10);
-				datetime = resultDateTimeValue.substring(0,5);
-				// datetime = new Date (0, 0, 0, hour, min, sec, milsec);
-			}
-			else {
-				var indexFirstDash = resultDateTimeValue.indexOf('-');
-				var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
-				var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
-				var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
-				var indexTime = resultDateTimeValue.indexOf('T');
-				var hour = parseInt(resultDateTimeValue.substring(indexTime+1,indexTime+3),10);
-				var min = parseInt(resultDateTimeValue.substring(indexTime+4, indexTime+6), 10);
-				var sec = parseInt(resultDateTimeValue.substring(indexTime+7, indexTime+9),10);
-				var milsec = parseInt(resultDateTimeValue.substring(indexTime+10,indexTime+13),10);
-				// datetime = resultDateTimeValue;
-				// console.log(resultDateTimeValue);
-				// console.log(year + monthNumber-1 + day + hour + min + sec + milsec);
-				datetime = new Date(year, monthNumber-1, day, hour, min, sec, milsec);
-			}
-		datetimes.push(datetime);
-		}
-
-		if (selectValues.length === 1){
-			sensorValuesSep[sensorId].push(parseFloat(result[selectValues[0]]["value"]));
-		}
-		else{
-			selectValues.forEach((selectValue) => {
-				sensorValuesSep[sensorId][selectValue].push(parseFloat(result[selectValue]["value"]));
-			});
-		}
-	});
-
-	let returnValue = {'sensorValues':sensorValuesSep, 'datetimes':datetimes };
-
-	return returnValue;
 }
 
 function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selectDateTime, parMotor){
@@ -736,20 +606,18 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 		})
 
 		chartFullData['y-axis'] = [];
-		reducedChartData[0].forEach((rowValue, i) => {
-			if (i !== 0){
-				if (info['parMotor'] && info['parMotor']['parMotorId'] === rowValue && info['parMotor']['calParMotor'] === true){
+		selectedSensors.forEach((sensorId, i) => {
+				if (info['parMotor'] && info['parMotor']['parMotorId'] === sensorId && info['parMotor']['calParMotor'] === true){
 					chartFullData['y-axis'].push(['ParMotor', 'Par Motor']);
 				}
 				else{
-					var sensor = _.find(infoSensores, ['indicatorId', rowValue]);
+					var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
 					var axisTitle = sensor['observedProperty'];
 					var unit = sensor['measureUnit'];
 					var axisLabel = axisTitle + " (" + unit + ")"
 					var axisData = [axisTitle, axisLabel];
 					chartFullData['y-axis'].push(axisData);
 				}
-			}
 		});
 
 		chartFullData['data'] = reducedChartData;
@@ -790,12 +658,17 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 	return allChartData;
 }
 
-function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes){
+function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, datetimes, parMotor){
 	let anomDatetimes = [];
 	let anomValues = {}
 
 	selectedSensors.forEach((sensorId) => {
-		anomValues[sensorId] = [sensorId];
+		if (parMotor['parMotorId'] && parMotor['parMotorId'] === sensorId && parMotor['calParMotor'] === true){
+			anomValues[sensorId] = [sensorId + " (Par Motor)"];
+		}
+		else{
+			anomValues[sensorId] = [sensorId];
+		}
 	});
 
 	let primSensor = selectedSensors[0];

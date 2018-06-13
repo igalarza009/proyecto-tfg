@@ -239,12 +239,12 @@ export class InformationQueryForm extends React.Component{
 					/>)
 				: (<div className="switch">
 						<label>
-							Off
+							False
 							<input type="checkbox" disabled={disabled}
 								onChange={(r) => {this.handleSwitch(r,sensorId);}}
 							/>
 							<span className="lever"></span>
-							On
+							True
 						</label>
 					</div>);
 			return(

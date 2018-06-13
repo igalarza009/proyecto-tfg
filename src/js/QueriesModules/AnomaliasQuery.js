@@ -30,7 +30,11 @@ export class AnomaliasQueryForm extends React.Component{
 				let newSensorDir = {};
 		        props.selectedSensors.forEach((sensorId) => {
 		            if (!sensorDir[sensorId]){
-		                newSensorDir[sensorId] = 'up';
+						const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+						if (sensor['resultType'] === 'DoubleValueResult')
+							newSensorDir[sensorId] = 'up';
+						else
+							newSensorDir[sensorId] = 'off';
 		            }
 					else{
 						newSensorDir[sensorId] = sensorDir[sensorId];
@@ -55,7 +59,11 @@ export class AnomaliasQueryForm extends React.Component{
 	resetValues(){
 		let sensorDir = {};
 		this.state.selectedSensors.forEach((sensorId) => {
-            sensorDir[sensorId] = 'up';
+			const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			if (sensor['resultType'] === 'DoubleValueResult')
+				sensorDir[sensorId] = 'up';
+			else
+				sensorDir[sensorId] = 'off';
         });
         this.setState({
             sensorDir: sensorDir,
@@ -84,6 +92,21 @@ export class AnomaliasQueryForm extends React.Component{
           });
 
 		  console.log(sensorDir);
+	}
+
+	handleSwitch(event, sensorId){
+		let sensorDir = this.state.sensorDir;
+		if (sensorDir[sensorId] === 'off'){
+			sensorDir[sensorId] = 'on';
+		}
+		else{
+			sensorDir[sensorId] = 'off';
+		}
+		this.setState({
+		   sensorDir: sensorDir,
+		});
+
+		console.log(sensorDir);
 	}
 
 	handleRadioChange(event, i){
@@ -151,16 +174,29 @@ export class AnomaliasQueryForm extends React.Component{
 						/>
 					</Col>)
 				: (null);
+
+			const valueType = (sensor['resultType'] === 'DoubleValueResult')
+				? (<Button floating className='white'
+						onClick={() => this.handleClick(sensorId)}>
+						{arrowIcon}
+					</Button>)
+				: (<div className="switch">
+						<label>
+							False
+							<input type="checkbox"
+								onChange={(e) => {this.handleSwitch(e,sensorId);}}
+							/>
+							<span className="lever"></span>
+							True
+						</label>
+					</div>);
             return(
                 <Row key={this.props.selectedSensors[i]} className="valign-wrapper">
                     <Col>
                         <p> Sensor {sensorId} ({sensorName}): </p>
                     </Col>
                     <Col>
-                        <Button floating className='white'
-							onClick={() => this.handleClick(sensorId)}>
-                            {arrowIcon}
-                        </Button>
+                        {valueType}
                     </Col>
 					{parMotor}
                 </Row>
