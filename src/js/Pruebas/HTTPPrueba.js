@@ -87,7 +87,7 @@ export class HTTPPrueba extends React.Component {
 		// 	headers: {'Accept': 'text/html'},
 		// })
 
-		const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
+		// const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
 		// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
 
 		// // const query="select distinct ?Concept where {[] a ?Concept} LIMIT 100";
@@ -101,7 +101,7 @@ export class HTTPPrueba extends React.Component {
 		// .catch((error) => {
 		// 	console.log(error);
 		// });
-		console.log(query);
+		// console.log(query);
 
 	}
 	render(){
