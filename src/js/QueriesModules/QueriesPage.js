@@ -22,7 +22,7 @@ const scatterChartName = 'Scatter';
 
 const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
 
-const infoSensores = require('../../infoSensores.json');
+// const infoSensores = require('../../infoSensores.json');
 const sensorIconNames = ['tempIcon', 'resistIcon', 'ventIcon', 'rpmIcon', 'consumoIcon', 'presionIcon', 'tempFundidoIcon'];
 const sensorIconTooltips = {
 	'tempIcon':'Temperatura',
@@ -90,7 +90,8 @@ export class SensorsInfo extends React.Component {
 	}
 
 	renderSensorMap(){
-		const sensors = infoSensores.slice();
+		const sensors = this.props.infoSensores;
+		console.log(sensors);
 		const sensorIcons = sensorIconNames.slice();
 		const selectedSensors = this.state.selectedSensors;
 
@@ -124,7 +125,7 @@ export class SensorsInfo extends React.Component {
 		});
 
 		const selectedSensorsNames = selectedSensors.map((value) => {
-			const sensor = _.find(infoSensores, ['indicatorId', value]);
+			const sensor = _.find(this.props.infoSensores, ['indicatorId', value]);
 			const sensorName = value + ' (' + sensor.name + ')';
 			return(
 				<li key={value}>
@@ -193,7 +194,7 @@ export class SensorsInfo extends React.Component {
 			nResponses++;
 			if (nResponses === selectedSensors.length){
 				console.log("finalizado!, podemos continuar");
-				let allChartData = DataFunctions.prepareResponseDataIndividual(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
+				let allChartData = DataFunctions.prepareResponseDataIndividual(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'}, this.props.infoSensores);
 				console.log(allChartData);
 				this.setState({
 					showChart: true,
@@ -278,7 +279,7 @@ export class SensorsInfo extends React.Component {
 					this.recursiveInforCallSplit(selectedSensors, groupBy, filter, filterValues, actualSensor, sensorFinished, sensorsResponse, selectValue, selectDateTime, chartType, split);
 				}
 				else{ //Finalizado todo de todos los sensores
-					let allChartData = DataFunctions.prepareDataForGoogleChartsSplit(sensorsResponse, selectedSensors, "infor", {});
+					let allChartData = DataFunctions.prepareDataForGoogleChartsSplit(sensorsResponse, selectedSensors, "infor", {}, this.props.infoSensores);
 					console.log(allChartData);
 					this.setState({
 						showChart: true,
@@ -331,7 +332,7 @@ export class SensorsInfo extends React.Component {
 			nResponses++;
 			if (nResponses === askedSensors.length){
 				console.log("finalizado!, podemos continuar");
-				let allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'});
+				let allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'}, this.props.infoSensores);
 				console.log(allChartData);
 				this.setState({
 					showChart: true,
@@ -386,7 +387,7 @@ export class SensorsInfo extends React.Component {
 			nResponses++;
 			if (nResponses === selectedSensors.length){
 				console.log("finalizado!, podemos continuar");
-				let allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor);
+				let allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor, this.props.infoSensores);
 				console.log(allChartData);
 				this.setState({
 					showChart: true,
@@ -446,6 +447,7 @@ export class SensorsInfo extends React.Component {
 		          	getInformationQuery={(s,g,f,fv) => {this.getInformationQuery(s,g,f,fv);}}
 		          	getOtherSensorQuery={(k,a,q) => {this.getOtherSensorQuery(k,a,q);}}
 					getAnomaliasQuery={(s,p) => {this.getAnomaliasQuery(s,p);}}
+					infoSensores={this.props.infoSensores}
 		        />)
 			: (null);
 

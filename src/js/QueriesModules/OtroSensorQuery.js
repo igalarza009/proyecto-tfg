@@ -7,7 +7,7 @@ import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
-const infoSensores = require('../../infoSensores.json');
+// const infoSensores = require('../../infoSensores.json');
 
 export class OtroSensorQueryForm extends React.Component{
 	constructor(props){
@@ -195,7 +195,7 @@ export class OtroSensorQueryForm extends React.Component{
 		const Range = createSliderWithTooltip(Slider.Range);
 
 		const checkboxesSensores = selectedSensors.map((sensorId, i) => {
-			const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 			const defChecked = (i === 0)
 				? (true)
 				: (false);
@@ -211,7 +211,7 @@ export class OtroSensorQueryForm extends React.Component{
 
 		let restoSensores = selectedSensors.map((sensorId, i) => {
 			if (askedSensors.indexOf(sensorId) === -1){
-				const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+				const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 				const sensorName = sensorId + ' (' + sensor.name + ')';
 				const minValue = sensor["minValue"];
 				const maxValue = sensor["maxValue"];

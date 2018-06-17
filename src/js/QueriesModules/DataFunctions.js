@@ -1,10 +1,10 @@
 var _ = require('lodash');
-const infoSensores = require('../../infoSensores.json');
+// const infoSensores = require('../../infoSensores.json');
 const maxChartPoints = 4500;
 const reducDataValues = 1000;
 
 // Prepare data of Information and Relation queries
-export function prepareResponseData(sensorsResponse, info){
+export function prepareResponseData(sensorsResponse, info, infoSensores){
 	// const results = responseData["results"]["bindings"];
 	let selectedValues = [];
 	let selectDateTime = '';
@@ -43,14 +43,14 @@ export function prepareResponseData(sensorsResponse, info){
 	let sensorValues = parsedResults['sensorValues'];
 	let datetimes = parsedResults['datetimes'];
 
-	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']});
+	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']}, infoSensores);
 
 	console.log(allChartData);
 
 	return allChartData;
 }
 
-export function prepareResponseDataIndividual(sensorsResponse, info){
+export function prepareResponseDataIndividual(sensorsResponse, info, infoSensores){
 	// const results = responseData["results"]["bindings"];
 	let selectedValues = [];
 	let selectDateTime = '';
@@ -89,7 +89,7 @@ export function prepareResponseDataIndividual(sensorsResponse, info){
 	let sensorValues = parsedResults['sensorValues'];
 	let datetimes = parsedResults['datetimes'];
 
-	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']});
+	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']}, infoSensores);
 
 	console.log(allChartData);
 
@@ -167,7 +167,7 @@ export function prepareResponseDataSplit(response, sensorId, calcDatetimes, sele
 // }
 
 // Prepare data for Anomalias queries
-export function prepareResponseDataAnomalias(results, selectedSensors, sensorDir, parMotor){
+export function prepareResponseDataAnomalias(results, selectedSensors, sensorDir, parMotor, infoSensores){
 	// const results = response["results"]["bindings"];
 
 	let selectValues = ["resultValue"];
@@ -187,7 +187,7 @@ export function prepareResponseDataAnomalias(results, selectedSensors, sensorDir
 
 	console.log(anomValuesResult);
 
-	let allChartData = prepareDataForGoogleCharts(selectedSensors, selectValues, anomValues, anomDatetimes, {'parMotor': parMotor, 'type': 'anom'});
+	let allChartData = prepareDataForGoogleCharts(selectedSensors, selectValues, anomValues, anomDatetimes, {'parMotor': parMotor, 'type': 'anom'}, infoSensores);
 
 	return allChartData;
 }
@@ -345,7 +345,7 @@ export function parseSensorValuesSplit(response, sensorId, calcDatetimes, select
 	return {'values':parsedValues, 'datetimes':datetimes, 'lastTimestamp':lastTimestamp };
 }
 
-function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes, info){
+function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes, info, infoSensores){
 	//info: parMotor, type
 	let allChartData = [];
 
@@ -440,7 +440,7 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 	return allChartData;
 }
 
-export function prepareDataForGoogleChartsSplit(sensorsResponse, selectedSensors, type, parMotor){
+export function prepareDataForGoogleChartsSplit(sensorsResponse, selectedSensors, type, parMotor, infoSensores){
 	//info: parMotor, type
 	let allChartData = [];
 

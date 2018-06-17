@@ -46,18 +46,21 @@ export class PruebaTabsMat extends React.Component {
 					 <InformationQueryForm
 			             selectedSensors={selectedSensors}
 			             getInformationQuery={(s,g,f,fv) => {this.props.getInformationQuery(s,g,f,fv);}}
+						 infoSensores={this.props.infoSensores}
 			         />
 				 </div>
 				 <div id="otro" className="col s12">
 					 <OtroSensorQueryForm
 			             selectedSensors={selectedSensors}
 			             getOtherSensorQuery={(k,a,f) => {this.props.getOtherSensorQuery(k,a,f);}}
+						 infoSensores={this.props.infoSensores}
 			         />
 				 </div>
 				 <div id="anom" className="col s12">
 					 <AnomaliasQueryForm
 			             selectedSensors={selectedSensors}
 						 getAnomaliasQuery={(s,p) => {this.props.getAnomaliasQuery(s,p);}}
+						 infoSensores={this.props.infoSensores}
 			         />
 				 </div>
 			 </div>

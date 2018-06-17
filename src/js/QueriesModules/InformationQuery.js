@@ -7,7 +7,7 @@ import 'rc-slider/assets/index.css';
 import $ from 'jquery';
 
 var _ = require('lodash');
-const infoSensores = require('../../infoSensores.json');
+// const infoSensores = require('../../infoSensores.json');
 
 export class InformationQueryForm extends React.Component{
 	constructor(props){
@@ -217,7 +217,7 @@ export class InformationQueryForm extends React.Component{
 			: (false);
 
 		const filtrarValores = selectedSensors.map((sensorId) => {
-			const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 			const sensorName = sensor['name'];
 			const labelCheckbox = "Sensor " + sensorId + " (" + sensorName + ") : ";
 			const minValue = sensor["minValue"];

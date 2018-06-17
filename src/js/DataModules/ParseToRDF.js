@@ -1,7 +1,7 @@
-const infoSensores = require('../../infoSensores.json');
+// const infoSensores = require('../../infoSensores.json');
 const graphURI = "<http://www.sensores.com/ontology/prueba04/extrusoras#>";
 
-export function parseDataToRDF(filename, data){
+export function parseDataToRDF(filename, data, infoSensores){
 
 	var _ = require('lodash');
 

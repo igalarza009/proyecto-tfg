@@ -6,7 +6,7 @@ import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
-const infoSensores = require('../../infoSensores.json');
+// const infoSensores = require('../../infoSensores.json');
 const paresValores = require('../../paresValores.json');
 
 const parMotorId = '79PWN7';
@@ -30,7 +30,7 @@ export class AnomaliasQueryForm extends React.Component{
 				let newSensorDir = {};
 		        props.selectedSensors.forEach((sensorId) => {
 		            if (!sensorDir[sensorId]){
-						const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+						const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 						if (sensor['resultType'] === 'DoubleValueResult')
 							newSensorDir[sensorId] = 'up';
 						else
@@ -59,7 +59,7 @@ export class AnomaliasQueryForm extends React.Component{
 	resetValues(){
 		let sensorDir = {};
 		this.state.selectedSensors.forEach((sensorId) => {
-			const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 			if (sensor['resultType'] === 'DoubleValueResult')
 				sensorDir[sensorId] = 'up';
 			else
@@ -161,7 +161,7 @@ export class AnomaliasQueryForm extends React.Component{
 		const relType = this.state.relType;
 
         const sensores = selectedSensors.map((sensorId, i) => {
-            const sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+            const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 			const sensorName = sensor.name;
             const arrowIcon = (sensorDir[sensorId] === 'up')
                 ? (<Icon className='blue-text text-darken-3'> arrow_upward </Icon>)
