@@ -53,7 +53,7 @@
 	},
     {
 		"indicatorId":"VMTKD6",
-		"name":"Temperatura de fundido",
+		"name":"Temperatura Fundido",
 		"class":"tempFundido",
 		"sensorType":"MeltingTemperatureSensor",
 		"observationType":"MeltingTemperatureObservation",

@@ -242,9 +242,9 @@ export class ParseData extends React.Component {
 					</Col>
 
 				</Row>
-			{/* <Row>
+			<Row>
 				<HTTPPrueba />
-			</Row> */}
+			</Row>
 		</div>
 		)
 	}

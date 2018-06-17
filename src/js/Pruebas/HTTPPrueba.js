@@ -6,6 +6,11 @@ import {Row, Col, Button, Card} from 'react-materialize'
 import M from 'materialize-css';
 import axios from 'axios';
 
+const virtuosoURL = 'http://localhost:8890/sparql';
+const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
+const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
+const usedURL = RESTfulURLGetQuery;
+
 export class HTTPPrueba extends React.Component {
 	constructor(props){
 		super(props);
@@ -33,75 +38,70 @@ export class HTTPPrueba extends React.Component {
 	}
 
 	handleClickQuery(){
-		let sensors = ['79PWN7', '2F1KT7'];
-		let groupBy = {
-		 	'groupBy': false,
-			'groupByDate': false,
-			'groupByHour': false,
-			'avg': false,
-			'min': false,
-			'max': false
-		};
-
-		let filter = {
-			'filter': false,
-			'filterDate': false,
-			'startDate': '2018-03-01',
-			'endDate': '2018-03-31',
-			'filterTime': false,
-			'startTime': '12:00:00',
-			'endTime': '16:59:59'
-		};
-
-		let filterValues = {
-			'filter': true,
-			'values': {
-				'2F1KT7': [196, 200],
-				'79PWN7': [18000, 20000]
-			}
-		}
-
-		let orderBy = {
-			'orderBy': true,
-			'order': 'desc',
-			'orderField': 'dateTime'
-		};
-
-		let knownSensors = {
-			'2F1KT7': 'max',
-			'649NNJ': 183
-		};
-
-		let askedSensors = ['VMTKD6'];
-
-		let quitarAnomalias = true;
-
-		let orderByDate = true;
-
-		// axios.get('http://localhost:8890/sparql?query=' + encodeURIComponent(query),{
-		// 	headers: {'Accept': 'text/html'},
-		// })
+		let query = 'prefix : <http://www.sensores.com/ontology/prueba05/extrusoras#> ' +
+				'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
+				'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
+				'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
+				'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
+				'prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#> ' +
+				'select ?sensorId ?name ?class ?sensorType ?observationType ?resultType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
+				'from <http://www.sensores.com/ontology/prueba05/extrusoras#> ' +
+				'where { ' +
+				    '{ ?sensorType rdfs:subClassOf :DoubleValueSensor . } ' +
+				     'union ' +
+				    '{ ?sensorType rdfs:subClassOf :BooleanSensor . } ' +
+				    '?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+				                                    'owl:onProperty sosa:madeObservation ; ' +
+				                                    'owl:allValuesFrom ?observationType ' +
+				                                '] . ' +
+				    '?observationType rdf:type owl:Class ; ' +
+							        'rdfs:subClassOf ?metaObservationType . ' +
+					'?metaObservationType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+							                                'owl:onProperty sosa:hasResult ; ' +
+							                                'owl:allValuesFrom ?resultType ' +
+							                             '] . ' +
+				    'optional { ' +
+				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+				                                        'owl:onProperty sosa:observes ; ' +
+				                                        'owl:hasValue ?observedProperty ' +
+				                                    '] . ' +
+				    '} ' +
+				     'optional { ' +
+				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+				                                        'owl:onProperty qu:unit ; ' +
+				                                        'owl:hasValue ?measureUnit ' +
+				                                    '] . ' +
+				    '} ' +
+				    'optional { ' +
+				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+				                                        'owl:onProperty :maxValue ; ' +
+				                                        'owl:hasValue ?maxValue ' +
+				                                    '] , ' +
+				                                    '[ rdf:type owl:Restriction ; ' +
+				                                        'owl:onProperty :minValue ; ' +
+				                                        'owl:hasValue ?minValue ' +
+				                                    '] . ' +
+				    '} ' +
+				    '?sensorName rdf:type ?sensorType ; ' +
+				                'rdf:type owl:NamedIndividual ; ' +
+				                ':indicatorId ?sensorId ; ' +
+				                ':sensorName ?name ; ' +
+				                ':htmlClass ?class . ' +
+				    'optional { ?sensorName :zone ?zone . } ' +
+				'} ';
 
 		// const querystring = require('querystring');
-		// axios.post('http://localhost:8890/sparql', querystring.stringify({'query': query}),{
-		// 	headers: {'Accept': 'text/html'},
-		// })
-
-		// const query = Queries.getInformationQuery(sensors, groupBy, filter, filterValues, orderBy);
-		// const query = Queries.getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderByDate);
-
-		// // const query="select distinct ?Concept where {[] a ?Concept} LIMIT 100";
-		// const getURL = "http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query?query=";
-		// const encodedQuery = getURL + encodeURIComponent(query);
-		// alert(encodedQuery);
-		// axios.get(encodedQuery)
-		// .then((response) => {
-		// 	console.log(response);
-		// })
-		// .catch((error) => {
-		// 	console.log(error);
-		// });
-		// console.log(query);
+		// console.log(usedURL + encodeURIComponent(query));
+		axios.get(usedURL + encodeURIComponent(query)
+		)
+		.then((response) => {
+			console.log(response);
+			let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
+			console.log(infoSensores);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
 
 	}
 	render(){
@@ -114,14 +114,75 @@ export class HTTPPrueba extends React.Component {
 							Prueba Query
 						</Button>
 					</Col>
-					<Col s={12} l={6}>
-						<Button className='purple lighten-1' onClick={this.handleClickHello}>
-							Prueba Hello
-						</Button>
-					</Col>
 				</Row>
 
 			</Card>
 		)
 	}
+}
+
+function getInfoSensores(results){
+	let infoSensores = [];
+	results.forEach((object) => {
+		var infoSensor = {};
+
+		infoSensor['indicatorId'] = object['sensorId']['value'];
+		infoSensor['name'] = object['name']['value'];
+		infoSensor['class'] = object['class']['value'];
+
+		var sensType = object['sensorType']['value'];
+		var iSensType = sensType.indexOf('#');
+		var sensTypeParsed = sensType.substring(iSensType+1, sensType.length);
+		infoSensor['sensorType'] = sensTypeParsed;
+
+		var obsType = object['observationType']['value'];
+		var iObsType = obsType.indexOf('#');
+		var obsTypeParsed = obsType.substring(iObsType+1, obsType.length);
+		infoSensor['observationType'] = obsTypeParsed;
+
+		var resType = object['resultType']['value'];
+		var iResType = resType.indexOf('#');
+		var resTypeParsed = resType.substring(iResType+1, resType.length);
+		infoSensor['resultType'] = resTypeParsed;
+
+		if (object['zone']){
+			infoSensor['zone'] = object['zone']['value'];
+		}
+		else{
+			infoSensor['zone'] = '';
+		}
+
+		if (object['observedProperty']){
+			var obsProp = object['observedProperty']['value'];
+			var iObsProp = obsProp.indexOf('#');
+			var obsPropParsed = obsProp.substring(iObsProp+1, obsProp.length);
+			infoSensor['observedProperty'] = obsPropParsed;
+		}
+		else{
+			infoSensor['observedProperty'] = '';
+		}
+
+		if (object['measureUnit']){
+			var unit = object['measureUnit']['value'];
+			var iUnit = unit.indexOf('#');
+			var unitParsed = unit.substring(iUnit+1, unit.length);
+			infoSensor['measureUnit'] = unitParsed;
+		}
+		else{
+			infoSensor['measureUnit'] = '';
+		}
+
+		if (object['minValue']){
+			infoSensor['minValue'] = parseInt(object['minValue']['value'], 10);
+			infoSensor['maxValue'] = parseInt(object['maxValue']['value'], 10);
+		}
+		else{
+			infoSensor['minValue'] = '';
+			infoSensor['maxValue'] = '';
+		}
+
+		infoSensores.push(infoSensor);
+	});
+
+	return infoSensores;
 }
