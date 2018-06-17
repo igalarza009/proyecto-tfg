@@ -1,6 +1,7 @@
 var _ = require('lodash');
 const infoSensores = require('../../infoSensores.json');
 const maxChartPoints = 4500;
+const reducDataValues = 1000;
 
 // Prepare data of Information and Relation queries
 export function prepareResponseData(sensorsResponse, info){
@@ -122,6 +123,7 @@ export function prepareVariablesSplit(selectedSensors, groupBy, filter, orderBy,
 			else {
 				selectValue = 'resultValue';
 				selectDateTime = "resultTime";
+				sensorsResponse['datetimes'] = ['Fecha y Hora'];
 			}
 		}
 	}
@@ -145,9 +147,12 @@ export function prepareResponseDataSplit(response, sensorId, calcDatetimes, sele
 
 	// console.log(parsedResults);
     //
-	// let sensorValues = parsedResults['sensorValues'];
-	// let datetimes = parsedResults['datetimes'];
-    //
+	let sensorValues = parsedResults['values'];
+	let datetimes = parsedResults['datetimes'];
+	let lastTimestamp = parsedResults['lastTimestamp'];
+
+	// let reducedParsedResults = reduceParsedResultsSplit(sensorValues, datetimes);
+
 	// let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']});
     //
 	// console.log(allChartData);
@@ -156,6 +161,10 @@ export function prepareResponseDataSplit(response, sensorId, calcDatetimes, sele
 
     return parsedResults;
 }
+
+// function reduceParsedResultsSplit(sensorValues, datetimes){
+//
+// }
 
 // Prepare data for Anomalias queries
 export function prepareResponseDataAnomalias(results, selectedSensors, sensorDir, parMotor){
@@ -274,7 +283,7 @@ function parseSensorValues(sensorsResponse, selectedSensors, selectValues, selec
 	return {'sensorValues':sensorValuesSep, 'datetimes':datetimes };
 }
 
-function parseSensorValuesSplit(response, sensorId, calcDatetimes, selectValue, selectDateTime, parMotor){
+export function parseSensorValuesSplit(response, sensorId, calcDatetimes, selectValue, selectDateTime, parMotor){
     let datetimes = [];
     let parsedValues = [];
     let lastTimestamp = '';
@@ -427,6 +436,68 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 			allChartData.push(chartFullData);
 		});
 	}
+
+	return allChartData;
+}
+
+export function prepareDataForGoogleChartsSplit(sensorsResponse, selectedSensors, type, parMotor){
+	//info: parMotor, type
+	let allChartData = [];
+
+	let dataToZip = [sensorsResponse['datetimes']];
+
+	selectedSensors.forEach((sensorId) => {
+		dataToZip.push(sensorsResponse[sensorId]);
+	});
+
+	let chartData = _.zip.apply(_,dataToZip);
+
+	console.log(chartData);
+
+	let reducedChartData = reduceChartPoints(chartData, maxChartPoints);
+
+	let chartFullData = {};
+
+	let title;
+	if (type==='infor'){
+		title = 'Información general.';
+	}
+	else if (type==='otro'){
+		title = 'Relación entre sensores.';
+	}
+	else{
+		title = 'Búsqueda de anomalías.';
+	}
+	chartFullData['title'] = title;
+
+	chartFullData['subtitle'] = "";
+	selectedSensors.forEach((sensorId, i) => {
+		if (i !== (selectedSensors.length - 1)){
+			chartFullData['subtitle'] += sensorId + ", ";
+		}
+		else{
+			chartFullData['subtitle'] += sensorId;
+		}
+	})
+
+	chartFullData['y-axis'] = [];
+	selectedSensors.forEach((sensorId, i) => {
+			if (parMotor['parMotorId'] && parMotor['parMotorId'] === sensorId && parMotor['calParMotor'] === true){
+				chartFullData['y-axis'].push(['ParMotor', 'Par Motor']);
+			}
+			else{
+				var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+				var axisTitle = sensor['observedProperty'];
+				var unit = sensor['measureUnit'];
+				var axisLabel = axisTitle + " (" + unit + ")"
+				var axisData = [axisTitle, axisLabel];
+				chartFullData['y-axis'].push(axisData);
+			}
+	});
+
+	chartFullData['data'] = reducedChartData;
+
+	allChartData.push(chartFullData);
 
 	return allChartData;
 }

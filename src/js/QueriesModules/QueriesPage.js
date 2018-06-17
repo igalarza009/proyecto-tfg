@@ -159,6 +159,7 @@ export class SensorsInfo extends React.Component {
 	}
 
 	getInformationQuery(sensors, groupBy, filter, filterValues){
+		console.log("Tiempo inicio " + Date.now());
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -199,6 +200,7 @@ export class SensorsInfo extends React.Component {
 					allChartData: allChartData,
 					chartType: chartType,
 				});
+				console.log("Tiempo fin " + Date.now());
 			}
 			else{
 				console.log("New axios call with nResponse: " + nResponses);
@@ -213,6 +215,8 @@ export class SensorsInfo extends React.Component {
 	}
 
 	getInformationQuerySplit(sensors, groupBy, filter, filterValues){
+		console.log("Tiempo inicio " + Date.now());
+
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -233,7 +237,9 @@ export class SensorsInfo extends React.Component {
 	    let selectValue = variables['selectValue'];
 	    let selectDateTime = variables['selectDateTime'];
 
-		let split = {firstSegment: true, lastTimestamp: '', limit:100000};
+		console.log(variables);
+
+		let split = {firstSegment: true, lastTimestamp: '', limit:10000};
 
 		this.recursiveInforCallSplit(sensors, groupBy, filter, filterValues, actualSensor, sensorFinished, sensorsResponse, selectValue, selectDateTime, chartType, split);
 	}
@@ -241,7 +247,7 @@ export class SensorsInfo extends React.Component {
 	recursiveInforCallSplit(selectedSensors, groupBy, filter, filterValues, actualSensor, sensorFinished, sensorsResponse, selectValue, selectDateTime, chartType, split){
 		const querystring = require('querystring');
 		var query = Queries.getInformationQueryIndividualSplit(selectedSensors[actualSensor], groupBy, filter, filterValues, orderBy, split);
-		console.log(query);
+		// console.log(query);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
@@ -252,12 +258,15 @@ export class SensorsInfo extends React.Component {
 			if (actualSensor === 0){
 				calcDatetimes = true;
 			}
-			let parsedResults = DataFunctions.prepareResponseDataSplit(response.data["results"]["bindings"], sensorId, calcDatetimes, selectValue, selectDateTime);
+
+			let parsedResults = DataFunctions.parseSensorValuesSplit(response.data["results"]["bindings"], sensorId, calcDatetimes, selectValue, selectDateTime, {});
 
 			if (parsedResults['values'].length > 0){
-				sensorsResponse[sensorId].concat(parsedResults['values']);
-				if (actualSensor === 0){
-					sensorsResponse['datetimes'].concat(parsedResults['datetimes']);
+				let newResponse = sensorsResponse[sensorId].concat(parsedResults['values']);
+				sensorsResponse[sensorId] = newResponse;
+				if (calcDatetimes){
+					let newDatetimes = sensorsResponse['datetimes'].concat(parsedResults['datetimes']);
+					sensorsResponse['datetimes'] = newDatetimes;
 				}
 			}
 
@@ -269,32 +278,23 @@ export class SensorsInfo extends React.Component {
 					this.recursiveInforCallSplit(selectedSensors, groupBy, filter, filterValues, actualSensor, sensorFinished, sensorsResponse, selectValue, selectDateTime, chartType, split);
 				}
 				else{ //Finalizado todo de todos los sensores
-
+					let allChartData = DataFunctions.prepareDataForGoogleChartsSplit(sensorsResponse, selectedSensors, "infor", {});
+					console.log(allChartData);
+					this.setState({
+						showChart: true,
+						allChartData: allChartData,
+						chartType: chartType,
+					});
+					console.log("Tiempo fin " + Date.now());
 				}
-
 			}
 			else{ //Seguir con sensor actual
+				split['firstSegment'] = false;
 				split['lastTimestamp'] = parsedResults['lastTimestamp'];
+				// console.log(parsedResults);
+				// console.log(split);
 				this.recursiveInforCallSplit(selectedSensors, groupBy, filter, filterValues, actualSensor, sensorFinished, sensorsResponse, selectValue, selectDateTime, chartType, split);
 			}
-
-			// const sensorId = selectedSensors[nResponses];
-			// sensorsResponse[sensorId] = response.data["results"]["bindings"];
-			// nResponses++;
-			// if (nResponses === selectedSensors.length){
-			// 	console.log("finalizado!, podemos continuar");
-			// 	let allChartData = prepareResponseData(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'});
-			// 	console.log(allChartData);
-			// 	this.setState({
-			// 		showChart: true,
-			// 		allChartData: allChartData,
-			// 		chartType: chartType,
-			// 	});
-			// }
-			// else{
-			// 	console.log("New axios call with nResponse: " + nResponses);
-			// 	this.recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse, chartType, split);
-			// }
 		})
 		.catch((error) => {
 			console.log(error);
@@ -309,7 +309,7 @@ export class SensorsInfo extends React.Component {
 			loadingQuery: true,
 		});
 
-		let chartType = barChartName;
+		let chartType = scatterChartName;
 
 		const querystring = require('querystring');
 		let numberOfResponses = 0;

@@ -1,3 +1,59 @@
+==================================== GET VALUES FROM ONTOLOGY ====================================
+
+prefix : <http://www.sensores.com/ontology/prueba05/extrusoras#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix sosa: <http://www.w3.org/ns/sosa/>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#>
+
+select ?sensorId ?name ?class ?sensorType ?observationType ?resultType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue
+from <http://www.sensores.com/ontology/prueba05/extrusoras#>
+where {
+    { ?sensorType rdfs:subClassOf :DoubleValueSensor . }
+     union
+    { ?sensorType rdfs:subClassOf :BooleanSensor . }
+
+    ?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                    owl:onProperty sosa:madeObservation ;
+                                    owl:allValuesFrom ?observationType
+                                ] .
+    ?observationType rdf:type owl:Class ;
+			        rdfs:subClassOf ?metaObservationType .
+	?metaObservationType rdfs:subClassOf [ rdf:type owl:Restriction ;
+			                                owl:onProperty sosa:hasResult ;
+			                                owl:allValuesFrom ?resultType
+			                             ] .
+    optional {
+    	?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                        owl:onProperty sosa:observes ;
+                                        owl:hasValue ?observedProperty
+                                    ] .
+    }
+     optional {
+    	?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                        owl:onProperty qu:unit ;
+                                        owl:hasValue ?measureUnit
+                                    ] .
+    }
+    optional {
+    	?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                        owl:onProperty :maxValue ;
+                                        owl:hasValue ?maxValue
+                                    ] ,
+                                    [ rdf:type owl:Restriction ;
+                                        owl:onProperty :minValue ;
+                                        owl:hasValue ?minValue
+                                    ] .
+    }
+    ?sensorName rdf:type ?sensorType ;
+                rdf:type owl:NamedIndividual ;
+                :indicatorId ?sensorId ;
+                :sensorName ?name ;
+                :htmlClass ?class .
+    optional { ?sensorName :zone ?zone .}
+}
+
 ==================================== INFORMATION QUERIES ====================================
 
 --------------- Todos los valores de todos los sensores disponibles ---------------
@@ -151,7 +207,7 @@ from <http://www.sensores.com/ontology/prueba03/extrusoras#>
 where {
     <#sensor2F1KT7> sosa:madeObservation ?knownObs1 .
     ?knownObs1 sosa:hasResult/sosa:hasSimpleResult "195.5"^^xsd:double .
-    ?knownObs1 sosa:resultTime ?resultTime . 
+    ?knownObs1 sosa:resultTime ?resultTime .
     {
        <#sensorVMTKD6> sosa:madeObservation ?askedObs .
        ?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue .
@@ -245,8 +301,8 @@ where {
     }
     union
     {
-    	<#sensorVMTKD6> sosa:madeObservation ?obsName . 
-    	bind(<#sensorVMTKD6> as ?sensorName) 
+    	<#sensorVMTKD6> sosa:madeObservation ?obsName .
+    	bind(<#sensorVMTKD6> as ?sensorName)
     }
     ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
     ?obsName sosa:resultTime ?resultTime .
@@ -272,8 +328,8 @@ where {
     }
     union
     {
-        <#sensorVMTKD6> sosa:madeObservation ?obsName . 
-        bind(<#sensorVMTKD6> as ?sensorName) 
+        <#sensorVMTKD6> sosa:madeObservation ?obsName .
+        bind(<#sensorVMTKD6> as ?sensorName)
     }
     ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
     ?obsName sosa:resultTime ?resultTime .
@@ -301,8 +357,8 @@ where {
     }
     union
     {
-        <#sensorVMTKD6> sosa:madeObservation ?obsName . 
-        bind(<#sensorVMTKD6> as ?sensorName) 
+        <#sensorVMTKD6> sosa:madeObservation ?obsName .
+        bind(<#sensorVMTKD6> as ?sensorName)
     }
     ?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue .
     ?obsName sosa:resultTime ?resultTime .
@@ -328,7 +384,7 @@ from <http://www.sensores.com/ontology/prueba03/extrusoras#>
 where {
     <#sensor2F1KT7> sosa:madeObservation ?knownObs1 .
     ?knownObs1 sosa:hasResult/sosa:hasSimpleResult "195.5"^^xsd:double .
-    ?knownObs1 sosa:resultTime ?resultTime . 
+    ?knownObs1 sosa:resultTime ?resultTime .
     {
        <#sensorVMTKD6> sosa:madeObservation ?askedObs .
        ?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue .

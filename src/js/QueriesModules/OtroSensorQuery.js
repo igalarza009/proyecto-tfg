@@ -22,6 +22,22 @@ export class OtroSensorQueryForm extends React.Component{
 		};
 	}
 
+	componentDidMount(){
+		const askedSensors = this.state.askedSensors;
+		const selectedSensors = this.state.selectedSensors;
+		const knownSensors = this.state.knownSensors;
+		let newKnownSensors = {};
+		selectedSensors.forEach((value,i) => {
+			if (askedSensors.indexOf(value) === -1){
+				newKnownSensors[value] = 0;
+			}
+		});
+
+		this.setState({
+			knownSensors: newKnownSensors,
+		});
+	}
+
 	static getDerivedStateFromProps(props, state){
         if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
 			const knownSensors = state.knownSensors;
@@ -161,6 +177,8 @@ export class OtroSensorQueryForm extends React.Component{
 				filterValues['values'][sensorId] = values[sensorId];
 			});
 		}
+
+		// this.resetValues();
 
 		this.props.getOtherSensorQuery(knownSensors, askedSensors, filterValues);
 	}

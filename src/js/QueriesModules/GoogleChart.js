@@ -80,8 +80,11 @@ export class GoogleChart extends React.Component{
 				options['chart']['title'] = title;
 				options['chart']['subtitle'] = subtitle;
 				options['hAxis'] = {
-					format: 'MMM dd'
+					format: 'MMM dd (HH:mm:ss)'
 				};
+				options['vAxis'] = {
+					format: 'decimal'
+				}
 				options['series'] = series;
 				options['axes'] = axes;
 				// options['axes']['x'] = {
