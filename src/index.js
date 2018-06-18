@@ -9,6 +9,8 @@ import {ParseData} from './js/DataModules/DataPage.js'
 import M from 'materialize-css';
 import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
 import axios from 'axios';
+import {Card} from 'react-materialize'
+import $ from 'jquery';
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
@@ -26,6 +28,8 @@ class SelectedPage extends React.Component {
 	}
 
 	componentDidMount(){
+		$(".button-collapse").sideNav();
+
 		// let infoSensores = {};
 		let query = 'prefix : <http://www.sensores.com/ontology/prueba05/extrusoras#> ' +
 				'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
@@ -89,6 +93,7 @@ class SelectedPage extends React.Component {
 			console.log(response);
 			let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
 			// console.log(infoSensores);
+			// alert('datos recibidos');
 			this.setState({
 				infoSensores: infoSensores,
 				selectedPage: 'preguntas',
@@ -125,7 +130,11 @@ class SelectedPage extends React.Component {
 		// 	: (<ParseData infoSensores={infoSensores}/>);
 
 		const cargando = (selectedPage === 'cargando')
-			? (<p>Cargando... </p>)
+			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
+					<img className='loading' alt='Cargando...'
+						src={require('./img/loading_bars.gif')}
+					/>
+				</Card>)
 			: (null);
 
 		const queries = (selectedPage === 'preguntas')
@@ -136,29 +145,68 @@ class SelectedPage extends React.Component {
 			? (<ParseData infoSensores={infoSensores}/>)
 			: (null);
 
-		const preguntasClass = (selectedPage === 'preguntas')
-			? ("active")
-			: ("");
+		// let preguntasDisabled = '';
+		// let traductorDisabled = '';
+		//
+		// if (selectedPage === 'cargando'){
+		// 	preguntasDisabled = preguntasDisabled + 'disabled ';
+		// 	traductorDisabled = traductorDisabled + 'disabled ';
+		// }
 
-		const traductorClass = (selectedPage === 'preguntas')
-			? ("")
-			: ("active");
+		let preguntasClass = '';
+		let traductorClass = '';
+
+		if (selectedPage === 'preguntas'){
+			preguntasClass = preguntasClass + 'active ';
+		}
+
+		if (selectedPage === 'datos'){
+			traductorClass = traductorClass + 'active ';
+		}
+
+		const navBar = (selectedPage === 'cargando')
+			? (<div className="nav-wrapper">
+					<a href="#" className="brand-logo center">Información sobre sensores</a>
+				</div>)
+			: (<div className="nav-wrapper">
+					<a href="#" className="brand-logo center">Información sobre sensores</a>
+					<a href="#" data-activates="mobile-demo" className="button-collapse">
+						<i className="material-icons">menu</i>
+					</a>
+					<ul id="nav-mobile" className="left hide-on-med-and-down">
+						<li className={preguntasClass}>
+							<a href="#" onClick={() => this.mostrarPreguntas()}>
+								Preguntas
+							</a>
+						</li>
+						<li className={traductorClass}>
+							<a href="#" onClick={() => this.mostrarTraductorDatos()}>
+								Traductor datos
+							</a>
+						</li>
+					</ul>
+					<ul id="mobile-demo" className="side-nav">
+						<li className={preguntasClass}>
+							<a href="#" onClick={() => this.mostrarPreguntas()}>
+								Preguntas
+							</a>
+						</li>
+						<li className={traductorClass}>
+							<a href="#" onClick={() => this.mostrarTraductorDatos()}>
+								Traductor datos
+							</a>
+						</li>
+					</ul>
+				</div>);
 
 		return(
 			<div>
 				<div className='navBar'>
 					<nav className='blue darken-3'>
-					    <div className="nav-wrapper">
-					      	<a href="#" className="brand-logo center">Información sobre sensores</a>
-					       	<ul id="nav-mobile" className="left hide-on-med-and-down">
-					        	<li className={preguntasClass}><a href="#" onClick={() => this.mostrarPreguntas()}>Preguntas</a></li>
-					        	<li className={traductorClass}><a href="#" onClick={() => this.mostrarTraductorDatos()}>Traductor datos</a></li>
-					      	</ul>
-					    </div>
+					    {navBar}
 					</nav>
 				</div>
 				<div className='container'>
-					{/* {contenido} */}
 					{cargando}
 					{queries}
 					{datos}
