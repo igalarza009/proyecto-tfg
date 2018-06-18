@@ -19,13 +19,14 @@ class SelectedPage extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			preguntasSelected: this.getInfoSensores(),
-			infoSensores: {},
+			preguntasSelected: {},
+			infoSensores: [],
+			selectedPage: 'cargando',
 		};
 	}
 
-	getInfoSensores(){
-		let infoSensores = {};
+	componentDidMount(){
+		// let infoSensores = {};
 		let query = 'prefix : <http://www.sensores.com/ontology/prueba05/extrusoras#> ' +
 				'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
 				'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
@@ -86,44 +87,60 @@ class SelectedPage extends React.Component {
 		)
 		.then((response) => {
 			console.log(response);
-			infoSensores = getInfoSensores(response.data["results"]["bindings"]);
+			let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
 			// console.log(infoSensores);
-			// this.setState({
-			// 	infoSensores: infoSensores,
-			// })
+			this.setState({
+				infoSensores: infoSensores,
+				selectedPage: 'preguntas',
+			})
 		})
 		.catch((error) => {
 			console.log(error);
 		});
 
-		return infoSensores;
+		// return infoSensores;
 	}
 
 	mostrarPreguntas(){
 		this.setState({
 			preguntasSelected: true,
+			selectedPage: 'preguntas',
 		});
 	}
 
 	mostrarTraductorDatos(){
 		this.setState({
 			preguntasSelected: false,
+			selectedPage: 'datos',
 		});
 	}
 
 	render(){
 		const preguntasSelected = this.state.preguntasSelected;
+		const selectedPage = this.state.selectedPage;
 		const infoSensores = this.state.infoSensores;
 
-		const contenido = preguntasSelected
-			? (<SensorsInfo infoSensores={infoSensores}/>)
-			: (<ParseData infoSensores={infoSensores}/>);
+		// const contenido = preguntasSelected
+		// 	? (<SensorsInfo infoSensores={infoSensores}/>)
+		// 	: (<ParseData infoSensores={infoSensores}/>);
 
-		const preguntasClass = preguntasSelected
+		const cargando = (selectedPage === 'cargando')
+			? (<p>Cargando... </p>)
+			: (null);
+
+		const queries = (selectedPage === 'preguntas')
+			? (<SensorsInfo infoSensores={infoSensores}/>)
+			: (null);
+
+		const datos = (selectedPage === 'datos')
+			? (<ParseData infoSensores={infoSensores}/>)
+			: (null);
+
+		const preguntasClass = (selectedPage === 'preguntas')
 			? ("active")
 			: ("");
 
-		const traductorClass = preguntasSelected
+		const traductorClass = (selectedPage === 'preguntas')
 			? ("")
 			: ("active");
 
@@ -141,7 +158,10 @@ class SelectedPage extends React.Component {
 					</nav>
 				</div>
 				<div className='container'>
-					{contenido}
+					{/* {contenido} */}
+					{cargando}
+					{queries}
+					{datos}
 				</div>
 			</div>
 		)

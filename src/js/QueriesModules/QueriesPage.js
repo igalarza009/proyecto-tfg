@@ -91,7 +91,6 @@ export class SensorsInfo extends React.Component {
 
 	renderSensorMap(){
 		const sensors = this.props.infoSensores;
-		console.log(sensors);
 		const sensorIcons = sensorIconNames.slice();
 		const selectedSensors = this.state.selectedSensors;
 

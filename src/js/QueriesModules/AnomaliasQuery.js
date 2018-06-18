@@ -30,7 +30,7 @@ export class AnomaliasQueryForm extends React.Component{
 				let newSensorDir = {};
 		        props.selectedSensors.forEach((sensorId) => {
 		            if (!sensorDir[sensorId]){
-						const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
+						const sensor = _.find(props.infoSensores, ['indicatorId', sensorId]);
 						if (sensor['resultType'] === 'DoubleValueResult')
 							newSensorDir[sensorId] = 'up';
 						else
