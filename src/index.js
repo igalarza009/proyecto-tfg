@@ -30,7 +30,6 @@ class SelectedPage extends React.Component {
 	componentDidMount(){
 		$(".button-collapse").sideNav();
 
-		// let infoSensores = {};
 		let query = 'prefix : <http://www.sensores.com/ontology/prueba05/extrusoras#> ' +
 				'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
 				'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
@@ -83,8 +82,6 @@ class SelectedPage extends React.Component {
 				    'optional { ?sensorName :zone ?zone . } ' +
 				'} ';
 
-		// const querystring = require('querystring');
-		// console.log(usedURL + encodeURIComponent(query));
 		const querystring = require('querystring');
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
@@ -92,8 +89,6 @@ class SelectedPage extends React.Component {
 		.then((response) => {
 			console.log(response);
 			let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
-			// console.log(infoSensores);
-			// alert('datos recibidos');
 			this.setState({
 				infoSensores: infoSensores,
 				selectedPage: 'preguntas',
@@ -102,8 +97,6 @@ class SelectedPage extends React.Component {
 		.catch((error) => {
 			console.log(error);
 		});
-
-		// return infoSensores;
 	}
 
 	mostrarPreguntas(){
@@ -125,10 +118,6 @@ class SelectedPage extends React.Component {
 		const selectedPage = this.state.selectedPage;
 		const infoSensores = this.state.infoSensores;
 
-		// const contenido = preguntasSelected
-		// 	? (<SensorsInfo infoSensores={infoSensores}/>)
-		// 	: (<ParseData infoSensores={infoSensores}/>);
-
 		const cargando = (selectedPage === 'cargando')
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
 					<img className='loading' alt='Cargando...'
@@ -144,14 +133,6 @@ class SelectedPage extends React.Component {
 		const datos = (selectedPage === 'datos')
 			? (<ParseData infoSensores={infoSensores}/>)
 			: (null);
-
-		// let preguntasDisabled = '';
-		// let traductorDisabled = '';
-		//
-		// if (selectedPage === 'cargando'){
-		// 	preguntasDisabled = preguntasDisabled + 'disabled ';
-		// 	traductorDisabled = traductorDisabled + 'disabled ';
-		// }
 
 		let preguntasClass = '';
 		let traductorClass = '';

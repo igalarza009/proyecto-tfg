@@ -18,7 +18,6 @@ var _ = require('lodash');
  // 		- filter['filterTime']: true or false
  // 		- filter['startTime']: STRING ('HH:MM:ss')
  // 		- filter['endTime']: STRING ('HH:MM:ss')
- //			- filter['filterValues']: true or false
  // 	filterValues: Collection
 // 			- filterValues['filter']: true or false
 // 			- filtervalues['values']: {'XXXXX':[startvalue, finalValue] OR [true/false], ... }
@@ -243,8 +242,11 @@ export function getInformationQueryIndividualSplit(sensorId, groupBy, filter, fi
 // 		{'sensorName':sensorValue, ...}
 // 			or
 // 		{'sensorName':'min'/'max', ...}
-// 	askedSensors: Array
-// 	quitarAnomalias: true or false
+// 	askedSensorId: string
+// 	filterValues: Collection
+// 			- filterValues['filter']: true or false
+// 			- filtervalues['values']: {'XXXXX':[startvalue, finalValue] OR [true/false], ... }
+// 										--> XXXXX = sensorId
 // 	orderBy: Collection
 // 		- orderBy['orderBy']: true or false
 // 		- orderBy['order']: 'desc' or 'asc'
