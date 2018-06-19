@@ -317,8 +317,8 @@ export class SensorsInfo extends React.Component {
 		});
 	}
 
-	getOtherSensorQuery(knownSensors, askedSensors, filterValues){
-		let infor =  {'sensors': askedSensors, 'knownSensors': knownSensors, 'filterValues': filterValues};
+	getOtherSensorQuery(knownSensors, askedSensors, filterValues, filter){
+		let infor =  {'sensors': askedSensors, 'knownSensors': knownSensors, 'filterValues': filterValues, 'filter': filter};
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -332,12 +332,12 @@ export class SensorsInfo extends React.Component {
 		let numberOfResponses = 0;
 		let sensorsResponse = {};
 
-		this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, numberOfResponses, sensorsResponse, chartType);
+		this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, numberOfResponses, sensorsResponse, chartType);
 	}
 
-	recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, nResponses, sensorsResponse, chartType){
+	recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse, chartType){
 		const querystring = require('querystring');
-		var query = Queries.getOtherSensorQueryIndividual(knownSensors, askedSensors[nResponses], filterValues, orderBy);
+		var query = Queries.getOtherSensorQueryIndividual(knownSensors, askedSensors[nResponses], filterValues, filter, orderBy);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
@@ -358,7 +358,7 @@ export class SensorsInfo extends React.Component {
 			}
 			else{
 				console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, nResponses, sensorsResponse, chartType);
+				this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse, chartType);
 			}
 		})
 		.catch((error) => {
@@ -620,7 +620,7 @@ export class SensorsInfo extends React.Component {
 		      		selectedSensors={selectedSensors}
 		          	moreThanOneSensor={moreThanOneSensor}
 		          	getInformationQuery={(s,g,f,fv) => {this.getInformationQuery(s,g,f,fv);}}
-		          	getOtherSensorQuery={(k,a,q) => {this.getOtherSensorQuery(k,a,q);}}
+		          	getOtherSensorQuery={(k,a,v,f) => {this.getOtherSensorQuery(k,a,v,f);}}
 					getAnomaliasQuery={(s,p) => {this.getAnomaliasQuery(s,p);}}
 					infoSensores={this.props.infoSensores}
 		        />)

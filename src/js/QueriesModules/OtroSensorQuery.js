@@ -19,6 +19,8 @@ export class OtroSensorQueryForm extends React.Component{
 			quitarAnomalias: false,
 			filterValues: [],
 			values: {},
+			fechaInicio: '',
+			fechaFin: '',
 		};
 	}
 
@@ -162,14 +164,29 @@ export class OtroSensorQueryForm extends React.Component{
 		console.log(values);
 	}
 
+	handleFechaInicio(event, value){
+		this.setState({
+			fechaInicio: value,
+		});
+	}
+
+	handleFechaFin(event, value){
+		this.setState({
+			fechaFin: value,
+		});
+	}
+
 	handleSubmit(){
 		const knownSensors = this.state.knownSensors;
 		const askedSensors = this.state.askedSensors.slice();
 		const values = this.state.values;
 		const stateFilterValues = this.state.filterValues;
+		const fechaInicio = this.state.fechaInicio;
+		const fechaFin = this.state.fechaFin;
 		// const quitarAnomalias = this.state.quitarAnomalias;
 
 		let filterValues = {'filter': false, 'values': {}};
+		let filter = {'filter':false, 'filterDate':false, 'startDate':'', 'endDate':'', 'filterTime':false, 'startTime':'', 'endTime':''};
 
 		if (stateFilterValues.length > 0){
 			filterValues['filter'] = true;
@@ -178,9 +195,16 @@ export class OtroSensorQueryForm extends React.Component{
 			});
 		}
 
+		if (fechaInicio !== ''){
+			filter['filter'] = true;
+			filter['filterDate'] = true;
+			filter['startDate'] = fechaInicio;
+			filter['endDate'] = fechaFin;
+		}
+
 		// this.resetValues();
 
-		this.props.getOtherSensorQuery(knownSensors, askedSensors, filterValues);
+		this.props.getOtherSensorQuery(knownSensors, askedSensors, filterValues, filter);
 	}
 
 	render(){
@@ -301,22 +325,22 @@ export class OtroSensorQueryForm extends React.Component{
 						</p>
 					</Row>
 					{restoSensores}
-					{/* <Row>
-						<p className='blue-text text-darken-3'>
-							Filtrar rango valores para evitar anomalías
+					<Row s={12}>
+					 	<p className='blue-text text-darken-3'>
+							Filtrar resultados por fechas:
 						</p>
+					 </Row>
+					 <Row className="center">
+					 	<Input s={12} l={6} type='date' label="Desde..."
+							options={{format: 'yyyy-mm-dd'}}
+					 		onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+					 	<Input s={12} l={6} type='date' label="Hasta..."
+								options={{format: 'yyyy-mm-dd'}}
+					 			onChange={(e, value) => {this.handleFechaFin(e, value);}} />
 					</Row>
-					<Row>
-						<Input s={12} name='checkboxesSensores'
-							type='checkbox' value='elimAnom'
-							label='Eliminar anomalías' className='filled-in'
-							onChange={(e) => {this.handleElimAnom(e);}}
-						/>
-					</Row> */}
 					<Row className='center-align'>
 						<Button className='blue darken-3' type='submit'
-							name='action' onClick={() => {this.handleSubmit();}}
-						>
+							name='action' onClick={() => {this.handleSubmit();}}>
 							Consultar <Icon right>bar_chart</Icon>
 		   				</Button>
 					</Row>

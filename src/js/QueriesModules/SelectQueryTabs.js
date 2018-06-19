@@ -52,7 +52,7 @@ export class PruebaTabsMat extends React.Component {
 				 <div id="otro" className="col s12">
 					 <OtroSensorQueryForm
 			             selectedSensors={selectedSensors}
-			             getOtherSensorQuery={(k,a,f) => {this.props.getOtherSensorQuery(k,a,f);}}
+			             getOtherSensorQuery={(k,a,v,f) => {this.props.getOtherSensorQuery(k,a,v,f);}}
 						 infoSensores={this.props.infoSensores}
 			         />
 				 </div>

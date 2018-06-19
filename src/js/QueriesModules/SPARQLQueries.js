@@ -77,7 +77,7 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
     }
 
     if (filter['filter']){
-    	where = getFilter(where, filter);
+    	where += getFilter(filter);
     }
 
     where += '} ';
@@ -145,7 +145,7 @@ export function getInformationQueryIndividualSplit(sensorId, groupBy, filter, fi
 	}
 
     if (filter['filter']){
-    	where = getFilter(where, filter);
+    	where += getFilter(filter);
     }
 
     where += '} ';
@@ -247,11 +247,19 @@ export function getInformationQueryIndividualSplit(sensorId, groupBy, filter, fi
 // 			- filterValues['filter']: true or false
 // 			- filtervalues['values']: {'XXXXX':[startvalue, finalValue] OR [true/false], ... }
 // 										--> XXXXX = sensorId
+// 	filter: Collection
+// 		- filter['filter']: true or false
+// 		- filter['filterDate']: true or false
+// 		- filter['startDate']: STRING ('yyyy-mm-dd')
+// 		- filter['endDate']: STRING ('yyyy-mm-dd')
+// 		- filter['filterTime']: true or false
+// 		- filter['startTime']: STRING ('HH:MM:ss')
+// 		- filter['endTime']: STRING ('HH:MM:ss')
 // 	orderBy: Collection
 // 		- orderBy['orderBy']: true or false
 // 		- orderBy['order']: 'desc' or 'asc'
 // 		- orderBy['orderField']: 'value', 'dateTime', 'date', 'sensorId'
-export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filterValues, orderBy){
+export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filterValues, filter, orderBy){
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
 		'prefix sosa: <http://www.w3.org/ns/sosa/> '+
@@ -313,6 +321,10 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 			'?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue . ' +
 			'?askedObs sosa:resultTime ?resultTime . ' +
 			'bind(<#sensor' + askedSensorId +'> as ?sensorName) ';
+
+	if (filter['filter']){
+		  where += getFilter(filter);
+	}
 
 	where += '} ';
 
@@ -430,17 +442,17 @@ function getSelect(groupBy){
 	return select;
 }
 
-function getFilter(where, filter){
-	where += 'filter( ';
+function getFilter(filter){
+	let where = 'filter( ';
     	if (filter['filterTime'] && filter['filterDate']){
    			where += ' xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime && ' +
-            	'xsd:dateTime(?resultTime) < "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime && ' +
+            	'xsd:dateTime(?resultTime) <= "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime && ' +
     			'xsd:time(xsd:dateTime(?resultTime)) >= "' + filter['startTime'] + '.000Z"^^xsd:time && ' +
             	'xsd:time(xsd:dateTime(?resultTime)) <= "' + filter['endTime'] + '.999Z"^^xsd:time ';
     	}
     	else if (filter['filterDate']){
     		where += ' xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime && ' +
-            	'xsd:dateTime(?resultTime) < "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime ';
+            	'xsd:dateTime(?resultTime) <= "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime ';
     	}
     	else if (filter['filterTime']){
     		where += 'xsd:time(xsd:dateTime(?resultTime)) >= "' + filter['startTime'] + '.000Z"^^xsd:time && ' +
