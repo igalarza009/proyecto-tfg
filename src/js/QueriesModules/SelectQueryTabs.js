@@ -59,7 +59,7 @@ export class PruebaTabsMat extends React.Component {
 				 <div id="anom" className="col s12">
 					 <AnomaliasQueryForm
 			             selectedSensors={selectedSensors}
-						 getAnomaliasQuery={(s,p) => {this.props.getAnomaliasQuery(s,p);}}
+						 getAnomaliasQuery={(s,p,f) => {this.props.getAnomaliasQuery(s,p,f);}}
 						 infoSensores={this.props.infoSensores}
 			         />
 				 </div>

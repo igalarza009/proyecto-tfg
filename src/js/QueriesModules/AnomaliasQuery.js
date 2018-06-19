@@ -19,6 +19,8 @@ export class AnomaliasQueryForm extends React.Component{
             sensorDir: {},
 			calParMotor: false,
 			relType: 'custom',
+			fechaInicio: '',
+			fechaFin: '',
 		};
 	}
 
@@ -144,14 +146,34 @@ export class AnomaliasQueryForm extends React.Component{
 		});
 	}
 
+	handleFechaInicio(event, value){
+		this.setState({
+			fechaInicio: value,
+		});
+	}
+
+	handleFechaFin(event, value){
+		this.setState({
+			fechaFin: value,
+		});
+	}
+
 	handleSubmit(){
 		const sensorDir = this.state.sensorDir;
 		const calParMotor = this.state.calParMotor;
+		const fechaInicio = this.state.fechaInicio;
+		const fechaFin = this.state.fechaFin;
 
-		console.log(sensorDir);
-		console.log(calParMotor);
+		let filter = {'filter':false, 'filterDate':false, 'startDate':'', 'endDate':'', 'filterTime':false, 'startTime':'', 'endTime':''};
 
-		this.props.getAnomaliasQuery(sensorDir, {'parMotorId': parMotorId, 'calParMotor': calParMotor});
+		if (fechaInicio !== ''){
+			filter['filter'] = true;
+			filter['filterDate'] = true;
+			filter['startDate'] = fechaInicio;
+			filter['endDate'] = fechaFin;
+		}
+
+		this.props.getAnomaliasQuery(sensorDir, {'parMotorId': parMotorId, 'calParMotor': calParMotor}, filter);
 	}
 
 	render(){
@@ -263,6 +285,19 @@ export class AnomaliasQueryForm extends React.Component{
 						</Input>
 					</Row>
 					{selectedRelType}
+					<Row s={12}>
+					 	<p className='blue-text text-darken-3'>
+							Filtrar resultados por fechas:
+						</p>
+					 </Row>
+					 <Row className="center">
+					 	<Input s={12} l={6} type='date' label="Desde..."
+							options={{format: 'yyyy-mm-dd'}}
+					 		onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+					 	<Input s={12} l={6} type='date' label="Hasta..."
+								options={{format: 'yyyy-mm-dd'}}
+					 			onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+					</Row>
 					<Row className='center-align'>
 						<Button className='blue darken-3' type='submit' name='action'
 							onClick={() => {this.handleSubmit();}}>

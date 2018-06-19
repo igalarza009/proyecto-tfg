@@ -368,14 +368,14 @@ export class SensorsInfo extends React.Component {
 		});
 	}
 
-	getAnomaliasQuery(sensorsDir, parMotor){
+	getAnomaliasQuery(sensorsDir, parMotor, filter){
 		// const selectedSensors = this.state.selectedSensors.slice();
 		let selectedSensors = [];
 		_.forEach(sensorsDir, (value, key) => {
 			selectedSensors.push(key);
 		});
 
-		let infor = {'sensors': selectedSensors, 'sensorsDir':sensorsDir, 'parMotor':parMotor};
+		let infor = {'sensors': selectedSensors, 'sensorsDir':sensorsDir, 'parMotor':parMotor, 'filter':filter};
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
@@ -389,12 +389,12 @@ export class SensorsInfo extends React.Component {
 		let sensorsResponse = {};
 
 		// console.log("First axios call with nResponses: " + numberOfResponses);
-		this.recursiveAnomCall(selectedSensors, numberOfResponses, sensorsResponse, sensorsDir, parMotor, chartType);
+		this.recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorsResponse, chartType);
 	}
 
-	recursiveAnomCall(selectedSensors, nResponses, sensorsResponse, sensorsDir, parMotor, chartType){
+	recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorsResponse, chartType){
 		const querystring = require('querystring');
-		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], {}, {}, {}, orderBy);
+		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], {}, filter, {}, orderBy);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
@@ -415,7 +415,7 @@ export class SensorsInfo extends React.Component {
 			}
 			else{
 				// console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveAnomCall(selectedSensors, nResponses, sensorsResponse, sensorsDir, parMotor, chartType);
+				this.recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorsResponse, chartType);
 			}
 		})
 		.catch((error) => {
@@ -621,7 +621,7 @@ export class SensorsInfo extends React.Component {
 		          	moreThanOneSensor={moreThanOneSensor}
 		          	getInformationQuery={(s,g,f,fv) => {this.getInformationQuery(s,g,f,fv);}}
 		          	getOtherSensorQuery={(k,a,v,f) => {this.getOtherSensorQuery(k,a,v,f);}}
-					getAnomaliasQuery={(s,p) => {this.getAnomaliasQuery(s,p);}}
+					getAnomaliasQuery={(s,p,f) => {this.getAnomaliasQuery(s,p,f);}}
 					infoSensores={this.props.infoSensores}
 		        />)
 			: (null);
