@@ -183,6 +183,12 @@ export class SensorsInfo extends React.Component {
 		if (groupBy['groupBy']){
 			chartType = barChartName;
 		}
+		else if (filter['filter'] && filter['filterTime']){
+			chartType = scatterChartName;
+		}
+		else if (filterValues['filter']) {
+			chartType = scatterChartName;
+		}
 
 		const querystring = require('querystring');
 		let numberOfResponses = 0;
