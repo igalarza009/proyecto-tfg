@@ -13,7 +13,8 @@ export class GoogleChart extends React.Component{
 	   super(props);
 	   const self = this;
 	   this.state = {
-		 convertFunc: getConvertOptionsFunc(this.props.chartType)
+		 convertFunc: getConvertOptionsFunc(this.props.chartType),
+		 allChartData: this.props.allChartData,
 	   };
 	   this.chartEvents = [
 		 {
@@ -26,9 +27,15 @@ export class GoogleChart extends React.Component{
 	   ]
 	 }
 
+	 static getDerivedStateFromProps(props, state){
+		 return {
+			 allChartData: props.allChartData,
+		 };
+	 }
+
 	render(){
 
-		const charts = this.props.allChartData.map((chartData, i) => {
+		const charts = this.state.allChartData.map((chartData, i) => {
 			var title = chartData['title'];
 			var subtitle = chartData['subtitle'];
 			var data = chartData['data'];
@@ -47,12 +54,19 @@ export class GoogleChart extends React.Component{
 			options['chart'] = {};
 			options['chart']['title'] = title;
 			options['chart']['subtitle'] = subtitle;
-			options['hAxis'] = {
-				format: 'MMM dd (HH:mm:ss)'
-			};
+			if (this.props.longDateFormat){
+				options['hAxis'] = {
+					format: 'MMM dd (HH:mm:ss)'
+				};
+			}
+			else{
+				options['hAxis'] = {
+					format: 'MMM dd'
+				};
+			}
 			options['vAxis'] = {
 				format: 'decimal'
-			}
+			};
 			options['series'] = series;
 			options['axes'] = axes;
 
@@ -65,7 +79,6 @@ export class GoogleChart extends React.Component{
 						chartType={this.props.chartType}
 						data={data}
 						options={finalOptions}
-						graph_id={i}
 						width="100%"
 						height="400px"
 						chartEvents={convertFunc ? null : this.chartEvents}

@@ -45,6 +45,7 @@ export class SensorsInfo extends React.Component {
 			showChart: false,
 			allChartData: null,
 			chartType: "ColumnChart",
+			longDateFormat: true,
 			queryType: '',
 			queryInfor: {}
 		};
@@ -172,16 +173,12 @@ export class SensorsInfo extends React.Component {
 	getInformationQuery(sensors, groupBy, filter, filterValues){
 		console.log("Tiempo inicio " + Date.now());
 		let infor = {'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'filterValues': filterValues};
-		this.setState({
-			showQueries: false,
-			loadingQuery: true,
-			queryInfor: infor,
-			queryType: 'infor',
-		});
 
 		let chartType = lineChartName;
+		let longDateFormat = true;
 		if (groupBy['groupBy']){
 			chartType = barChartName;
+			longDateFormat = false;
 		}
 		else if (filter['filter'] && filter['filterTime']){
 			chartType = scatterChartName;
@@ -189,6 +186,15 @@ export class SensorsInfo extends React.Component {
 		else if (filterValues['filter']) {
 			chartType = scatterChartName;
 		}
+
+		this.setState({
+			showQueries: false,
+			loadingQuery: true,
+			queryInfor: infor,
+			queryType: 'infor',
+			chartType: chartType,
+			longDateFormat: longDateFormat,
+		});
 
 		const querystring = require('querystring');
 		let numberOfResponses = 0;
@@ -200,7 +206,7 @@ export class SensorsInfo extends React.Component {
 
 	}
 
-	recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse, chartType){
+	recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse){
 		const querystring = require('querystring');
 		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], groupBy, filter, filterValues, orderBy);
 		axios.post(usedURL,
@@ -218,13 +224,12 @@ export class SensorsInfo extends React.Component {
 				this.setState({
 					showChart: true,
 					allChartData: allChartData,
-					chartType: chartType,
 				});
 				console.log("Tiempo fin " + Date.now());
 			}
 			else{
 				console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse, chartType);
+				this.recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse);
 			}
 		})
 		.catch((error) => {
@@ -325,23 +330,25 @@ export class SensorsInfo extends React.Component {
 
 	getOtherSensorQuery(knownSensors, askedSensors, filterValues, filter){
 		let infor =  {'sensors': askedSensors, 'knownSensors': knownSensors, 'filterValues': filterValues, 'filter': filter};
+
+		let chartType = scatterChartName;
+
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
 			queryInfor: infor,
 			queryType: 'otro',
+			chartType: chartType,
 		});
-
-		let chartType = scatterChartName;
 
 		const querystring = require('querystring');
 		let numberOfResponses = 0;
 		let sensorsResponse = {};
 
-		this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, numberOfResponses, sensorsResponse, chartType);
+		this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, numberOfResponses, sensorsResponse);
 	}
 
-	recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse, chartType){
+	recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse){
 		const querystring = require('querystring');
 		var query = Queries.getOtherSensorQueryIndividual(knownSensors, askedSensors[nResponses], filterValues, filter, orderBy);
 		axios.post(usedURL,
@@ -359,12 +366,11 @@ export class SensorsInfo extends React.Component {
 				this.setState({
 					showChart: true,
 					allChartData: allChartData,
-					chartType: chartType,
 				});
 			}
 			else{
 				console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse, chartType);
+				this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse);
 			}
 		})
 		.catch((error) => {
@@ -382,23 +388,25 @@ export class SensorsInfo extends React.Component {
 		});
 
 		let infor = {'sensors': selectedSensors, 'sensorsDir':sensorsDir, 'parMotor':parMotor, 'filter':filter};
+
+		let chartType = scatterChartName;
+
 		this.setState({
 			showQueries: false,
 			loadingQuery: true,
 			queryInfor: infor,
 			queryType: 'anom',
+			chartType: chartType,
 		});
-
-		let chartType = scatterChartName;
 
 		let numberOfResponses = 0;
 		let sensorsResponse = {};
 
 		// console.log("First axios call with nResponses: " + numberOfResponses);
-		this.recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorsResponse, chartType);
+		this.recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorsResponse);
 	}
 
-	recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorsResponse, chartType){
+	recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorsResponse){
 		const querystring = require('querystring');
 		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], {}, filter, {}, orderBy);
 		axios.post(usedURL,
@@ -416,12 +424,11 @@ export class SensorsInfo extends React.Component {
 				this.setState({
 					showChart: true,
 					allChartData: allChartData,
-					chartType: chartType,
 				});
 			}
 			else{
 				// console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorsResponse, chartType);
+				this.recursiveAnomCall(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorsResponse);
 			}
 		})
 		.catch((error) => {
@@ -620,6 +627,7 @@ export class SensorsInfo extends React.Component {
 		const showChart = this.state.showChart;
 		const allChartData = this.state.allChartData;
 		const chartType = this.state.chartType;
+		const longDateFormat = this.state.longDateFormat;
 
 		const queriesCardMat = (showQueries)
 			? (<PruebaTabsMat
@@ -635,20 +643,20 @@ export class SensorsInfo extends React.Component {
 		const loadingQueryCard = (loadingQuery)
 			&& (this.makeQueryResume());
 
-		let chartCard = null;
-		if (loadingQuery){
-			chartCard = <Card className='center'>
-							<img className='loading' alt='Cargando...'
-								src={require('../../img/loading_bars.gif')}
-							/>
-						</Card>;
-		}
-		if (showChart){
-			chartCard = <GoogleChart
-							allChartData={allChartData}
-							chartType={chartType}
-						/>;
-		}
+		// let chartCard = null;
+		const loadingChartCard = (loadingQuery && !showChart) &&
+		 	(<Card className='center'>
+				<img className='loading' alt='Cargando...'
+					src={require('../../img/loading_bars.gif')}
+				/>
+			</Card>);
+
+		const chartCard = (showChart) &&
+			(<GoogleChart
+				allChartData={allChartData}
+				chartType={chartType}
+				longDateFormat={longDateFormat}
+			/>);
 
 		return(
 			<div className='sensorsInfo'>
@@ -664,6 +672,7 @@ export class SensorsInfo extends React.Component {
 					</Col>
 				</Row>
 				<Row s={12}>
+					{loadingChartCard}
 					{chartCard}
 				</Row>
 			</div>
