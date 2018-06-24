@@ -58,6 +58,10 @@
 	background-color: white  ;
 }
 
+.hidden{
+	visibility: hidden;
+}
+
 /*--------------- DATE PICKER -------------*/
 
 .picker__year-display{

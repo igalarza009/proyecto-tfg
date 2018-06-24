@@ -348,12 +348,18 @@ export function parseSensorValuesSplit(response, sensorId, calcDatetimes, select
 function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes, info, infoSensores){
 	//info: parMotor, type
 	let allChartData = [];
+	// 
+	// if (datetimes.length === 1){
+	// 	datetimes.push(0);
+	// }
 
 	if (selectValues.length === 1){
-		console.log("Hola 1");
 		let dataToZip = [datetimes];
 
 		selectedSensors.forEach((sensorId) => {
+			// if (sensorValues[sensorId].length === 1){
+			// 	sensorValues[sensorId].push(0);
+			// }
 			dataToZip.push(sensorValues[sensorId]);
 		});
 
@@ -407,7 +413,6 @@ function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues,
 		allChartData.push(chartFullData);
 	}
 	else{
-		console.log("Hola 1");
 		_.forEach(sensorValues, (sensorData, sensorId) =>{
 			var dataToZip = [datetimes];
 

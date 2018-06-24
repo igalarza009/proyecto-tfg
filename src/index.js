@@ -24,6 +24,7 @@ class SelectedPage extends React.Component {
 			preguntasSelected: {},
 			infoSensores: [],
 			selectedPage: 'cargando',
+			errorLoading: false,
 		};
 	}
 
@@ -92,10 +93,14 @@ class SelectedPage extends React.Component {
 			this.setState({
 				infoSensores: infoSensores,
 				selectedPage: 'preguntas',
+				errorLoading: false,
 			})
 		})
 		.catch((error) => {
 			console.log(error);
+			this.setState({
+				errorLoading: true,
+			})
 		});
 	}
 
@@ -117,14 +122,21 @@ class SelectedPage extends React.Component {
 		const preguntasSelected = this.state.preguntasSelected;
 		const selectedPage = this.state.selectedPage;
 		const infoSensores = this.state.infoSensores;
+		const errorLoading = this.state.errorLoading;
 
-		const cargando = (selectedPage === 'cargando')
+		const cargando = (selectedPage === 'cargando' && !errorLoading)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
-					<img className='loading' alt='Cargando...'
+				<img className='loading' alt='Cargando...'
 						src={require('./img/loading_bars.gif')}
 					/>
 				</Card>)
 			: (null);
+
+		const cardError = (selectedPage === 'cargando' && errorLoading) &&
+			(<Card s={12} l={8} offset='l2' title="Error al cargar datos" className='center'>
+				<p>Ha ocurrido un error al cargar los datos necesarios desde el servidor.</p>
+				<p>Vuelva a cargar la página para intentar solucionarlo.</p>
+			</Card>);
 
 		const queries = (selectedPage === 'preguntas')
 			? (<SensorsInfo infoSensores={infoSensores}/>)
@@ -189,6 +201,7 @@ class SelectedPage extends React.Component {
 				</div>
 				<div className='container'>
 					{cargando}
+					{cardError}
 					{queries}
 					{datos}
 				</div>

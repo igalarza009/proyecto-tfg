@@ -520,7 +520,7 @@ export class InformationQueryForm extends React.Component{
 										<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>
 											<option value='day'>Cada día</option>
 											<option value='hour'>Cada hora</option>
-											<option value='all'>Valor absoluto en todo el intervalo</option>
+											{/* <option value='all'>Valor absoluto en todo el intervalo</option> */}
 										</Input>
 									</Col>
 								</Row>
