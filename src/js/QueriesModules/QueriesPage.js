@@ -43,7 +43,7 @@ export class SensorsInfo extends React.Component {
 			moreThanOneSensor: false,
 			loadingQuery: false,
 			showChart: false,
-			nodata: false,
+			noDataCharts: [],
 			allChartData: null,
 			chartType: "ColumnChart",
 			longDateFormat: true,
@@ -215,32 +215,35 @@ export class SensorsInfo extends React.Component {
 		)
 		.then((response) => {
 			console.log(response);
+			const sensorId = selectedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 1){
-				const sensorId = selectedSensors[nResponses];
 				sensorsResponse[sensorId] = response.data["results"]["bindings"];
-				nResponses++;
-				if (nResponses === selectedSensors.length){
-					console.log("finalizado!, podemos continuar");
-					let allChartData = DataFunctions.prepareResponseDataIndividual(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'}, this.props.infoSensores);
-					console.log(allChartData);
-					this.setState({
-						showChart: true,
-						loadingQuery: false,
-						allChartData: allChartData,
-					});
-					console.log("Tiempo fin " + Date.now());
-				}
-				else{
-					console.log("New axios call with nResponse: " + nResponses);
-					this.recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse);
-				}
 			}
 			else{
-				console.log("No hay datos");
+				let noDataCharts = this.state.noDataCharts;
+				noDataCharts.push(sensorId);
 				this.setState({
-					loadingQuery: false,
-					noData: true,
+					noDataCharts: noDataCharts,
 				});
+			}
+			nResponses++;
+			if (nResponses === selectedSensors.length){
+				console.log("finalizado!, podemos continuar");
+				let allChartData = [];
+				if (_.size(sensorsResponse) > 0){
+					allChartData = DataFunctions.prepareResponseDataIndividual(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'}, this.props.infoSensores);
+				}
+				console.log(allChartData);
+				this.setState({
+					showChart: true,
+					loadingQuery: false,
+					allChartData: allChartData,
+				});
+				// console.log("Tiempo fin " + Date.now());
+			}
+			else{
+				// console.log("New axios call with nResponse: " + nResponses);
+				this.recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse);
 			}
 		})
 		.catch((error) => {
@@ -367,31 +370,34 @@ export class SensorsInfo extends React.Component {
 		)
 		.then((response) => {
 			console.log(response);
+			const sensorId = askedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 1){
-				const sensorId = askedSensors[nResponses];
 				sensorsResponse[sensorId] = response.data["results"]["bindings"];
-				nResponses++;
-				if (nResponses === askedSensors.length){
-					console.log("finalizado!, podemos continuar");
-					let allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'}, this.props.infoSensores);
-					console.log(allChartData);
-					this.setState({
-						showChart: true,
-						allChartData: allChartData,
-						loadingQuery: false
-					});
-				}
-				else{
-					console.log("New axios call with nResponse: " + nResponses);
-					this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse);
-				}
 			}
 			else{
-				console.log("No hay datos");
+				let noDataCharts = this.state.noDataCharts;
+				noDataCharts.push(sensorId);
 				this.setState({
-					loadingQuery: false,
-					noData: true,
+					noDataCharts: noDataCharts,
 				});
+			}
+			nResponses++;
+			if (nResponses === askedSensors.length){
+				console.log("finalizado!, podemos continuar");
+				let allChartData = [];
+				if (_.size(sensorsResponse) > 0){
+					allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'}, this.props.infoSensores);
+				}
+				console.log(allChartData);
+				this.setState({
+					showChart: true,
+					allChartData: allChartData,
+					loadingQuery: false
+				});
+			}
+			else{
+				console.log("New axios call with nResponse: " + nResponses);
+				this.recursiveOtroSensorCall(askedSensors, knownSensors, filterValues, filter, nResponses, sensorsResponse);
 			}
 		})
 		.catch((error) => {
@@ -436,11 +442,23 @@ export class SensorsInfo extends React.Component {
 		.then((response) => {
 			console.log(response);
 			const sensorId = selectedSensors[nResponses];
-			sensorsResponse[sensorId] = response.data["results"]["bindings"];
+			if (response.data["results"]["bindings"].length > 1){
+				sensorsResponse[sensorId] = response.data["results"]["bindings"];
+			}
+			else{
+				let noDataCharts = this.state.noDataCharts;
+				noDataCharts.push(sensorId);
+				this.setState({
+					noDataCharts: noDataCharts,
+				});
+			}
 			nResponses++;
 			if (nResponses === selectedSensors.length){
 				console.log("finalizado!, podemos continuar");
-				let allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor, this.props.infoSensores);
+				let allChartData = [];
+				if (_.size(sensorsResponse) > 0){
+					allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor, this.props.infoSensores);
+				}
 				console.log(allChartData);
 				if (allChartData[0]['data'].length > 1){
 					this.setState({
@@ -450,10 +468,11 @@ export class SensorsInfo extends React.Component {
 					});
 				}
 				else{
-					console.log("No hay datos");
+					console.log("No hay anomalías");
 					this.setState({
 						loadingQuery: false,
-						noData: true,
+						// noData: true,
+						noAnom: true
 					});
 				}
 			}
@@ -479,7 +498,9 @@ export class SensorsInfo extends React.Component {
 			showQueries: showQueries,
 			loadingQuery: false,
 			showChart: false,
-			noData: false,
+			// noData: false,
+			noAnom: false,
+			noDataCharts: [],
 			queryType: '',
 			queryInfor: {},
 		});
@@ -489,9 +510,9 @@ export class SensorsInfo extends React.Component {
 		const type = this.state.queryType;
 		const info = this.state.queryInfor;
 		const showChart = this.state.showChart;
-		const noData = this.state.noData;
+		// const noData = this.state.noData;
 
-		const newQueryButton = (showChart || noData)
+		const newQueryButton = (showChart)
 			? (<Button className='blue darken-3' onClick={() => {this.newQuery();}}> Nueva pregunta </Button>)
 			: (<img className='loading' alt='Cargando...' src={require('../../img/loading_bars.gif')}/>);
 
@@ -661,7 +682,10 @@ export class SensorsInfo extends React.Component {
 		const allChartData = this.state.allChartData;
 		const chartType = this.state.chartType;
 		const longDateFormat = this.state.longDateFormat;
-		const noData = this.state.noData;
+		// const noData = this.state.noData;
+		const noDataCharts = this.state.noDataCharts;
+		// const queryType = this.state.queryType;
+		const noAnom = this.state.noAnom;
 
 		const queriesCardMat = (showQueries)
 			? (<PruebaTabsMat
@@ -674,7 +698,7 @@ export class SensorsInfo extends React.Component {
 		        />)
 			: (null);
 
-		const loadingQueryCard = (loadingQuery || showChart || noData)
+		const loadingQueryCard = (loadingQuery || showChart)
 			&& (this.makeQueryResume());
 
 		// let chartCard = null;
@@ -689,9 +713,20 @@ export class SensorsInfo extends React.Component {
 			? ("")
 			: ("hidden");
 
-		const noDataCard = (noData) && (
-			<Card className='center'>
-				<p className='red-text'>No hay datos para mostrar en el gráfico</p>
+		const noDataInfo = noDataCharts.map((sensorId) => {
+			return(
+				<p key={sensorId}> No hay datos disponibles del sensor {sensorId}</p>
+			);
+		});
+
+		const noDataCard = (noDataCharts.length > 0 && showChart) &&
+			(<Card className='center red-text'>
+				{noDataInfo}
+			</Card>);
+
+		const noAnomCard = (noAnom && showChart) &&
+			(<Card className='center green-text'>
+				No se ha encontrado ninguna anomalía en la relación especificada.
 			</Card>);
 
 		// const chartCard =
@@ -717,6 +752,7 @@ export class SensorsInfo extends React.Component {
 				<Row s={12}>
 					{loadingChartCard}
 					{noDataCard}
+					{noAnom}
 					<div className={chartClass}>
 						<GoogleChart
 							allChartData={allChartData}

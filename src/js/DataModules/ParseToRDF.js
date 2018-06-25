@@ -1,5 +1,5 @@
 // const infoSensores = require('../../infoSensores.json');
-const graphURI = "<http://www.sensores.com/ontology/prueba04/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 
 export function parseDataToRDF(filename, data, infoSensores){
 

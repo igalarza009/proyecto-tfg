@@ -240,12 +240,11 @@ export class ParseData extends React.Component {
 							{loadingInsertData}
 						</Card>
 					</Col>
-
 				</Row>
-			<Row>
-				<HTTPPrueba />
-			</Row>
-		</div>
+				{/* <Row>
+					<HTTPPrueba />
+				</Row> */}
+			</div>
 		)
 	}
 }

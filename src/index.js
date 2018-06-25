@@ -31,14 +31,14 @@ class SelectedPage extends React.Component {
 	componentDidMount(){
 		$(".button-collapse").sideNav();
 
-		let query = 'prefix : <http://www.sensores.com/ontology/prueba05/extrusoras#> ' +
+		let query = 'prefix : <http://www.sensores.com/ontology/prueba08/extrusoras#> ' +
 				'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
 				'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
 				'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
 				'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
 				'prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#> ' +
 				'select ?sensorId ?name ?class ?sensorType ?observationType ?resultType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
-				'from <http://www.sensores.com/ontology/prueba05/extrusoras#> ' +
+				'from <http://www.sensores.com/ontology/prueba08/extrusoras#> ' +
 				'where { ' +
 				    '{ ?sensorType rdfs:subClassOf :DoubleValueSensor . } ' +
 				     'union ' +
