@@ -23,6 +23,44 @@ export class HTTPPrueba extends React.Component {
 		// this.handleQuerySinAxios = this.handleQuerySinAxios.bind(this);
 	}
 
+	handleClickSelect(){
+		const query = 'select * ' +
+					'from <http://pruebas.com/prueba#> ' +
+					'where { ' +
+					  '?o ?p ?q ' +
+					'} ';
+
+		const querystring = require('querystring');
+		axios.post('http://localhost:8890/sparql',
+			querystring.stringify({'query': query})
+		)
+		.then((response) => {
+			console.log(response);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+	}
+
+	handleClickInsert(){
+		const query = 'PREFIX dc: <http://purl.org/dc/elements/1.1/> ' +
+					'INSERT data ' +
+					'{ ' +
+ 						'graph <http://pruebas.com/prueba#> ' +
+							'{ <http://example/egbook> dc:title  "PRUEBA HTTP REQUEST" } ' +
+					'} ';
+
+		const querystring = require('querystring');
+		axios.post('http://localhost:8890/sparql/',
+			querystring.stringify({'query': query}))
+		.then((response) => {
+			console.log(response);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+	}
+
 	handleClickHello(){
 		let name = 'Irati Galarza Burguete';
 		const querystring = require('querystring');
@@ -104,14 +142,19 @@ export class HTTPPrueba extends React.Component {
 		});
 
 	}
-	render(){
 
+	render(){
 		return(
 			<Card className='center blue-text darken-3'>
 				<Row>
 					<Col s={12} l={6}>
-						<Button className='pink lighten-1' onClick={this.handleClickQuery}>
-							Prueba Query
+						<Button className='pink lighten-1' onClick={this.handleClickSelect}>
+							Prueba Select
+						</Button>
+					</Col>
+					<Col  s={12} l={6}>
+						<Button className='yellow darken-3' onClick={this.handleClickInsert}>
+							Prueba Insert
 						</Button>
 					</Col>
 				</Row>

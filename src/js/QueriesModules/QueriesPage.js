@@ -1,3 +1,5 @@
+// GRANT EXECUTE ON DB.DBA.L_O_LOOK TO "SPARQL";
+
 import React from 'react';
 import '../../index.css';
 import * as Queries from './SPARQLQueries.js';
@@ -12,7 +14,7 @@ var _ = require('lodash');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = RESTfulURLQuery;
+const usedURL = virtuosoURL;
 
 const lineChartName = 'Line';
 const barChartName = 'Bar';
@@ -210,8 +212,9 @@ export class SensorsInfo extends React.Component {
 	recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse){
 		const querystring = require('querystring');
 		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], groupBy, filter, filterValues, orderBy);
+		console.log(query);
 		axios.post(usedURL,
-			querystring.stringify({'query': query})
+			querystring.stringify({'query': query, 'maxrows':700000})
 		)
 		.then((response) => {
 			console.log(response);
@@ -460,7 +463,7 @@ export class SensorsInfo extends React.Component {
 					allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor, this.props.infoSensores);
 				}
 				console.log(allChartData);
-				if (allChartData[0]['data'].length > 1){
+				if (allChartData.length > 0){
 					this.setState({
 						showChart: true,
 						allChartData: allChartData,
@@ -472,6 +475,7 @@ export class SensorsInfo extends React.Component {
 					this.setState({
 						loadingQuery: false,
 						// noData: true,
+						showChart: true,
 						noAnom: true
 					});
 				}
@@ -752,7 +756,7 @@ export class SensorsInfo extends React.Component {
 				<Row s={12}>
 					{loadingChartCard}
 					{noDataCard}
-					{noAnom}
+					{noAnomCard}
 					<div className={chartClass}>
 						<GoogleChart
 							allChartData={allChartData}
