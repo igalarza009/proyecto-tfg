@@ -4,12 +4,13 @@ import '../../index.css';
 import * as Queries from '../QueriesModules/SPARQLQueries.js';
 import {Row, Col, Button, Card} from 'react-materialize'
 import M from 'materialize-css';
-import axios from 'axios';
+// import axios from 'axios';
+import * as Virtuoso from '../Functions/VirtuosoCalls.js';
 
-const virtuosoURL = 'http://localhost:8890/sparql';
-const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-const usedURL = RESTfulURLGetQuery;
+// const virtuosoURL = 'http://localhost:8890/sparql';
+// const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
+// const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
+// const usedURL = RESTfulURLGetQuery;
 
 export class HTTPPrueba extends React.Component {
 	constructor(props){
@@ -30,16 +31,18 @@ export class HTTPPrueba extends React.Component {
 					  '?o ?p ?q ' +
 					'} ';
 
-		const querystring = require('querystring');
-		axios.post('http://localhost:8890/sparql',
-			querystring.stringify({'query': query})
-		)
-		.then((response) => {
-			console.log(response);
-		})
-		.catch((error) => {
-			console.log(error);
-		});
+		// const querystring = require('querystring');
+		// axios.post('http://localhost:8890/sparql',
+		// 	querystring.stringify({'query': query})
+		// )
+		// .then((response) => {
+		// 	console.log(response);
+		// })
+		// .catch((error) => {
+		// 	console.log(error);
+		// });
+		Virtuoso.performQuery(query, console.log);
+		// console.log(response);
 	}
 
 	handleClickInsert(){
@@ -47,32 +50,34 @@ export class HTTPPrueba extends React.Component {
 					'INSERT data ' +
 					'{ ' +
  						'graph <http://pruebas.com/prueba#> ' +
-							'{ <http://example/egbook> dc:title  "PRUEBA HTTP REQUEST" } ' +
+							'{ <http://example/egbook> dc:title  "Prueba con VirtuosoCalls y callback 2" } ' +
 					'} ';
 
-		const querystring = require('querystring');
-		axios.post('http://localhost:8890/sparql/',
-			querystring.stringify({'query': query}))
-		.then((response) => {
-			console.log(response);
-		})
-		.catch((error) => {
-			console.log(error);
-		});
+		// const querystring = require('querystring');
+		// axios.post('http://localhost:8890/sparql/',
+		// 	querystring.stringify({'query': query}))
+		// .then((response) => {
+		// 	console.log(response);
+		// })
+		// .catch((error) => {
+		// 	console.log(error);
+		// });
+		Virtuoso.performQuery(query, console.log);
+		// console.log(response);
 	}
 
 	handleClickHello(){
 		let name = 'Irati Galarza Burguete';
 		const querystring = require('querystring');
-		axios.post('http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello',
-			querystring.stringify({'name': name})
-		)
-		.then((response) => {
-			console.log(response);
-		})
-		.catch((error) => {
-			console.log(error);
-		});
+		// axios.post('http://localhost:8080/VirtuosoPruebaWeb2/rest/service/hello',
+		// 	querystring.stringify({'name': name})
+		// )
+		// .then((response) => {
+		// 	console.log(response);
+		// })
+		// .catch((error) => {
+		// 	console.log(error);
+		// });
 	}
 
 	handleClickQuery(){
@@ -130,16 +135,20 @@ export class HTTPPrueba extends React.Component {
 
 		// const querystring = require('querystring');
 		// console.log(usedURL + encodeURIComponent(query));
-		axios.get(usedURL + encodeURIComponent(query)
-		)
-		.then((response) => {
-			console.log(response);
-			let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
-			console.log(infoSensores);
-		})
-		.catch((error) => {
-			console.log(error);
-		});
+		// axios.get(usedURL + encodeURIComponent(query)
+		// )
+		// .then((response) => {
+		// 	console.log(response);
+		// 	let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
+		// 	console.log(infoSensores);
+		// })
+		// .catch((error) => {
+		// 	console.log(error);
+		// // });
+		// const response = Virtuoso.performQuery(query);
+		// console.log(response);
+		// let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
+		// console.log(infoSensores);
 
 	}
 
