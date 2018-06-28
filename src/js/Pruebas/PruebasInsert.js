@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import '../../index.css';
-import * as Queries from '../QueriesModules/SPARQLQueries.js';
+import * as Queries from '../Functions/SPARQLQueries.js';
 import {Row, Col, Button, Card, Icon} from 'react-materialize'
 import M from 'materialize-css';
 import axios from 'axios';

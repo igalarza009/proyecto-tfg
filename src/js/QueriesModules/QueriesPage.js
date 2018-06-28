@@ -2,7 +2,7 @@
 
 import React from 'react';
 import '../../index.css';
-import * as Queries from './SPARQLQueries.js';
+import * as Queries from '../Functions/SPARQLQueries.js';
 import {Button, Row, Col, Card, Icon} from 'react-materialize'
 import M from 'materialize-css';
 import axios from 'axios';
@@ -212,9 +212,9 @@ export class SensorsInfo extends React.Component {
 	recursiveInforCall(selectedSensors, groupBy, filter, filterValues, nResponses, sensorsResponse){
 		const querystring = require('querystring');
 		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], groupBy, filter, filterValues, orderBy);
-		console.log(query);
+		// console.log(query);
 		axios.post(usedURL,
-			querystring.stringify({'query': query, 'maxrows':700000})
+			querystring.stringify({'query': query})
 		)
 		.then((response) => {
 			console.log(response);

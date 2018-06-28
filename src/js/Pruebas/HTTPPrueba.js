@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import '../../index.css';
-import * as Queries from '../QueriesModules/SPARQLQueries.js';
+import * as Queries from '../Functions/SPARQLQueries.js';
 import {Row, Col, Button, Card} from 'react-materialize'
 import M from 'materialize-css';
 // import axios from 'axios';
@@ -46,12 +46,32 @@ export class HTTPPrueba extends React.Component {
 	}
 
 	handleClickInsert(){
-		const query = 'PREFIX dc: <http://purl.org/dc/elements/1.1/> ' +
-					'INSERT data ' +
-					'{ ' +
- 						'graph <http://pruebas.com/prueba#> ' +
-							'{ <http://example/egbook> dc:title  "Prueba con VirtuosoCalls y callback 2" } ' +
-					'} ';
+		const query = 'prefix : <http://www.sensores.com/ontology/pruebas_insert/extrusoras#> ' +
+			'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
+			'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
+			'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ' +
+			'prefix sosa: <http://www.w3.org/ns/sosa/>  ' +
+			'insert data { ' +
+				'graph <http://www.sensores.com/ontology/pruebas_insert/extrusoras#> ' +
+				'{ ' +
+					':sensor2F1KT7date20180324obs1 rdf:type owl:NamedIndividual , ' +
+					':TemperatureObservation . ' +
+					':sensor2F1KT7date20180324obs1result rdf:type owl:NamedIndividual , ' +
+					':DoubleValueResult . ' +
+					':sensor2F1KT7date20180324obs1result sosa:hasSimpleResult "195.9"^^xsd:double . ' +
+					':sensor2F1KT7date20180324obs1 sosa:hasResult :sensor2F1KT7date20180324obs1result . ' +
+					':sensor2F1KT7date20180324obs1 sosa:resultTime "2018-03-24T23:59:59.657Z"^^xsd:dateTime . ' +
+					':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7date20180324obs1 . ' +
+					':sensor2F1KT7date20180324obs2 rdf:type owl:NamedIndividual , ' +
+					':TemperatureObservation . ' +
+					':sensor2F1KT7date20180324obs2result rdf:type owl:NamedIndividual , ' +
+					':DoubleValueResult . ' +
+					':sensor2F1KT7date20180324obs2result sosa:hasSimpleResult "195.9"^^xsd:double . ' +
+					':sensor2F1KT7date20180324obs2 sosa:hasResult :sensor2F1KT7date20180324obs2result . ' +
+					':sensor2F1KT7date20180324obs2 sosa:resultTime "2018-03-24T23:59:58.657Z"^^xsd:dateTime . ' +
+					':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7date20180324obs2 . ' +
+			 	'} ' +
+			'} ';
 
 		// const querystring = require('querystring');
 		// axios.post('http://localhost:8890/sparql/',

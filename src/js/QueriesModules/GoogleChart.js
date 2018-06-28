@@ -14,7 +14,7 @@ export class GoogleChart extends React.Component{
 	  	const self = this;
 	   	this.state = {
 			convertFunc: getConvertOptionsFunc(this.props.chartType),
-		   	allChartData: this.props.allChartData,
+		   	// allChartData: this.props.allChartData,
 	   	};
 	   	this.chartEvents = [
 			{
@@ -27,16 +27,16 @@ export class GoogleChart extends React.Component{
 	   	]
 	 }
 
-	 static getDerivedStateFromProps(props, state){
-		 return {
-			 allChartData: props.allChartData,
-		 };
-	 }
+	 // static getDerivedStateFromProps(props, state){
+		//  return {
+		// 	 allChartData: props.allChartData,
+		//  };
+	 // }
 
 	render(){
 		let charts = null;
-		if (this.state.allChartData){
-			charts = this.state.allChartData.map((chartData, i) => {
+		if (this.props.allChartData){
+			charts = this.props.allChartData.map((chartData, i) => {
 				var title = chartData['title'];
 				var subtitle = chartData['subtitle'];
 				var data = chartData['data'];

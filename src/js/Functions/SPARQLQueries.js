@@ -1,4 +1,5 @@
-const graphURI = '<http://www.sensores.com/ontology/prueba04/extrusoras#>';
+// const graphURI = '<http://www.sensores.com/ontology/prueba08/extrusoras#>';
+const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
 var _ = require('lodash');
 
  // 	sensors: Array of selected sensors
@@ -335,6 +336,15 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
     }
 
 	return finalQuery;
+}
+
+export function getInsertQuery(prefixes, dataToInsert){
+	let query = prefixes;
+	query += ' insert data { graph ' + graphURI + ' { ';
+	query += dataToInsert;
+	query += ' } } ';
+
+	return query;
 }
 
 // export function getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy){

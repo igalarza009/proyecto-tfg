@@ -16,7 +16,12 @@ export function parseDataToRDF(filename, data, infoSensores){
 	const sensorIndicator = filename.substring(0, indexOfDot);
 	const sensorName = 'sensor' + sensorIndicator;
 
-	const currentSensor = _.find(infoSensores, ['indicatorId', sensorIndicator]);
+	console.log(sensorIndicator);
+	console.log(infoSensores);
+
+	const currentSensor = _.find(infoSensores, {'indicatorId':sensorIndicator});
+
+	console.log(currentSensor);
 
 	let observationResult = '';
 	const observationType = currentSensor.observationType;

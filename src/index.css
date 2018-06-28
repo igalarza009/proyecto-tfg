@@ -2,6 +2,10 @@
 
  /*----------- CLASES VARIADAS -------------*/
 
+.padding{
+	padding: 1%;
+}
+
 .pointer{
 	cursor: pointer;
 }
