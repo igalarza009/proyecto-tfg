@@ -5,7 +5,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {ParseData} from './js/DataModules/DataPage.js'
+import {ParseData} from './js/DataModules/DataPage_New.js'
 import M from 'materialize-css';
 import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
 import axios from 'axios';

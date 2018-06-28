@@ -45,9 +45,10 @@ export class ParseData extends React.Component {
 	jsonParsingCompleted(fileName, parsedData){
 			console.log("CSV file parsed to JSON");
 			var file = Parser.parseDataToRDF(fileName, parsedData, this.props.infoSensores);
+			// Parser.parseDataToRDF_Sin(fileName, parsedData, this.props.infoSensores);
             console.log("Data inserted and TTL file created");
             this.setState({
-                file: file,
+                // file: file,
                 dataInserted: true,
                 insertingData: false,
             });

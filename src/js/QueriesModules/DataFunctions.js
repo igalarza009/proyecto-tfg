@@ -50,51 +50,51 @@ export function prepareResponseData(sensorsResponse, info, infoSensores){
 	return allChartData;
 }
 
-export function prepareResponseDataIndividual(sensorsResponse, info, infoSensores){
-	// const results = responseData["results"]["bindings"];
-	let selectedValues = [];
-	let selectDateTime = '';
-	if (info['type'] === 'infor'){
-		if (!info['groupBy']['groupByAll']){
-			if (info['groupBy']['groupBy']){
-				if (info['groupBy']['groupByDate'])
-					selectDateTime = 'resultDate';
-				else if (info['groupBy']['groupByHour'])
-					selectDateTime = 'resultHour';
-
-				if (info['groupBy']['avg'])
-					selectedValues.push('avgValue');
-
-				if (info['groupBy']['min'])
-					selectedValues.push('minValue');
-
-				if (info['groupBy']['max'])
-					selectedValues.push('maxValue');
-			}
-			else {
-				selectedValues.push('resultValue');
-				selectDateTime = "resultTime";
-			}
-		}
-	}
-	else{
-		selectedValues.push('resultValue');
-		selectDateTime = "resultTime";
-	}
-
-	let parsedResults = parseSensorValues(sensorsResponse, info['sensors'], selectedValues, selectDateTime, {});
-
-	console.log(parsedResults);
-
-	let sensorValues = parsedResults['sensorValues'];
-	let datetimes = parsedResults['datetimes'];
-
-	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']}, infoSensores);
-
-	console.log(allChartData);
-
-	return allChartData;
-}
+// export function prepareResponseDataIndividual(sensorsResponse, info, infoSensores){
+// 	// const results = responseData["results"]["bindings"];
+// 	let selectedValues = [];
+// 	let selectDateTime = '';
+// 	if (info['type'] === 'infor'){
+// 		if (!info['groupBy']['groupByAll']){
+// 			if (info['groupBy']['groupBy']){
+// 				if (info['groupBy']['groupByDate'])
+// 					selectDateTime = 'resultDate';
+// 				else if (info['groupBy']['groupByHour'])
+// 					selectDateTime = 'resultHour';
+//
+// 				if (info['groupBy']['avg'])
+// 					selectedValues.push('avgValue');
+//
+// 				if (info['groupBy']['min'])
+// 					selectedValues.push('minValue');
+//
+// 				if (info['groupBy']['max'])
+// 					selectedValues.push('maxValue');
+// 			}
+// 			else {
+// 				selectedValues.push('resultValue');
+// 				selectDateTime = "resultTime";
+// 			}
+// 		}
+// 	}
+// 	else{
+// 		selectedValues.push('resultValue');
+// 		selectDateTime = "resultTime";
+// 	}
+//
+// 	let parsedResults = parseSensorValues(sensorsResponse, info['sensors'], selectedValues, selectDateTime, {});
+//
+// 	console.log(parsedResults);
+//
+// 	let sensorValues = parsedResults['sensorValues'];
+// 	let datetimes = parsedResults['datetimes'];
+//
+// 	let allChartData = prepareDataForGoogleCharts(info['sensors'], selectedValues, sensorValues, datetimes, {'type':info['type']}, infoSensores);
+//
+// 	console.log(allChartData);
+//
+// 	return allChartData;
+// }
 
 export function prepareVariablesSplit(selectedSensors, groupBy, filter, orderBy, type){
     let sensorsResponse = {};
@@ -348,7 +348,7 @@ export function parseSensorValuesSplit(response, sensorId, calcDatetimes, select
 function prepareDataForGoogleCharts(selectedSensors, selectValues, sensorValues, datetimes, info, infoSensores){
 	//info: parMotor, type
 	let allChartData = [];
-	// 
+	//
 	// if (datetimes.length === 1){
 	// 	datetimes.push(0);
 	// }

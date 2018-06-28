@@ -43,6 +43,7 @@ export class GoogleChart extends React.Component{
 
 				var series = {};
 				var axes = {'y':{}};
+				console.log(chartData['y-axis']);
 				chartData['y-axis'].forEach((axisValues, i) => {
 					series[i] = {'axis': axisValues[0]};
 					if (!axes['y'][axisValues[0]]){
