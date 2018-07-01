@@ -2,17 +2,17 @@ const maxPoints = 4500;
 const _ = require('lodash');
 
 // Prepare data of the queries
-export function parseResponseData(sensorResponse, sensorId, info, infoSensores){
+export function parseResponseData(sensorResponse, sensorId, info){
 	// const results = responseData["results"]["bindings"];
 	let selectedValues = [];
-	let selectDateTime = '';
+	let selectedDateTime = '';
 	if (info['type'] === 'infor'){
 		if (!info['groupBy']['groupByAll']){
 			if (info['groupBy']['groupBy']){
 				if (info['groupBy']['groupByDate'])
-					selectDateTime = 'resultDate';
+					selectedDateTime = 'resultDate';
 				else if (info['groupBy']['groupByHour'])
-					selectDateTime = 'resultHour';
+					selectedDateTime = 'resultHour';
 
 				if (info['groupBy']['avg'])
 					selectedValues.push('avgValue');
@@ -25,31 +25,30 @@ export function parseResponseData(sensorResponse, sensorId, info, infoSensores){
 			}
 			else {
 				selectedValues.push('resultValue');
-				selectDateTime = "resultTime";
+				selectedDateTime = "resultTime";
 			}
 		}
 	}
 	else{
 		selectedValues.push('resultValue');
-		selectDateTime = "resultTime";
+		selectedDateTime = "resultTime";
 	}
 
-	let parsedResults = parseSensorValues(sensorResponse, sensorId, selectedValues, selectDateTime, info['parMotor']);
+	let parsedResults = parseSensorValues(sensorResponse, sensorId, selectedValues, selectedDateTime, info['parMotor']);
 
 	let finalResults;
-	if (info['type'] === 'anom'){
+	if (info['type'] === 'anom' || selectedValues.length > 1){
 		finalResults = parsedResults;
 	}
 	else{
 		finalResults = reduceSensorValues(parsedResults['values'], parsedResults['datetimes'], info['sensors']);
 	}
 
-    return finalResults;
+    return {'values': finalResults['values'], 'datetimes': finalResults['datetimes'], 'selectedValues': selectedValues};
 }
 
 function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTime, parMotor){
-	console.log("Hola, estamos en parseSensorValues");
-    let sensorValues = [];
+    let sensorValues;
 	let datetimes = [];
 
 	if (selectDateTime === "resultHour"){
@@ -62,22 +61,19 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 		datetimes.push("Fecha y hora");
 	}
 
-    // --------- De momento no tenemos en cuenta más de un valor agregado ---------
-	// if (selectValues.length === 1){
-	// 	selectedSensors.forEach((sensorId) => {
-	// 		sensorValuesSep[sensorId] = [sensorId];
-	// 	});
-	// }
-	// else{
-	// 	selectedSensors.forEach((sensorId) => {
-	// 		sensorValuesSep[sensorId] = {};
-	// 		selectValues.forEach((selectValue) => {
-	// 			sensorValuesSep[sensorId][selectValue] = [selectValue];
-	// 		})
-	// 	});
-	// }
-	// _.forEach(sensorsResponse, (values, sensorId) => {
-    sensorValues.push(sensorId);
+    // --------- Teniendo en cuenta más de un valor agregado ---------
+	if (selectValues.length === 1){
+		sensorValues = [];
+		sensorValues.push(sensorId);
+	}
+	else{
+		sensorValues = {};
+		selectValues.forEach((selectValue) => {
+			sensorValues[selectValue] = [selectValue];
+		});
+	}
+
+    // sensorValues.push(sensorId);
 
 		sensorResponse.forEach((result, i) => {
 			var sensorNameValue = result["sensorName"]["value"];
@@ -112,38 +108,32 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 					var min = parseInt(resultDateTimeValue.substring(indexTime+4, indexTime+6), 10);
 					var sec = parseInt(resultDateTimeValue.substring(indexTime+7, indexTime+9),10);
 					var milsec = parseInt(resultDateTimeValue.substring(indexTime+10,indexTime+13),10);
-					// datetime = resultDateTimeValue;
-					// console.log(resultDateTimeValue);
-					// console.log(year + monthNumber-1 + day + hour + min + sec + milsec);
 					datetime = new Date(year, monthNumber-1, day, hour, min, sec, milsec);
 				}
 				datetimes.push(datetime);
 			}
 
-            // --------- De momento no tenemos en cuenta más de un valor agregado ---------
-			// if (selectValues.length === 1){
+            // --------- Teniendo en cuenta más de un valor agregado ---------
+			if (selectValues.length === 1){
 				if (parMotor['parMotorId'] && parMotor['parMotorId'] === sensorId && parMotor['calParMotor'] === true){ // [79PWN7] * 0.00302) * 3.84
-					// console.log("Calcular Par Motor.");
 					let parMotorValue = (parseFloat(result[selectValues[0]]["value"]) * 0.00302) * 3.84;
 					sensorValues.push(parMotorValue);
 				}
 				else{
 					sensorValues.push(parseFloat(result[selectValues[0]]["value"]));
 				}
-			// }
-			// else{
-			// 	selectValues.forEach((selectValue) => {
-			// 		sensorValuesSep[sensorId][selectValue].push(parseFloat(result[selectValue]["value"]));
-			// 	});
-			// }
+			}
+			else{
+				selectValues.forEach((selectValue) => {
+			 		sensorValues[selectValue].push(parseFloat(result[selectValue]["value"]));
+			 	});
+		 	}
 		});
-	// });
 
-	return {'values':sensorValues, 'datetimes':datetimes };
+	return {'values':sensorValues, 'datetimes':datetimes};
 }
 
 function reduceSensorValues(values, datetimes, selectedSensors){
-	console.log("Hola, estamos en reduceSensorValues");
     let reducedValues = [];
     let reducedDatetimes = [];
     if (values.length > (maxPoints / selectedSensors.length)){
@@ -157,11 +147,6 @@ function reduceSensorValues(values, datetimes, selectedSensors){
 				if (!isNaN(datetime)){
 					prevDatetimes.push(datetime);
 				}
-				// prevDatetimes.push(datetimes[i].getTime());
-				// if ((i / splitLength) < 100){
-				// 	console.log(prevDatetimes);
-				// 	console.log(new Date(Math.round(_.mean(prevDatetimes))));
-				// }
                 if (prevValues.length === splitLength){ // hacer la media, introducir, vaciar y seguir
                     reducedValues.push(_.mean(prevValues));
                     reducedDatetimes.push(new Date(Math.round(_.mean(prevDatetimes))));
@@ -169,10 +154,6 @@ function reduceSensorValues(values, datetimes, selectedSensors){
                     prevValues = [];
                     prevDatetimes = [];
                 }
-                // else{ // seguir metiendo datos para hacer la media
-                //     prevValues.push(value);
-                //     prevDatetimes.push(datetimes[i].getTime());
-                // }
             }
 			else{
 				reducedValues.push(value);
@@ -193,8 +174,7 @@ function reduceSensorValues(values, datetimes, selectedSensors){
 
 }
 
-export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedSensors, type, parMotor, infoSensores){
-	console.log("Hola, estamos en prepareGoogleChartsData");
+export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedSensors, infoQuery, infoSensores){
     let allChartData = [];
 
 	// let dataToZip = [sensorsResponse['datetimes']];
@@ -210,60 +190,89 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 		});
 	// }
 
-	let dataToZip = [largestDatetimes];
+	if (infoQuery['type']==='infor' && infoQuery['selectedValues'].length > 1){ // Más de una gráfica
+		_.forEach(sensorValues, (sensorData, sensorId) =>{
+			var dataToZip = [largestDatetimes];
 
-	selectedSensors.forEach((sensorId) => {
-		dataToZip.push(sensorValues[sensorId]);
-	});
+			_.forEach(sensorData, (data, selectHeader) =>{
+				dataToZip.push(data);
+			});
 
-	let chartData = _.zip.apply(_,dataToZip);
+			var chartData = _.zip.apply(_,dataToZip);
 
-	console.log(chartData);
+			console.log(chartData);
 
-	// let reducedChartData = reduceChartPoints(chartData, maxChartPoints);
+			let chartFullData = {};
 
-	let chartFullData = {};
+			chartFullData['title'] = "Información del sensor: "+ sensorId;
 
-	let title;
-	if (type==='infor'){
-		title = 'Información general.';
+			var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			var axisTitle = sensor['observedProperty'];
+			var unit = sensor['measureUnit'];
+			var axisLabel = axisTitle + " (" + unit + ")"
+			chartFullData['y-axis'] = [axisTitle, axisLabel];
+
+			chartFullData['data'] = chartData;
+
+			allChartData.push(chartFullData);
+		});
 	}
-	else if (type==='otro'){
-		title = 'Relación entre sensores.';
-	}
-	else{
-		title = 'Búsqueda de anomalías.';
-	}
-	chartFullData['title'] = title;
+	else{ // Sólo una gráfica
+		var dataToZip = [largestDatetimes];
 
-	chartFullData['subtitle'] = "";
-	selectedSensors.forEach((sensorId, i) => {
-		if (i !== (selectedSensors.length - 1)){
-			chartFullData['subtitle'] += sensorId + ", ";
+		selectedSensors.forEach((sensorId) => {
+			dataToZip.push(sensorValues[sensorId]);
+		});
+
+		var chartData = _.zip.apply(_,dataToZip);
+
+		console.log(chartData);
+
+		// let reducedChartData = reduceChartPoints(chartData, maxChartPoints);
+
+		var chartFullData = {};
+
+		var title;
+		if (infoQuery['type']==='infor'){
+			title = 'Información general.';
+		}
+		else if (infoQuery['type']==='otro'){
+			title = 'Relación entre sensores.';
 		}
 		else{
-			chartFullData['subtitle'] += sensorId;
+			title = 'Búsqueda de anomalías.';
 		}
-	})
+		chartFullData['title'] = title;
 
-	chartFullData['y-axis'] = [];
-	selectedSensors.forEach((sensorId, i) => {
-			if (parMotor['parMotorId'] && parMotor['parMotorId'] === sensorId && parMotor['calParMotor'] === true){
-				chartFullData['y-axis'].push(['ParMotor', 'Par Motor']);
+		chartFullData['subtitle'] = "";
+		selectedSensors.forEach((sensorId, i) => {
+			if (i !== (selectedSensors.length - 1)){
+				chartFullData['subtitle'] += sensorId + ", ";
 			}
 			else{
-				var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
-				var axisTitle = sensor['observedProperty'];
-				var unit = sensor['measureUnit'];
-				var axisLabel = axisTitle + " (" + unit + ")"
-				var axisData = [axisTitle, axisLabel];
-				chartFullData['y-axis'].push(axisData);
+				chartFullData['subtitle'] += sensorId;
 			}
-	});
+		})
 
-	chartFullData['data'] = chartData;
+		chartFullData['y-axis'] = [];
+		selectedSensors.forEach((sensorId, i) => {
+				if (infoQuery['parMotor']['parMotorId'] && infoQuery['parMotor']['parMotorId'] === sensorId && infoQuery['parMotor']['calParMotor'] === true){
+					chartFullData['y-axis'].push(['ParMotor', 'Par Motor']);
+				}
+				else{
+					var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+					var axisTitle = sensor['observedProperty'];
+					var unit = sensor['measureUnit'];
+					var axisLabel = axisTitle + " (" + unit + ")"
+					var axisData = [axisTitle, axisLabel];
+					chartFullData['y-axis'].push(axisData);
+				}
+		});
 
-	allChartData.push(chartFullData);
+		chartFullData['data'] = chartData;
+
+		allChartData.push(chartFullData);
+	}
 
 	return allChartData;
 }
