@@ -18,7 +18,7 @@ export class AnomaliasQueryForm extends React.Component{
 			selectedSensors: this.props.selectedSensors,
             sensorDir: {},
 			calParMotor: false,
-			relType: 'custom',
+			relType: 'predef',
 			fechaInicio: '',
 			fechaFin: '',
 		};
@@ -182,6 +182,13 @@ export class AnomaliasQueryForm extends React.Component{
 		const parMotorId = this.state.parMotorId;
 		const relType = this.state.relType;
 
+		const select = (selectedSensors.length > 1)
+			? (<Input s={12} l={6} type='select' defaultValue='predef' onChange={(e) => {this.handleSelectChange(e);}}>
+					<option value='custom'>Relación personalizada</option>
+					<option value='predef'>Relaciones predefinidas</option>
+				</Input>)
+			: (null);
+
         const sensores = selectedSensors.map((sensorId, i) => {
             const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 			const sensorName = sensor.name;
@@ -236,14 +243,25 @@ export class AnomaliasQueryForm extends React.Component{
 				const arrowDir = (value === 'up') ? "arrow_upward" : "arrow_downward";
 				const icon = (<Icon>{arrowDir}</Icon>);
 				const sensorId = sensorIds[iPar];
+				let sensorName;
+				if (sensorId === 'ParMotor'){
+					sensorName = "Cálculo del par motor (Consumo del motor)";
+				}
+				else{
+					const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
+					sensorName = 'Sensor ' + sensorId + ' (' + sensor.name + ')';
+				}
 				const key = "keyRel" + iRel + "par" + iPar;
 				return(
-					(<p key={key}>Sensor {sensorId} {icon}</p>)
+					(<p key={key}> {sensorName} {icon}</p>)
 				);
 			});
 			const id = "sensorRel" + iRel;
+			// const checked = (iRel === 0)
+			// 	? (true)
+			// 	: (false);
 			return(
-				<Col s={12} l={6} key={id} className="margin-bottom">
+				<Col s={12} key={id} className="margin-bottom">
 					<input name="predefRel" className="with-gap" type="radio" id={id} onChange={(e) => {this.handleRadioChange(e,iRel);}}/>
 					<label htmlFor={id} className="valign-wrapper">
 						{sensorRels}
@@ -256,8 +274,7 @@ export class AnomaliasQueryForm extends React.Component{
 			? (<div>
 					<Row>
 						<p className='grey-text'>
-							Especificar la relación esperada entre los sensores,
-							especificando el aumento o decrecimiento que se debería dar en sus valores.
+							Especificar la tendencia que debería darse en los valores de los sensores seleccionados en condiciones normales.
 						</p>
 					</Row>
 					{sensores}
@@ -266,7 +283,7 @@ export class AnomaliasQueryForm extends React.Component{
 					<Row>
 						<Col s={12}>
 							<p className='grey-text'>
-								Elegir una de las relaciones entre sensores predefinidas.
+								Elegir una de las relaciones predefinidas, que representan la tendencia que debería darse en los valores de los sensores en condiciones normales.
 							</p>
 						</Col>
 					</Row>
@@ -279,11 +296,13 @@ export class AnomaliasQueryForm extends React.Component{
 			<Card>
 				<div className='form'>
 					<Row>
-						<Input s={12} l={6} type='select' defaultValue='custom' onChange={(e) => {this.handleSelectChange(e);}}>
-							<option value='custom'>Relación personalizada</option>
-							<option value='predef'>Relaciones predefinidas</option>
-						</Input>
+						{select}
 					</Row>
+					<Row s={12}>
+					 	<p className='blue-text text-darken-3'>
+							Relación que debería darse entre los sensores:
+						</p>
+					 </Row>
 					{selectedRelType}
 					<Row s={12}>
 					 	<p className='blue-text text-darken-3'>

@@ -69,7 +69,16 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 	else{
 		sensorValues = {};
 		selectValues.forEach((selectValue) => {
-			sensorValues[selectValue] = [selectValue];
+			if (selectValue === 'avgValue'){
+				sensorValues[selectValue] = ['Valor medio'];
+			}
+			else if (selectValue === 'minValue'){
+				sensorValues[selectValue] = ['Valor mínimo'];
+			}
+			else if (selectValue === 'maxValue'){
+				sensorValues[selectValue] = ['Valor máximo'];
+			}
+
 		});
 	}
 
@@ -210,7 +219,11 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 			var axisTitle = sensor['observedProperty'];
 			var unit = sensor['measureUnit'];
 			var axisLabel = axisTitle + " (" + unit + ")"
-			chartFullData['y-axis'] = [axisTitle, axisLabel];
+			var axisData = [axisTitle, axisLabel];
+			chartFullData['y-axis'] = [];
+			infoQuery['selectedValues'].forEach((value) => {
+				chartFullData['y-axis'].push(axisData);
+			});
 
 			chartFullData['data'] = chartData;
 

@@ -43,7 +43,7 @@ export class SensorsInfo extends React.Component {
 		super(props);
 		this.state = {
 			selectedSensors: [],
-			showQueries: false,
+			showQueries: true,
 			moreThanOneSensor: false,
 			loadingQuery: false,
 			showChart: false,
@@ -73,16 +73,16 @@ export class SensorsInfo extends React.Component {
 			selectedSensors: selectedSensors,
 		});
 
-		if (selectedSensors.length > 0 && !showQueries && !loadingQuery && !showChart){
+		if (!showQueries && !loadingQuery && !showChart){
 			this.setState({
 				showQueries: true,
 			});
 		}
-		else if (selectedSensors.length === 0){
-			this.setState({
-				showQueries: false,
-			});
-		}
+		// else if (selectedSensors.length === 0){
+		// 	this.setState({
+		// 		showQueries: false,
+		// 	});
+		// }
 
 		if (selectedSensors.length > 1 && !moreThanOneSensor){
 			this.setState({
@@ -157,7 +157,7 @@ export class SensorsInfo extends React.Component {
 
 		const cardValue = (selectedSensors.length === 0)
 			? (<p className='center'>
-					Selecciona el sensor o sensores deseados
+					Selecciona el sensor o sensores deseados para realizar preguntas personalizadas.
 				</p>)
 			: (cardContent);
 
@@ -780,12 +780,12 @@ export class SensorsInfo extends React.Component {
 
 	newQuery(){
 		const selectedSensors = this.state.selectedSensors.slice();
-		let showQueries = false;
-		if (selectedSensors.length > 0){
-			showQueries = true;
-		}
+		// let showQueries = false;
+		// if (selectedSensors.length > 0){
+		// 	showQueries = true;
+		// }
 		this.setState({
-			showQueries: showQueries,
+			showQueries: true,
 			loadingQuery: false,
 			showChart: false,
 			// noData: false,
@@ -1055,55 +1055,3 @@ export class SensorsInfo extends React.Component {
 		);
 	}
 }
-
-// 	let reducedValues = {};
-// 	selectedSensors.forEach((sensorId) => {
-// 		reducedValues[sensorId] = [];
-// 	});
-// 	let reducedDatetimes = [];
-//
-// 	let primSensorId = selectedSensors[0];
-// 	if (sensorValues[primSensorId].length > 2000){
-// 		let redMax = Math.round(sensorValues[primSensorId].length / 2000);
-// 		let valuesToAvg = {};
-// 		selectedSensors.forEach((sensorId) => {
-// 			valuesToAvg[sensorId] = [];
-// 		});
-// 		let timesToAvg = [];
-// 		sensorValues[primSensorId].forEach((value, i) => {
-// 			if (i!==0){
-// 				if (valuesToAvg[primSensorId].length < redMax){
-// 					// valuestoAvg[primSensorId].push(value);
-// 					selectedSensors.forEach((sensorId) => {
-// 						valuesToAvg[primSensorId].push(sensorValues[sensorId][i]);
-// 					});
-// 					if (valuesToAvg[primSensorId].length === 1){
-// 						timesToAvg.push(datetimes[i].getTime());
-// 					}
-// 					else if (valuesToAvg[primSensorId].length === redMax){
-// 						timesToAvg.push(datetimes[i].getTime());
-// 					}
-// 				}
-// 				else{
-// 					// reducedValues[primSensorId].push(_.mean(valuesToAvg[primSensorId]));
-// 					selectedSensors.forEach((sensorId) => {
-// 						reducedValues[sensorId].push(_.mean(valuesToAvg[sensorId]));
-// 					});
-// 					reducedDatetimes.push(new Date( Math.round(_.mean(timesToAvg))));
-// 					selectedSensors.forEach((sensorId) => {
-// 						valuesToAvg[sensorId] = [];
-// 					});
-// 					timesToAvg = [];
-// 				}
-// 			}
-// 			else{
-// 				selectedSensors.forEach((sensorId) => {
-// 					reducedValues[sensorId].push(sensorValues[sensorId][i]);
-// 				});
-// 				reducedDatetimes.push(datetimes[i]);
-// 			}
-// 		});
-//
-// 		console.log(reducedValues);
-// 		console.log(reducedDatetimes);
-// 	}

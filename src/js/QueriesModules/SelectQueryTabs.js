@@ -20,7 +20,11 @@ export class PruebaTabsMat extends React.Component {
 		const selectedSensors = this.props.selectedSensors;
 		const moreThanOneSensor = this.props.moreThanOneSensor;
 
-		const classNames = (moreThanOneSensor)
+		const inforClassNames = (selectedSensors.length > 0)
+			? ("tab col s4")
+			: ("tab col s4 disabled");
+
+		const otroClassNames = (selectedSensors.length > 1)
 			? ("tab col s4")
 			: ("tab col s4 disabled");
 
@@ -29,8 +33,9 @@ export class PruebaTabsMat extends React.Component {
 				<div className="row">
 				<div className="col s12">
 					 <ul className="tabs tabs-fixed-width">
-						 <li className="tab col s4">
-							 <a className="active" href="#infor">Información
+						 <li className="tab col s4"><a className="active"  href="#anom">Anomalías</a></li>
+						 <li className={inforClassNames}>
+							 <a href="#infor">Información
 								 {/* <i className="tiny grey-text material-icons tooltipped infoTabs"
 									 data-position="bottom"
 									 data-tooltip="I am a tooltip">
@@ -38,8 +43,7 @@ export class PruebaTabsMat extends React.Component {
 								 </i> */}
 							 </a>
 						 </li>
-						 <li className={classNames}><a href="#otro">Otro sensor</a></li>
-						 <li className={classNames}><a href="#anom">Anomalias</a></li>
+						 <li className={otroClassNames}><a href="#otro">Relación</a></li>
 					 </ul>
 				 </div>
 				 <div id="infor" className="col s12">

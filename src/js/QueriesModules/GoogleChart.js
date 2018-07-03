@@ -35,27 +35,26 @@ export class GoogleChart extends React.Component{
 
 	render(){
 		let charts = null;
-		if (this.props.allChartData){
-			charts = this.props.allChartData.map((chartData, i) => {
-				var title = chartData['title'];
-				var subtitle = chartData['subtitle'];
+		const allChartData = this.props.allChartData;
+		if (allChartData){
+			charts = allChartData.map((chartData, i) => {
 				var data = chartData['data'];
 
 				var series = {};
 				var axes = {'y':{}};
-				console.log(chartData['y-axis']);
 				chartData['y-axis'].forEach((axisValues, i) => {
 					series[i] = {'axis': axisValues[0]};
 					if (!axes['y'][axisValues[0]]){
 						axes['y'][axisValues[0]] = {'label': axisValues[1]};
 					}
 				});
-
 				var options = {};
 
 				options['chart'] = {};
-				options['chart']['title'] = title;
-				options['chart']['subtitle'] = subtitle;
+				options['chart']['title'] = chartData['title'];
+				if (chartData['subtitle']){
+					options['chart']['subtitle'] = chartData['subtitle'];
+				}
 				if (this.props.longDateFormat){
 					options['hAxis'] = {
 						format: 'MMM dd (HH:mm:ss)'
@@ -72,8 +71,8 @@ export class GoogleChart extends React.Component{
 				options['series'] = series;
 				options['axes'] = axes;
 
-				const convertFunc = this.state.convertFunc;
-	    		const finalOptions = convertFunc ? convertFunc(options) : options;
+				var convertFunc = this.state.convertFunc;
+	    		var finalOptions = convertFunc ? convertFunc(options) : options;
 
 				return(
 					<Card key={i}>
@@ -83,7 +82,7 @@ export class GoogleChart extends React.Component{
 							options={finalOptions}
 							width="100%"
 							height="400px"
-							chartEvents={convertFunc ? null : this.chartEvents}
+							chartEvents={convertFunc ? [] : this.chartEvents}
 						/>
 					</Card>
 				);
