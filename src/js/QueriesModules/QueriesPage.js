@@ -157,7 +157,7 @@ export class SensorsInfo extends React.Component {
 
 		const cardValue = (selectedSensors.length === 0)
 			? (<p className='center'>
-					Selecciona el sensor o sensores deseados para realizar preguntas personalizadas.
+					Selecciona uno o varios sensores para realizar preguntas personalizadas.
 				</p>)
 			: (cardContent);
 

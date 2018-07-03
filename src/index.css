@@ -109,7 +109,7 @@
 
 .tabs .tab a:hover,.tabs .tab a.active {
 	background-color: transparent;
-	color: #1565c0;
+	color: #135bac;
 }
 .tabs .tab.disabled a,.tabs .tab.disabled a:hover {
 	color:grey;

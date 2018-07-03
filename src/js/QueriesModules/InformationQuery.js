@@ -22,13 +22,48 @@ export class InformationQueryForm extends React.Component{
 			filterValues: [],
 			values: {},
 			formArrowUp: [false, false, false, false],
+			errores: {
+				fechasMal:false,
+				faltaFecha: false,
+				horasMal:false,
+				faltaHora:false
+			},
+			openedTabs: [],
 		};
 	}
 
 	componentDidMount(){
 		$(document).ready(function(){
-			$('.collapsible').collapsible();
+			$('.collapsible').collapsible(
+				// {
+				// 	onOpen: function(el) {
+				// 		this.addToTabs(el[0].id);
+				// 	},
+	    		// 	onClose: function(el) {
+				// 		this.removeFromTabs(el[0].id);
+				// 	} // Callback for Collapsible close
+				// }
+			);
 		});
+	}
+
+	addToTabs(id){
+		let openedTabs = this.state.openedTabs.slice();
+		openedTabs.push(id);
+		this.setState({
+			openedTabs: openedTabs,
+		});
+		console.log(openedTabs);
+	}
+
+	removeFromTabs(id){
+		let openedTabs = this.state.openedTabs.slice();
+		const posId = openedTabs.indexOf(id);
+		openedTabs.splice(posId, 1);
+		this.setState({
+			openedTabs: openedTabs,
+		});
+		console.log(openedTabs);
 	}
 
 	handleOpenForm(index){
@@ -40,20 +75,57 @@ export class InformationQueryForm extends React.Component{
 	}
 
 	handleFechaInicio(event, value){
+		const fechaFin = this.state.fechaFin;
+		var errores = this.state.errores;
+		var fechasMal = false;
+		var faltaFecha = false;
+		if (fechaFin === ''){
+			faltaFecha = true;
+		}
+		else{
+			var dateInicio = new Date(value + 'T00:00:00');
+			var dateFin = new Date(fechaFin + 'T00:00:00');
+			if (dateInicio.getTime() > dateFin.getTime()){
+				fechasMal = true;
+			}
+		}
+		errores['fechasMal'] = fechasMal;
+		errores['faltaFecha'] = faltaFecha;
 		this.setState({
 			fechaInicio: value,
+			errores: errores,
 		});
+		console.log(errores);
 	}
 
 	handleFechaFin(event, value){
+		const fechaInicio = this.state.fechaInicio;
+		var errores = this.state.errores;
+		var fechasMal = false;
+		var faltaFecha = false;
+		if (fechaInicio === ''){
+			faltaFecha = true;
+		}
+		else{
+			var dateInicio = new Date(fechaInicio + 'T00:00:00');
+			var dateFin = new Date(value + 'T00:00:00');
+			if (dateInicio.getTime() > dateFin.getTime()){
+				fechasMal = true;
+			}
+		}
+		errores['fechasMal'] = fechasMal;
+		errores['faltaFecha'] = faltaFecha;
 		this.setState({
 			fechaFin: value,
+			errores: errores,
 		});
+		console.log(errores);
 	}
 
 	handleTimeChange(event,  timeName, timeType){
 		let value = event.target.value;
 		let newValue = value;
+		// let errores = this.state.errores;
 		if (value.length === 1){
 			newValue = '0' + value;
 			event.target.value = newValue;
@@ -64,9 +136,37 @@ export class InformationQueryForm extends React.Component{
 		}
 		let time = this.state[timeName];
 		time[timeType] = newValue;
+
 		this.setState({
 			[timeName]: time,
 		});
+
+		this.checkTimes();
+	}
+
+	checkTimes(){
+		const horaInicio = this.state.horaInicio;
+		const horaFin = this.state.horaFin;
+		var errores = this.state.errores;
+
+		var faltaHora = false, horasMal = false;
+
+		if (_.includes(horaInicio, null) || _.includes(horaFin, null)){
+			faltaHora = true;
+		}
+		else{
+			var dateInicio = new Date('2000-01-01T' + horaInicio['hor'] + ':' + horaInicio['min'] + ':' + horaInicio['seg']);
+			var dateFin = new Date('2000-01-01T' + horaFin['hor'] + ':' + horaFin['min'] + ':' + horaFin['seg']);
+			if (dateInicio.getTime() > dateFin.getTime()){
+				horasMal = true;
+			}
+		}
+		errores['horasMal'] = horasMal;
+		errores['faltaHora'] = faltaHora;
+		this.setState({
+			errores: errores,
+		});
+		console.log(errores);
 	}
 
 	handleSwitch(event, sensorId){
@@ -388,14 +488,14 @@ export class InformationQueryForm extends React.Component{
 			// 	</div>
 			// </Card>
 				<ul className="collapsible" data-collapsible="expandable">
-					<li>
+					<li id='enunciado'>
 						<div className="collapsible-header no-pointer grey-text">
 							<div className="form-collap">
 								Obtener una gráfica sobre los valores que toman los sensores selecionados.
 							</div>
 						</div>
 					</li>
-					<li>
+					<li id='fechas'>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(0);}}>
 							<i className={formIconColors[0]}>{formIcons[0]}</i>
 							<div className={formTitleColors[0]}>
@@ -417,7 +517,7 @@ export class InformationQueryForm extends React.Component{
 							</span>
 						</div>
 					</li>
-					<li>
+					<li id='horas'>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(1);}}>
 							<i className={formIconColors[1]}>{formIcons[1]}</i>
 							<div className={formTitleColors[1]}>
@@ -475,7 +575,7 @@ export class InformationQueryForm extends React.Component{
 							</span>
 						</div>
 					</li>
-					<li>
+					<li id='valores'>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(2);}}>
 							<i className={formIconColors[2]}>{formIcons[2]}</i>
 							<div className={formTitleColors[2]}>
@@ -488,7 +588,7 @@ export class InformationQueryForm extends React.Component{
 							</span>
 						</div>
 					</li>
-					<li>
+					<li id='agrupar'>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(3);}}>
 							<i className={formIconColors[3]}>{formIcons[3]}</i>
 							<div className={formTitleColors[3]}>
@@ -527,7 +627,7 @@ export class InformationQueryForm extends React.Component{
 							</span>
 						</div>
 					</li>
-					<li>
+					<li id='consultar'>
 						<div className="collapsible-header no-pointer blue-text text-darken-3">
 							<Row className='center-align form-collap'>
 								<Button className='blue darken-3 topMargin' type='submit' name='action' onClick={() => {this.handleSubmit();}}>

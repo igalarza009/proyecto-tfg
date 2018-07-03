@@ -184,8 +184,8 @@ export class AnomaliasQueryForm extends React.Component{
 
 		const select = (selectedSensors.length > 1)
 			? (<Input s={12} l={6} type='select' defaultValue='predef' onChange={(e) => {this.handleSelectChange(e);}}>
+					<option value='predef'>Relación predefinida</option>
 					<option value='custom'>Relación personalizada</option>
-					<option value='predef'>Relaciones predefinidas</option>
 				</Input>)
 			: (null);
 
@@ -292,6 +292,10 @@ export class AnomaliasQueryForm extends React.Component{
 					</Row>
 				</div>);
 
+		const buttonDisabled = (_.size(sensorDir) < 1)
+			? (true)
+			: (false);
+
 		return(
 			<Card>
 				<div className='form'>
@@ -318,7 +322,7 @@ export class AnomaliasQueryForm extends React.Component{
 					 			onChange={(e, value) => {this.handleFechaFin(e, value);}} />
 					</Row>
 					<Row className='center-align'>
-						<Button className='blue darken-3' type='submit' name='action'
+						<Button className='blue darken-3' type='submit' name='action' disabled={buttonDisabled}
 							onClick={() => {this.handleSubmit();}}>
 							Consultar <Icon right>bar_chart</Icon>
 		   				</Button>

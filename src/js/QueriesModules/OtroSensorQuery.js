@@ -31,7 +31,7 @@ export class OtroSensorQueryForm extends React.Component{
 		let newKnownSensors = {};
 		selectedSensors.forEach((value,i) => {
 			if (askedSensors.indexOf(value) === -1){
-				newKnownSensors[value] = 0;
+				newKnownSensors[value] = null;
 			}
 		});
 
@@ -54,7 +54,7 @@ export class OtroSensorQueryForm extends React.Component{
 					newAskedSensors.push(value);
 				}
 				else if (!knownSensors[value]){
-					newKnownSensors[value] = 0;
+					newKnownSensors[value] = null;
 				}
 				else{
 					newKnownSensors[value] = knownSensors[value];
@@ -83,7 +83,7 @@ export class OtroSensorQueryForm extends React.Component{
 		let newKnownSensors = knownSensors;
 		if ( iAskedSensor !== -1){
 			askedSensors.splice(iAskedSensor, 1);
-			newKnownSensors[value] = 0;
+			newKnownSensors[value] = null;
 		}
 		else{
 			askedSensors.push(value);
@@ -101,7 +101,7 @@ export class OtroSensorQueryForm extends React.Component{
 		let value = event.target.value;
 		let knownSensors = this.state.knownSensors;
 		if (value === ""){
-			knownSensors[sensorId] = 0;
+			knownSensors[sensorId] = null;
 		}
 		else{
 			knownSensors[sensorId] = parseFloat(value);
@@ -115,7 +115,7 @@ export class OtroSensorQueryForm extends React.Component{
 		let value = event.target.value;
 		let knownSensors = this.state.knownSensors;
 		if (value === 'esp'){
-			knownSensors[sensorId] = 0;
+			knownSensors[sensorId] = null;
 		}
 		else{
 			knownSensors[sensorId] = value;
@@ -302,6 +302,10 @@ export class OtroSensorQueryForm extends React.Component{
 			}
 		});
 
+		const buttonDisabled = (_.includes(knownSensors, null))
+			? (true)
+			: (false);
+
 		return(
 			<Card>
 				<div className='form'>
@@ -340,7 +344,8 @@ export class OtroSensorQueryForm extends React.Component{
 					</Row>
 					<Row className='center-align'>
 						<Button className='blue darken-3' type='submit'
-							name='action' onClick={() => {this.handleSubmit();}}>
+							name='action' disabled={buttonDisabled}
+							onClick={() => {this.handleSubmit();}}>
 							Consultar <Icon right>bar_chart</Icon>
 		   				</Button>
 					</Row>

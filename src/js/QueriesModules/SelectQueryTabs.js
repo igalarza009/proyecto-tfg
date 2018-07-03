@@ -33,17 +33,36 @@ export class PruebaTabsMat extends React.Component {
 				<div className="row">
 				<div className="col s12">
 					 <ul className="tabs tabs-fixed-width">
-						 <li className="tab col s4"><a className="active"  href="#anom">Anomalías</a></li>
-						 <li className={inforClassNames}>
-							 <a href="#infor">Información
-								 {/* <i className="tiny grey-text material-icons tooltipped infoTabs"
+						 <li className="tab col s4">
+							 <a className="active" href="#anom">
+								 Anomalías
+								 <i className="tiny material-icons tooltipped infoTabs"
 									 data-position="bottom"
-									 data-tooltip="I am a tooltip">
+									 data-tooltip="Búsqueda de anomalías en los valores de los sensores.">
 									 info
-								 </i> */}
+								 </i>
 							 </a>
 						 </li>
-						 <li className={otroClassNames}><a href="#otro">Relación</a></li>
+						 <li className={inforClassNames}>
+							 <a href="#infor">
+								 Información
+								 <i className="tiny material-icons tooltipped infoTabs"
+									 data-position="bottom"
+									 data-tooltip="Preguntas de información general sobre los sensores.">
+									 info
+								 </i>
+							 </a>
+						 </li>
+						 <li className={otroClassNames}>
+							 <a href="#otro">
+								 Relación
+								 <i className="tiny material-icons tooltipped infoTabs"
+									 data-position="bottom"
+									 data-tooltip="Búsqueda de relaciones entre los valores de los sensores.">
+									 info
+								 </i>
+							 </a>
+						 </li>
 					 </ul>
 				 </div>
 				 <div id="infor" className="col s12">
