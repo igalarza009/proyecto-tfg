@@ -34,16 +34,7 @@ export class InformationQueryForm extends React.Component{
 
 	componentDidMount(){
 		$(document).ready(function(){
-			$('.collapsible').collapsible(
-				// {
-				// 	onOpen: function(el) {
-				// 		this.addToTabs(el[0].id);
-				// 	},
-	    		// 	onClose: function(el) {
-				// 		this.removeFromTabs(el[0].id);
-				// 	} // Callback for Collapsible close
-				// }
-			);
+			$('.collapsible').collapsible();
 		});
 	}
 
@@ -66,7 +57,7 @@ export class InformationQueryForm extends React.Component{
 		console.log(openedTabs);
 	}
 
-	handleOpenForm(index){
+	handleOpenForm(index, tabName){
 		let formArrowUp = this.state.formArrowUp;
 		formArrowUp[index] = !this.state.formArrowUp[index];
 		this.setState({
@@ -488,14 +479,14 @@ export class InformationQueryForm extends React.Component{
 			// 	</div>
 			// </Card>
 				<ul className="collapsible" data-collapsible="expandable">
-					<li id='enunciado'>
+					<li>
 						<div className="collapsible-header no-pointer grey-text">
 							<div className="form-collap">
 								Obtener una gráfica sobre los valores que toman los sensores selecionados.
 							</div>
 						</div>
 					</li>
-					<li id='fechas'>
+					<li>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(0);}}>
 							<i className={formIconColors[0]}>{formIcons[0]}</i>
 							<div className={formTitleColors[0]}>
@@ -517,7 +508,7 @@ export class InformationQueryForm extends React.Component{
 							</span>
 						</div>
 					</li>
-					<li id='horas'>
+					<li>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(1);}}>
 							<i className={formIconColors[1]}>{formIcons[1]}</i>
 							<div className={formTitleColors[1]}>
@@ -575,7 +566,7 @@ export class InformationQueryForm extends React.Component{
 							</span>
 						</div>
 					</li>
-					<li id='valores'>
+					<li>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(2);}}>
 							<i className={formIconColors[2]}>{formIcons[2]}</i>
 							<div className={formTitleColors[2]}>
@@ -588,7 +579,7 @@ export class InformationQueryForm extends React.Component{
 							</span>
 						</div>
 					</li>
-					<li id='agrupar'>
+					<li>
 						<div className="collapsible-header" onClick={() => {this.handleOpenForm(3);}}>
 							<i className={formIconColors[3]}>{formIcons[3]}</i>
 							<div className={formTitleColors[3]}>

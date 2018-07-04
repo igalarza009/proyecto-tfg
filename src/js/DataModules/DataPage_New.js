@@ -26,7 +26,9 @@ export class ParseData extends React.Component {
 	handleInsertData(){
 		const selectedFile = this.fileInput.files;
 		const fileName = selectedFile[0].name;
-		let parsedData = [];
+		// let parsedData = [];
+		let parsedValues = [];
+		let parsedTimestamps = [];
 
 		this.setState({
 			insertingData: true,
@@ -36,15 +38,17 @@ export class ParseData extends React.Component {
 
 		Papa.parse(selectedFile[0], {
 			step: function(row) {
-				parsedData.push(row.data[0]);
+				// parsedData.push(row.data[0]);
+				let parsedValues = [];
+				let parsedTimestamps = [];
 			},
-			complete: (results) => {this.jsonParsingCompleted(fileName,parsedData)},
+			complete: (results) => {this.jsonParsingCompleted(fileName, parsedValues, parsedTimestamps);},
 		});
 	}
 
-	jsonParsingCompleted(fileName, parsedData){
+	jsonParsingCompleted(fileName, parsedValues, parsedTimestamps){
 			console.log("CSV file parsed to JSON");
-			var file = Parser.parseDataToRDF(fileName, parsedData, this.props.infoSensores);
+			var file = Parser.parseDataToRDF_Sin(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
 			// Parser.parseDataToRDF_Sin(fileName, parsedData, this.props.infoSensores);
             console.log("Data inserted and TTL file created");
             this.setState({

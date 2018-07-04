@@ -11,6 +11,10 @@ import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insertfile';
 
+const maxReqLength = 250000;
+
+// const querystring = require('querystring');
+
 export class ParseData extends React.Component {
 	constructor(props) {
 	    super(props);
@@ -26,43 +30,12 @@ export class ParseData extends React.Component {
 	    }
  	}
 
-	// handleSubmit(event){
-	// 	const selectedFile = this.fileInput.files;
-	// 	const fileName = selectedFile[0].name;
-	// 	let parsedData = [];
-	//
-	// 	Papa.parse(selectedFile[0], {
-	// 		// worker: true,
-	// 		step: function(row) {
-	// 			// console.log("Row:", row.data);
-	// 			parsedData.push(row.data[0]);
-	// 		},
-	// 		complete: function() {
-	// 			console.log("CSV file parsed to JSON");
-	// 			var file = Parser.parseDataToRDF(fileName, parsedData);
-	// 			console.log("TTL file created")
-	// 			var formData = new FormData();
-	// 			formData.append("file", file);
-	// 			axios.post(RESTfulURLInsert, formData, {
-	// 				headers: {
-	// 					 'Content-Type': 'multipart/form-data'
-	// 				}
-	// 			})
-	// 			.then((response) => {
-	// 				console.log(response);
-	// 			})
-	// 			.catch((error) => {
-	// 				console.log(error);
-	// 			});
-	// 		}
-	// 	});
-	//
-	// }
-
 	handleParseFile(){
 		const selectedFile = this.fileInput.files;
 		const fileName = selectedFile[0].name;
-		let parsedData = [];
+		// let parsedData = [];
+		let parsedValues = [];
+		let parsedTimestamps = [];
 
 		this.setState({
 			parsingFile: true,
@@ -71,22 +44,57 @@ export class ParseData extends React.Component {
 		});
 
 		Papa.parse(selectedFile[0], {
-			step: function(row) {
-				parsedData.push(row.data[0]);
+			step: function(row, i) {
+				// parsedData.push(row.data[0]);
+				if (row.data[0][0] !== "" && !isNaN(row.data[0][1])){
+					parsedTimestamps.push(row.data[0][0]);
+					parsedValues.push(parseFloat(row.data[0][1]));
+				}
 			},
-			complete: (results) => {this.parsingCompleted(fileName,parsedData)},
+			complete: (results) => {
+				parsedTimestamps.reverse();
+				parsedValues.reverse();
+				this.parsingCompleted(fileName, parsedValues, parsedTimestamps, [], []);
+			},
 		});
 	}
 
-	parsingCompleted(fileName, parsedData){
-			console.log("CSV file parsed to JSON");
-			var file = Parser.parseDataToRDF(fileName, parsedData, this.props.infoSensores);
-			console.log("TTL file created");
-			this.setState({
-				file: file,
-				parsingEnded: true,
-				parsingFile: false,
-			});
+	parsingCompleted(fileName, parsedValues, parsedTimestamps, fixedValues, fixedTimestamps){
+		console.log("CSV file parsed to JSON");
+		const firstValues = parsedValues.splice(0, maxReqLength);
+		const firstTimestamps = parsedTimestamps.splice(0, maxReqLength);
+		// console.log(firstValues);
+		// console.log(firstTimestamps);
+		// console.log(parsedValues);
+		// console.log(parsedTimestamps);
+		axios.post("http://35.224.159.30/api/fix/",
+			{timestamps: firstTimestamps, values:firstValues}
+		)
+		.then((response) => {
+			console.log(response);
+			let newFixedValues = fixedValues.concat(response['data']['values']);
+			let newFixedTimestamps = fixedTimestamps.concat(response['data']['timestamps']);
+			// console.log(newFixedValues);
+			// console.log(newFixedTimestamps);
+			if (parsedValues.length > 0){
+				this.parsingCompleted(fileName, parsedValues, parsedTimestamps, newFixedValues, newFixedTimestamps);
+			}
+			else{
+				console.log("No hay más datos");
+				console.log(newFixedValues);
+				console.log(newFixedTimestamps);
+				var file = Parser.parseDataToRDF(fileName, newFixedValues, newFixedTimestamps, this.props.infoSensores);
+				console.log("TTL file created");
+				this.setState({
+					file: file,
+					parsingEnded: true,
+					parsingFile: false,
+				});
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+		});
 	}
 
 	handleDownload(){

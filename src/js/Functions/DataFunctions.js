@@ -92,32 +92,19 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 				var resultDateTimeValue = result[selectDateTime]["value"];
 				var datetime;
 				if (selectDateTime === 'resultDate'){
-					var indexFirstDash = resultDateTimeValue.indexOf('-');
-					var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
-					var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
-					var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
-					datetime = new Date(year, monthNumber-1, day);
+					// var indexT = resultDateTimeValue.indexOf('T'); 
+					// Cambiar a espacio con los fixed dates
+					var indexT = resultDateTimeValue.indexOf(' ');
+					var date = resultDateTimeValue.substring(0, indexT);
+					datetime = new Date(date);
 				}
 				else if (selectDateTime === 'resultHour'){
 					var indexFirstSep = resultDateTimeValue.indexOf(':');
 					var hour = parseInt(resultDateTimeValue.substring(0,indexFirstSep),10);
-					// var min = parseInt(resultDateTimeValue.substring(indexFirstSep+1, indexFirstSep+3), 10);
-					// var sec = parseInt(resultDateTimeValue.substring(indexFirstSep+4,indexFirstSep+6),10);
-					// var milsec = parseInt(resultDateTimeValue.substring(indexFirstSep+7,indexFirstSep+10),10);
 					datetime = hour + ":00 - " + (hour + 1) + ":00";
-					// datetime = new Date (0, 0, 0, hour, min, sec, milsec);
 				}
 				else {
-					var indexFirstDash = resultDateTimeValue.indexOf('-');
-					var year = parseInt(resultDateTimeValue.substring(0,indexFirstDash),10);
-					var monthNumber = parseInt(resultDateTimeValue.substring(indexFirstDash+1, indexFirstDash+3), 10);
-					var day = parseInt(resultDateTimeValue.substring(indexFirstDash+4,indexFirstDash+6),10);
-					var indexTime = resultDateTimeValue.indexOf('T');
-					var hour = parseInt(resultDateTimeValue.substring(indexTime+1,indexTime+3),10);
-					var min = parseInt(resultDateTimeValue.substring(indexTime+4, indexTime+6), 10);
-					var sec = parseInt(resultDateTimeValue.substring(indexTime+7, indexTime+9),10);
-					var milsec = parseInt(resultDateTimeValue.substring(indexTime+10,indexTime+13),10);
-					datetime = new Date(year, monthNumber-1, day, hour, min, sec, milsec);
+					datetime = new Date(resultDateTimeValue);
 				}
 				datetimes.push(datetime);
 			}

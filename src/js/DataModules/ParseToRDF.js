@@ -1,7 +1,8 @@
 // const infoSensores = require('../../infoSensores.json');
-const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
+const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
 
-export function parseDataToRDF(filename, data, infoSensores){
+export function parseDataToRDF(filename, values, timestamps, infoSensores){
 
 	var _ = require('lodash');
 
@@ -31,26 +32,31 @@ export function parseDataToRDF(filename, data, infoSensores){
 			? ("xsd:double")
 			: ("xsd:boolean");
 
-	data.forEach((element, index) => {
-		if (index !== 0 && element[0] !== ""){
-			var dateTime = element[0];
+	values.forEach((value, index) => {
+		// if (value !== ""){
+			var dateTime = timestamps[index];
 			var posGuion = dateTime.indexOf('-');
 			var date = dateTime.substring(0, posGuion) + dateTime.substring(posGuion+1, posGuion+3) + dateTime.substring(posGuion+4, posGuion+6);
-			var value = element[1];
+			// var value = element[1];
 
 			var observationName = sensorName + "date" + date + "obs" + index;
 			var observationResultName = observationName + "result";
+
+			let fixedValue = value;
+			if (value === 'NA'){
+				fixedValue = 0;
+			}
 
 			observationResult = observationResult +
 				':' + observationName + ' rdf:type owl:NamedIndividual , \n' +
 					':' + observationType + ' . \n' +
 				':' + observationResultName + ' rdf:type owl:NamedIndividual , \n' +
 					':' + resultType + ' . \n' +
-				':' + observationResultName + ' sosa:hasSimpleResult "' + value + '"^^' + valueType + ' . \n' +
+				':' + observationResultName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . \n' +
 				':' + observationName + ' sosa:hasResult :' + observationResultName + ' . \n' +
 				':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . \n' + //Añadir ^^xsd:dateTime
 				':' + sensorName + ' sosa:madeObservation :' + observationName + ' . \n';
-		}
+		// }
 	});
 
 	// const finalResult = prefixes + sensorInitialization + observationResult;
