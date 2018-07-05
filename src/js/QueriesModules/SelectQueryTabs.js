@@ -48,7 +48,7 @@ export class PruebaTabsMat extends React.Component {
 								 Información
 								 <i className="tiny material-icons tooltipped infoTabs"
 									 data-position="bottom"
-									 data-tooltip="Preguntas de información general sobre los sensores.">
+									 data-tooltip="Consultas de información general sobre cada sensor.">
 									 info
 								 </i>
 							 </a>

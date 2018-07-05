@@ -30,6 +30,7 @@ export class AnomaliasQueryForm extends React.Component{
 			if (relType === 'custom'){
 				const sensorDir = state.sensorDir;
 				let newSensorDir = {};
+				let relType = state.relType;
 		        props.selectedSensors.forEach((sensorId) => {
 		            if (!sensorDir[sensorId]){
 						const sensor = _.find(props.infoSensores, ['indicatorId', sensorId]);
@@ -41,10 +42,13 @@ export class AnomaliasQueryForm extends React.Component{
 					else{
 						newSensorDir[sensorId] = sensorDir[sensorId];
 					}
-		        })
+		        });
+				if (props.selectedSensors.length <2)
+					relType = 'predef';
 		        return {
 		            sensorDir: newSensorDir,
-					selectedSensors: props.selectedSensors
+					selectedSensors: props.selectedSensors,
+					relType: relType
 		        };
 			}
 			else{

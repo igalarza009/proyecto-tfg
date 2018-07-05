@@ -15,10 +15,10 @@ import $ from 'jquery';
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 // const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-const usedURL = RESTfulURLQuery;
-// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
+const usedURL = virtuosoURL;
+const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
+// const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
 
 class SelectedPage extends React.Component {
 	constructor(props){

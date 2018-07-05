@@ -1,7 +1,7 @@
 // const graphURI = '<http://www.sensores.com/ontology/prueba04/extrusoras#>';
-// const graphURI = '<http://www.sensores.com/ontology/prueba08/extrusoras#>';
+const graphURI = '<http://www.sensores.com/ontology/prueba08/extrusoras#>';
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
+// const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
 
 var _ = require('lodash');
 

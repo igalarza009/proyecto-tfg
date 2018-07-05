@@ -697,11 +697,13 @@ export class SensorsInfo extends React.Component {
 		let sensorValues = {};
 		let sensorDatetimes = {};
 
+		let sensorsWithData = [];
+
 		// console.log("First axios call with nResponses: " + numberOfResponses);
-		this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorValues, sensorDatetimes);
+		this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorValues, sensorDatetimes, sensorsWithData);
 	}
 
-	recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes){
+	recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes, sensorsWithData){
 		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], {}, filter, {}, orderBy);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
@@ -719,6 +721,7 @@ export class SensorsInfo extends React.Component {
 				console.log(result);
 				sensorValues[sensorId] = result['values'];
 				sensorDatetimes[sensorId] = result['datetimes'];
+				sensorsWithData.push(sensorId);
 			}
 			else{
 				let noDataCharts = this.state.noDataCharts;
@@ -734,7 +737,7 @@ export class SensorsInfo extends React.Component {
 				if (_.size(sensorValues) > 0){
 					// allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor, this.props.infoSensores);
 					let anomResults = DataFunctions.getAnomaliasValues(
-						selectedSensors,
+						sensorsWithData,
 						sensorsDir,
 						sensorValues,
 						sensorDatetimes,
@@ -768,7 +771,7 @@ export class SensorsInfo extends React.Component {
 			}
 			else{
 				// console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes);
+				this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes, sensorsWithData);
 			}
 		})
 		.catch((error) => {
