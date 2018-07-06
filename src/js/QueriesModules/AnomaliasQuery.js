@@ -21,6 +21,10 @@ export class AnomaliasQueryForm extends React.Component{
 			relType: 'predef',
 			fechaInicio: '',
 			fechaFin: '',
+			errores: {
+				fechasMal:false,
+				faltaFecha: false,
+			},
 		};
 	}
 
@@ -151,14 +155,62 @@ export class AnomaliasQueryForm extends React.Component{
 	}
 
 	handleFechaInicio(event, value){
+		const fechaFin = this.state.fechaFin;
+		var errores = this.state.errores;
+		var fechasMal = false;
+		var faltaFecha = false;
+		if (value !== ''){
+			if (fechaFin === ''){
+				faltaFecha = true;
+			}
+			else{
+				var dateInicio = new Date(value + 'T00:00:00');
+				var dateFin = new Date(fechaFin + 'T00:00:00');
+				if (dateInicio.getTime() > dateFin.getTime()){
+					fechasMal = true;
+				}
+			}
+		}
+		else{
+			if (fechaFin !== ''){
+				faltaFecha = true;
+			}
+		}
+		errores['fechasMal'] = fechasMal;
+		errores['faltaFecha'] = faltaFecha;
 		this.setState({
 			fechaInicio: value,
+			errores: errores,
 		});
 	}
 
 	handleFechaFin(event, value){
+		const fechaInicio = this.state.fechaInicio;
+		var errores = this.state.errores;
+		var fechasMal = false;
+		var faltaFecha = false;
+		if (value !== ''){
+			if (fechaInicio === ''){
+				faltaFecha = true;
+			}
+			else{
+				var dateInicio = new Date(fechaInicio + 'T00:00:00');
+				var dateFin = new Date(value + 'T00:00:00');
+				if (dateInicio.getTime() > dateFin.getTime()){
+					fechasMal = true;
+				}
+			}
+		}
+		else{
+			if (fechaInicio !== ''){
+				faltaFecha = true;
+			}
+		}
+		errores['fechasMal'] = fechasMal;
+		errores['faltaFecha'] = faltaFecha;
 		this.setState({
 			fechaFin: value,
+			errores: errores,
 		});
 	}
 
@@ -185,6 +237,7 @@ export class AnomaliasQueryForm extends React.Component{
         const selectedSensors = this.props.selectedSensors;
 		const parMotorId = this.state.parMotorId;
 		const relType = this.state.relType;
+		const errores = this.state.errores;
 
 		const select = (selectedSensors.length > 1)
 			? (<Input s={12} l={6} type='select' defaultValue='predef' onChange={(e) => {this.handleSelectChange(e);}}>
@@ -296,9 +349,24 @@ export class AnomaliasQueryForm extends React.Component{
 					</Row>
 				</div>);
 
-		const buttonDisabled = (_.size(sensorDir) < 1)
-			? (true)
-			: (false);
+		let buttonDisabled = false;
+		let erroresFechas = null;
+		let fechasClass = '';
+
+		if (_.size(sensorDir) < 1){
+			buttonDisabled = true;
+		}
+
+		if (errores['faltaFecha']){
+			erroresFechas = (<p className='red-text'> Falta especificar una fecha.</p>);
+			buttonDisabled = true;
+			fechasClass = 'error';
+		}
+		else if (errores['fechasMal']){
+			erroresFechas = (<p className='red-text'> La fecha de inicio no puede ser posterior a la fecha final. </p>);
+			buttonDisabled = true;
+			fechasClass = 'error';
+		}
 
 		return(
 			<Card>
@@ -320,10 +388,13 @@ export class AnomaliasQueryForm extends React.Component{
 					 <Row className="center">
 					 	<Input s={12} l={6} type='date' label="Desde..."
 							options={{format: 'yyyy-mm-dd'}}
-					 		onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+					 		onChange={(e, value) => {this.handleFechaInicio(e, value);}}
+							className={fechasClass}/>
 					 	<Input s={12} l={6} type='date' label="Hasta..."
-								options={{format: 'yyyy-mm-dd'}}
-					 			onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+							options={{format: 'yyyy-mm-dd'}}
+					 		onChange={(e, value) => {this.handleFechaFin(e, value);}} 
+							className={fechasClass}/>
+						{erroresFechas}
 					</Row>
 					<Row className='center-align'>
 						<Button className='blue darken-3' type='submit' name='action' disabled={buttonDisabled}

@@ -331,6 +331,11 @@
     box-shadow: 0 1px 0 0 #1976d2;
 }
 
+.input-field input[type=text].error{
+    border-bottom: 1px solid red;
+    box-shadow: 0 1px 0 0 red;
+}
+
 [type="checkbox"]+label{
 	color: grey;
 }
@@ -418,6 +423,17 @@ input[type="checkbox"].filled-in {
 }
 */
 
+input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]),
+input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]),
+input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]){
+	border-bottom: 1px solid #1976d2;
+    box-shadow: 0 1px 0 0 #1976d2;
+}
+
+input[type=number].error{
+	border-bottom: 1px solid red;
+    box-shadow: 0 1px 0 0 red;
+}
 
 
 -------------------------- Icon in the middle -------------

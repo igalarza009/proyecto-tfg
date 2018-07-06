@@ -81,8 +81,8 @@ export class ParseData extends React.Component {
 			}
 			else{
 				console.log("No hay más datos");
-				console.log(newFixedValues);
-				console.log(newFixedTimestamps);
+				// console.log(newFixedValues);
+				// console.log(newFixedTimestamps);
 				var file = Parser.parseDataToRDF(fileName, newFixedValues, newFixedTimestamps, this.props.infoSensores);
 				console.log("TTL file created");
 				this.setState({

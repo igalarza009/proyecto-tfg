@@ -21,6 +21,10 @@ export class OtroSensorQueryForm extends React.Component{
 			values: {},
 			fechaInicio: '',
 			fechaFin: '',
+			errores: {
+				fechasMal:false,
+				faltaFecha: false,
+			},
 		};
 	}
 
@@ -165,14 +169,62 @@ export class OtroSensorQueryForm extends React.Component{
 	}
 
 	handleFechaInicio(event, value){
+		const fechaFin = this.state.fechaFin;
+		var errores = this.state.errores;
+		var fechasMal = false;
+		var faltaFecha = false;
+		if (value !== ''){
+			if (fechaFin === ''){
+				faltaFecha = true;
+			}
+			else{
+				var dateInicio = new Date(value + 'T00:00:00');
+				var dateFin = new Date(fechaFin + 'T00:00:00');
+				if (dateInicio.getTime() > dateFin.getTime()){
+					fechasMal = true;
+				}
+			}
+		}
+		else{
+			if (fechaFin !== ''){
+				faltaFecha = true;
+			}
+		}
+		errores['fechasMal'] = fechasMal;
+		errores['faltaFecha'] = faltaFecha;
 		this.setState({
 			fechaInicio: value,
+			errores: errores,
 		});
 	}
 
 	handleFechaFin(event, value){
+		const fechaInicio = this.state.fechaInicio;
+		var errores = this.state.errores;
+		var fechasMal = false;
+		var faltaFecha = false;
+		if (value !== ''){
+			if (fechaInicio === ''){
+				faltaFecha = true;
+			}
+			else{
+				var dateInicio = new Date(fechaInicio + 'T00:00:00');
+				var dateFin = new Date(value + 'T00:00:00');
+				if (dateInicio.getTime() > dateFin.getTime()){
+					fechasMal = true;
+				}
+			}
+		}
+		else{
+			if (fechaInicio !== ''){
+				faltaFecha = true;
+			}
+		}
+		errores['fechasMal'] = fechasMal;
+		errores['faltaFecha'] = faltaFecha;
 		this.setState({
 			fechaFin: value,
+			errores: errores,
 		});
 	}
 
@@ -213,6 +265,7 @@ export class OtroSensorQueryForm extends React.Component{
 		const knownSensors = this.state.knownSensors;
 		const filterValues = this.state.filterValues;
 		const values = this.state.values;
+		const errores = this.state.errores;
 
 		const Slider = require('rc-slider');
 		const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -239,6 +292,9 @@ export class OtroSensorQueryForm extends React.Component{
 				const sensorName = sensorId + ' (' + sensor.name + ')';
 				const minValue = sensor["minValue"];
 				const maxValue = sensor["maxValue"];
+				const valorClass = (knownSensors[sensorId] === null)
+					? ('error')
+					: ('');
 				const disabled = (filterValues.indexOf(sensorId) === -1)
 					? (true)
 					: (false);
@@ -247,7 +303,7 @@ export class OtroSensorQueryForm extends React.Component{
 					: ([values[sensorId][0], values[sensorId][1]]);
 				const valueInput = (isNaN(knownSensors[sensorId]))
 						? (null)
-						: (<Input s={3} label="Valor"
+						: (<Input s={3} label="Valor" className={valorClass}
 								onChange={(e) => {this.handleValueChange(e,sensorId);}}
 							/>);
 				const valuePickerType = (sensor['resultType'] === 'DoubleValueResult')
@@ -280,6 +336,9 @@ export class OtroSensorQueryForm extends React.Component{
 								</Col>
 							</div>)
 						: (null);
+				const errorValor = (knownSensors[sensorId] === null)
+					? (<p className='red-text'> Falta especificar el valor especifico del sensor.</p>)
+					: (null);
 				return(
 					<Row key={sensorId}>
 						<Col s={12}>
@@ -293,6 +352,9 @@ export class OtroSensorQueryForm extends React.Component{
 							<option value='max'>Valor máximo</option>
 						</Input>
 						{valueInput}
+						<Col s={12}>
+							{errorValor}
+						</Col>
 						{showFilterValues}
 					</Row>
 				);
@@ -302,9 +364,24 @@ export class OtroSensorQueryForm extends React.Component{
 			}
 		});
 
-		const buttonDisabled = (_.includes(knownSensors, null))
-			? (true)
-			: (false);
+		let buttonDisabled = false;
+		let erroresFechas = null;
+		let fechasClass = '';
+
+		if (_.includes(knownSensors, null)){
+			buttonDisabled = true;
+		}
+
+		if (errores['faltaFecha']){
+			erroresFechas = (<p className='red-text'> Falta especificar una fecha.</p>);
+			buttonDisabled = true;
+			fechasClass = 'error';
+		}
+		else if (errores['fechasMal']){
+			erroresFechas = (<p className='red-text'> La fecha de inicio no puede ser posterior a la fecha final. </p>);
+			buttonDisabled = true;
+			fechasClass = 'error';
+		}
 
 		return(
 			<Card>
@@ -337,10 +414,13 @@ export class OtroSensorQueryForm extends React.Component{
 					 <Row className="center">
 					 	<Input s={12} l={6} type='date' label="Desde..."
 							options={{format: 'yyyy-mm-dd'}}
-					 		onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+					 		onChange={(e, value) => {this.handleFechaInicio(e, value);}}
+							className={fechasClass}/>
 					 	<Input s={12} l={6} type='date' label="Hasta..."
-								options={{format: 'yyyy-mm-dd'}}
-					 			onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+							options={{format: 'yyyy-mm-dd'}}
+					 		onChange={(e, value) => {this.handleFechaFin(e, value);}}
+							className={fechasClass}/>
+						{erroresFechas}
 					</Row>
 					<Row className='center-align'>
 						<Button className='blue darken-3' type='submit'

@@ -26,9 +26,9 @@ export class InformationQueryForm extends React.Component{
 				fechasMal:false,
 				faltaFecha: false,
 				horasMal:false,
-				faltaHora:false
+				faltaHora:false,
 			},
-			openedTabs: [],
+			openedTabs: [false, false, false, false],
 		};
 	}
 
@@ -57,11 +57,14 @@ export class InformationQueryForm extends React.Component{
 		console.log(openedTabs);
 	}
 
-	handleOpenForm(index, tabName){
+	handleOpenForm(index){
 		let formArrowUp = this.state.formArrowUp;
+		let openedTabs = this.state.openedTabs;
 		formArrowUp[index] = !this.state.formArrowUp[index];
+		openedTabs[index] = !this.state.openedTabs[index];
 		this.setState({
-			formArrowUp: formArrowUp
+			formArrowUp: formArrowUp,
+			openedTabs: openedTabs,
 		});
 	}
 
@@ -70,14 +73,21 @@ export class InformationQueryForm extends React.Component{
 		var errores = this.state.errores;
 		var fechasMal = false;
 		var faltaFecha = false;
-		if (fechaFin === ''){
-			faltaFecha = true;
+		if (value !== ''){
+			if (fechaFin === ''){
+				faltaFecha = true;
+			}
+			else{
+				var dateInicio = new Date(value + 'T00:00:00');
+				var dateFin = new Date(fechaFin + 'T00:00:00');
+				if (dateInicio.getTime() > dateFin.getTime()){
+					fechasMal = true;
+				}
+			}
 		}
 		else{
-			var dateInicio = new Date(value + 'T00:00:00');
-			var dateFin = new Date(fechaFin + 'T00:00:00');
-			if (dateInicio.getTime() > dateFin.getTime()){
-				fechasMal = true;
+			if (fechaFin !== ''){
+				faltaFecha = true;
 			}
 		}
 		errores['fechasMal'] = fechasMal;
@@ -86,7 +96,6 @@ export class InformationQueryForm extends React.Component{
 			fechaInicio: value,
 			errores: errores,
 		});
-		console.log(errores);
 	}
 
 	handleFechaFin(event, value){
@@ -94,14 +103,21 @@ export class InformationQueryForm extends React.Component{
 		var errores = this.state.errores;
 		var fechasMal = false;
 		var faltaFecha = false;
-		if (fechaInicio === ''){
-			faltaFecha = true;
+		if (value !== ''){
+			if (fechaInicio === ''){
+				faltaFecha = true;
+			}
+			else{
+				var dateInicio = new Date(fechaInicio + 'T00:00:00');
+				var dateFin = new Date(value + 'T00:00:00');
+				if (dateInicio.getTime() > dateFin.getTime()){
+					fechasMal = true;
+				}
+			}
 		}
 		else{
-			var dateInicio = new Date(fechaInicio + 'T00:00:00');
-			var dateFin = new Date(value + 'T00:00:00');
-			if (dateInicio.getTime() > dateFin.getTime()){
-				fechasMal = true;
+			if (fechaInicio !== ''){
+				faltaFecha = true;
 			}
 		}
 		errores['fechasMal'] = fechasMal;
@@ -116,7 +132,7 @@ export class InformationQueryForm extends React.Component{
 	handleTimeChange(event,  timeName, timeType){
 		let value = event.target.value;
 		let newValue = value;
-		// let errores = this.state.errores;
+
 		if (value.length === 1){
 			newValue = '0' + value;
 			event.target.value = newValue;
@@ -298,6 +314,8 @@ export class InformationQueryForm extends React.Component{
 		const filterValues = this.state.filterValues;
 		const values = this.state.values;
 		const formArrowUp = this.state.formArrowUp;
+		const errores = this.state.errores;
+		const openedTabs = this.state.openedTabs;
 
 		const Slider = require('rc-slider');
 		const createSliderWithTooltip = Slider.createSliderWithTooltip;
@@ -380,104 +398,35 @@ export class InformationQueryForm extends React.Component{
 			}
 		});
 
+		let erroresFechas = null;
+		let erroresHoras = null;
+		let buttonDisabled = false;
+		let fechasClass = '';
+		let horasClass = '';
+
+		if (openedTabs[0] && errores['faltaFecha']){
+			erroresFechas = (<p className='red-text'> Falta especificar una fecha.</p>);
+			buttonDisabled = true;
+			fechasClass = 'error';
+		}
+		else if (openedTabs[0] && errores['fechasMal']){
+			erroresFechas = (<p className='red-text'> La fecha de inicio no puede ser posterior a la fecha final. </p>);
+			buttonDisabled = true;
+			fechasClass = 'error';
+		}
+
+		if (openedTabs[1] && errores['faltaHora']){
+			erroresHoras = (<p className='red-text'> Horas no especificadas correctamente. Faltan campos por rellenar. </p>);
+			buttonDisabled = true;
+			horasClass = 'error';
+		}
+		else if (openedTabs[1] && errores['horasMal']){
+			erroresHoras = (<p className='red-text'> La hora de inicio no puede ser posterior a la hora final. </p>);
+			buttonDisabled = true;
+			horasClass = 'error';
+		}
+
 		return(
-			// <Card>
-			// 	<div className='form'>
-			// 		<Row>
-			// 			<p className='grey-text'>
-			// 				Obtener una gráfica sobre los valores que toman los sensores selecionados.
-			// 				Completa solo los campos deseados para aplicar filtros a la respuesta.
-			// 			</p>
-			// 		</Row>
-			// 		<Row s={12}>
-			// 			<p className='blue-text text-darken-3'>Filtrar resultados por fechas: </p>
-			// 		</Row>
-			// 		<Row className="center">
-			// 			<Col s={12} l={6}>
-			// 				<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
-			// 					onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
-			// 			</Col>
-			// 			<Col s={12} l={6}>
-			// 				<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}}
-			// 					onChange={(e, value) => {this.handleFechaFin(e, value);}} />
-			// 			</Col>
-			// 		</Row>
-			// 		<Row s={12}>
-			// 			<p className='blue-text text-darken-3'>Filtrar resultados por horas: </p>
-			// 		</Row>
-			// 		<Row className='grey-text center'>
-			// 			<Col s={12} l={6}>
-			// 				Desde las... (HH:mm:ss)
-			// 			</Col>
-			// 			<Col s={12} l={6}>
-			// 				Hasta las... (HH:mm:ss)
-			// 			</Col>
-			// 		</Row>
-			// 		<Row className='center'>
-			// 			<Col s={12} l={6}>
-			// 				<input id="number" type="number" min="0" max="23"
-			// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
-			// 				:
-			// 				<input id="number" type="number" min="0" max="59"
-			// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
-			// 				:
-			// 				<input id="number" type="number" min="0" max="59"
-			// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
-			// 				{/* <Input name='hora1' type='text'  label="Desde las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraInicio(e, value);}}/> */}
-			// 			</Col>
-			// 			<Col s={12} l={6}>
-			// 				{/* <Input name='hora2' type='text'  label="Hasta las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraFin(e, value);}}/> */}
-			// 				<input id="number" type="number" min="0" max="23"
-			// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
-			// 				:
-			// 				<input id="number" type="number" min="0" max="59"
-			// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
-			// 				:
-			// 				<input id="number" type="number" min="0" max="59"
-			// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
-			// 			</Col>
-			// 		</Row>
-			// 		<Row s={12}>
-			// 			<p className='blue-text text-darken-3'>Filtrar resultados por valores: </p>
-			// 		</Row>
-			// 		{filtrarValores}
-			// 		<Row s={12}>
-			// 			<p className='blue-text text-darken-3'>Agrupar resultados para mostrar: </p>
-			// 		</Row>
-			// 		<Row>
-			// 			<Col s={12}>
-			// 				<Input name='groupBy' type='checkbox' className='filled-in'
-			// 					value='avg' label='Valor medio del sensor (AVG)'
-			// 					onChange={(e) => {this.handleAggregates(e);}}
-			// 				/>
-			// 			</Col>
-			// 			<Col s={12}>
-			// 				<Input name='groupBy' type='checkbox' className='filled-in'
-			// 					value='max' label='Valor máximo del sensor (MAX)'
-			// 					onChange={(e) => {this.handleAggregates(e);}}
-			// 				/>
-			// 			</Col>
-			// 			<Col s={12}>
-			// 				<Input name='groupBy' type='checkbox' className='filled-in'
-			// 					value='min' label='Valor mínimo del sensor (MIN)'
-			// 					onChange={(e) => {this.handleAggregates(e);}}
-			// 				/>
-			// 			</Col>
-			// 			<Col s={12}>
-			// 				<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>
-			// 					<option value='day'>Cada día</option>
-			// 					<option value='hour'>Cada hora</option>
-			// 					<option value='all'>Valor absoluto en todo el intervalo</option>
-			// 				</Input>
-			// 			</Col>
-			// 		</Row>
-			// 		<Row className='center-align'>
-			// 			<Button className='blue darken-3' type='submit' name='action' onClick={() => {this.handleSubmit();}}>
-			// 				Consultar <Icon right>bar_chart</Icon>
-		   	// 		</Button>
-			// 		</Row>
-			// 	</div>
-			// </Card>
 				<ul className="collapsible" data-collapsible="expandable">
 					<li>
 						<div className="collapsible-header no-pointer grey-text">
@@ -498,12 +447,15 @@ export class InformationQueryForm extends React.Component{
 							 	<Row>
 		 						 	<Col s={12} l={6}>
 		 								<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
-		 						 			onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+		 						 			onChange={(e, value) => {this.handleFechaInicio(e, value);}}
+											className={fechasClass}/>
 		 						 	</Col>
 		 						 	<Col s={12} l={6}>
 		 						 		<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}}
-		 						 			onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+		 						 			onChange={(e, value) => {this.handleFechaFin(e, value);}}
+											className={fechasClass}/>
 		 						 	</Col>
+									{erroresFechas}
 								</Row>
 							</span>
 						</div>
@@ -521,48 +473,33 @@ export class InformationQueryForm extends React.Component{
 		 							<Col s={12} l={6}>
 		 								<p> Desde las... (HH:mm:ss) </p>
 										<input id="number" type="number" min="0" max="23"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}
+											className={horasClass}/>
 		 								:
 		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}
+											className={horasClass}/>
 		 								:
 		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}
+											className={horasClass}/>
 		 							</Col>
 		 							<Col s={12} l={6}>
 		 								<p> Hasta las... (HH:mm:ss) </p>
 										<input id="number" type="number" min="0" max="23"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}
+											className={horasClass}/>
 		 								:
 		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}
+											className={horasClass}/>
 		 								:
 		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
+		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}
+											className={horasClass}/>
 		 							</Col>
+									{erroresHoras}
 		 						</Row>
-		 						{/* <Row className='center'>
-		 							<Col s={12} l={6}>
-		 								<input id="number" type="number" min="0" max="23"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
-		 								:
-		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
-		 								:
-		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
-		 							</Col>
-		 							<Col s={12} l={6}>
-		 								<input id="number" type="number" min="0" max="23"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
-		 								:
-		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
-		 								:
-		 								<input id="number" type="number" min="0" max="59"
-		 									onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
-		 							</Col>
-		 						</Row> */}
 							</span>
 						</div>
 					</li>
@@ -621,13 +558,113 @@ export class InformationQueryForm extends React.Component{
 					<li id='consultar'>
 						<div className="collapsible-header no-pointer blue-text text-darken-3">
 							<Row className='center-align form-collap'>
-								<Button className='blue darken-3 topMargin' type='submit' name='action' onClick={() => {this.handleSubmit();}}>
+								<Button className='blue darken-3 topMargin' type='submit'
+									name='action' onClick={() => {this.handleSubmit();}}
+									disabled={buttonDisabled}>
 									Consultar <Icon right>bar_chart</Icon>
 						   	 	</Button>
 							 </Row>
 						</div>
 					</li>
 				</ul>
+
+				// <Card>
+				// 	<div className='form'>
+				// 		<Row>
+				// 			<p className='grey-text'>
+				// 				Obtener una gráfica sobre los valores que toman los sensores selecionados.
+				// 				Completa solo los campos deseados para aplicar filtros a la respuesta.
+				// 			</p>
+				// 		</Row>
+				// 		<Row s={12}>
+				// 			<p className='blue-text text-darken-3'>Filtrar resultados por fechas: </p>
+				// 		</Row>
+				// 		<Row className="center">
+				// 			<Col s={12} l={6}>
+				// 				<Input type='date' label="Desde..." options={{format: 'yyyy-mm-dd'}}
+				// 					onChange={(e, value) => {this.handleFechaInicio(e, value);}} />
+				// 			</Col>
+				// 			<Col s={12} l={6}>
+				// 				<Input type='date' label="Hasta..." options={{format: 'yyyy-mm-dd'}}
+				// 					onChange={(e, value) => {this.handleFechaFin(e, value);}} />
+				// 			</Col>
+				// 		</Row>
+				// 		<Row s={12}>
+				// 			<p className='blue-text text-darken-3'>Filtrar resultados por horas: </p>
+				// 		</Row>
+				// 		<Row className='grey-text center'>
+				// 			<Col s={12} l={6}>
+				// 				Desde las... (HH:mm:ss)
+				// 			</Col>
+				// 			<Col s={12} l={6}>
+				// 				Hasta las... (HH:mm:ss)
+				// 			</Col>
+				// 		</Row>
+				// 		<Row className='center'>
+				// 			<Col s={12} l={6}>
+				// 				<input id="number" type="number" min="0" max="23"
+				// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'hor');}}/>
+				// 				:
+				// 				<input id="number" type="number" min="0" max="59"
+				// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'min');}}/>
+				// 				:
+				// 				<input id="number" type="number" min="0" max="59"
+				// 					onChange={(e) => {this.handleTimeChange(e, 'horaInicio', 'seg');}}/>
+				// 				{/* <Input name='hora1' type='text'  label="Desde las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraInicio(e, value);}}/> */}
+				// 			</Col>
+				// 			<Col s={12} l={6}>
+				// 				{/* <Input name='hora2' type='text'  label="Hasta las... (HH:mm:ss)" onChange={(e, value) => {this.handleHoraFin(e, value);}}/> */}
+				// 				<input id="number" type="number" min="0" max="23"
+				// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'hor');}}/>
+				// 				:
+				// 				<input id="number" type="number" min="0" max="59"
+				// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'min');}}/>
+				// 				:
+				// 				<input id="number" type="number" min="0" max="59"
+				// 					onChange={(e) => {this.handleTimeChange(e, 'horaFin', 'seg');}}/>
+				// 			</Col>
+				// 		</Row>
+				// 		<Row s={12}>
+				// 			<p className='blue-text text-darken-3'>Filtrar resultados por valores: </p>
+				// 		</Row>
+				// 		{filtrarValores}
+				// 		<Row s={12}>
+				// 			<p className='blue-text text-darken-3'>Agrupar resultados para mostrar: </p>
+				// 		</Row>
+				// 		<Row>
+				// 			<Col s={12}>
+				// 				<Input name='groupBy' type='checkbox' className='filled-in'
+				// 					value='avg' label='Valor medio del sensor (AVG)'
+				// 					onChange={(e) => {this.handleAggregates(e);}}
+				// 				/>
+				// 			</Col>
+				// 			<Col s={12}>
+				// 				<Input name='groupBy' type='checkbox' className='filled-in'
+				// 					value='max' label='Valor máximo del sensor (MAX)'
+				// 					onChange={(e) => {this.handleAggregates(e);}}
+				// 				/>
+				// 			</Col>
+				// 			<Col s={12}>
+				// 				<Input name='groupBy' type='checkbox' className='filled-in'
+				// 					value='min' label='Valor mínimo del sensor (MIN)'
+				// 					onChange={(e) => {this.handleAggregates(e);}}
+				// 				/>
+				// 			</Col>
+				// 			<Col s={12}>
+				// 				<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>
+				// 					<option value='day'>Cada día</option>
+				// 					<option value='hour'>Cada hora</option>
+				// 					<option value='all'>Valor absoluto en todo el intervalo</option>
+				// 				</Input>
+				// 			</Col>
+				// 		</Row>
+				// 		<Row className='center-align'>
+				// 			<Button className='blue darken-3' type='submit' name='action' onClick={() => {this.handleSubmit();}}>
+				// 				Consultar <Icon right>bar_chart</Icon>
+			   	// 		</Button>
+				// 		</Row>
+				// 	</div>
+				// </Card>
 		)
 	}
 }

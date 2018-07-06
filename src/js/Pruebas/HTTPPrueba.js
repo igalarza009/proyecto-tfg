@@ -4,13 +4,16 @@ import '../../index.css';
 import * as Queries from '../Functions/SPARQLQueries.js';
 import {Row, Col, Button, Card} from 'react-materialize'
 import M from 'materialize-css';
-// import axios from 'axios';
+import axios from 'axios';
 import * as Virtuoso from '../Functions/VirtuosoCalls.js';
 
-// const virtuosoURL = 'http://localhost:8890/sparql';
-// const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-// const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-// const usedURL = RESTfulURLGetQuery;
+const querystring = require('querystring');
+
+const virtuosoURL = 'http://localhost:8890/sparql';
+const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
+const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
+const virtuosoMaqVirtual = 'http://35.237.194.21:8890/sparql';
+const usedURL = virtuosoMaqVirtual;
 
 export class HTTPPrueba extends React.Component {
 	constructor(props){
@@ -26,55 +29,63 @@ export class HTTPPrueba extends React.Component {
 
 	handleClickSelect(){
 		const query = 'select * ' +
-					'from <http://pruebas.com/prueba#> ' +
+					'from <http://www.pruebas.com/maquina_virtual/prueba_insert> ' +
 					'where { ' +
 					  '?o ?p ?q ' +
 					'} ';
 
-		// const querystring = require('querystring');
-		// axios.post('http://localhost:8890/sparql',
-		// 	querystring.stringify({'query': query})
-		// )
-		// .then((response) => {
-		// 	console.log(response);
-		// })
-		// .catch((error) => {
-		// 	console.log(error);
-		// });
-		Virtuoso.performQuery(query, console.log);
+		axios.post(usedURL,
+			querystring.stringify({'query': query})
+		)
+		.then((response) => {
+			console.log(response);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+		// Virtuoso.performQuery(query, console.log);
 		// console.log(response);
 	}
 
 	handleClickInsert(){
-		const query = 'prefix : <http://www.sensores.com/ontology/pruebas_insert/extrusoras#> ' +
-			'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
-			'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
-			'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ' +
-			'prefix sosa: <http://www.w3.org/ns/sosa/>  ' +
+		// const query = 'prefix : <http://www.sensores.com/ontology/pruebas_insert/extrusoras#> ' +
+		// 	'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
+		// 	'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
+		// 	'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ' +
+		// 	'prefix sosa: <http://www.w3.org/ns/sosa/>  ' +
+		// 	'insert data { ' +
+		// 		'graph <http://www.sensores.com/ontology/pruebas_insert/extrusoras# ' +
+		// 		'{ ' +
+		// 			':sensor2F1KT7date20180324obs1 rdf:type owl:NamedIndividual , ' +
+		// 			':TemperatureObservation . ' +
+		// 			':sensor2F1KT7date20180324obs1result rdf:type owl:NamedIndividual , ' +
+		// 			':DoubleValueResult . ' +
+		// 			':sensor2F1KT7date20180324obs1result sosa:hasSimpleResult "195.9"^^xsd:double . ' +
+		// 			':sensor2F1KT7date20180324obs1 sosa:hasResult :sensor2F1KT7date20180324obs1result . ' +
+		// 			':sensor2F1KT7date20180324obs1 sosa:resultTime "2018-03-24T23:59:59.657Z"^^xsd:dateTime . ' +
+		// 			':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7date20180324obs1 . ' +
+		// 			':sensor2F1KT7date20180324obs2 rdf:type owl:NamedIndividual , ' +
+		// 			':TemperatureObservation . ' +
+		// 			':sensor2F1KT7date20180324obs2result rdf:type owl:NamedIndividual , ' +
+		// 			':DoubleValueResult . ' +
+		// 			':sensor2F1KT7date20180324obs2result sosa:hasSimpleResult "195.9"^^xsd:double . ' +
+		// 			':sensor2F1KT7date20180324obs2 sosa:hasResult :sensor2F1KT7date20180324obs2result . ' +
+		// 			':sensor2F1KT7date20180324obs2 sosa:resultTime "2018-03-24T23:59:58.657Z"^^xsd:dateTime . ' +
+		// 			':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7date20180324obs2 . ' +
+		// 	 	'} ' +
+		// 	'} ';
+
+		const query = 'PREFIX dc: <http://purl.org/dc/elements/1.1/> ' +
 			'insert data { ' +
-				'graph <http://www.sensores.com/ontology/pruebas_insert/extrusoras#> ' +
+				'graph <http://www.pruebas.com/maquina_virtual/prueba_insert#> ' +
 				'{ ' +
-					':sensor2F1KT7date20180324obs1 rdf:type owl:NamedIndividual , ' +
-					':TemperatureObservation . ' +
-					':sensor2F1KT7date20180324obs1result rdf:type owl:NamedIndividual , ' +
-					':DoubleValueResult . ' +
-					':sensor2F1KT7date20180324obs1result sosa:hasSimpleResult "195.9"^^xsd:double . ' +
-					':sensor2F1KT7date20180324obs1 sosa:hasResult :sensor2F1KT7date20180324obs1result . ' +
-					':sensor2F1KT7date20180324obs1 sosa:resultTime "2018-03-24T23:59:59.657Z"^^xsd:dateTime . ' +
-					':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7date20180324obs1 . ' +
-					':sensor2F1KT7date20180324obs2 rdf:type owl:NamedIndividual , ' +
-					':TemperatureObservation . ' +
-					':sensor2F1KT7date20180324obs2result rdf:type owl:NamedIndividual , ' +
-					':DoubleValueResult . ' +
-					':sensor2F1KT7date20180324obs2result sosa:hasSimpleResult "195.9"^^xsd:double . ' +
-					':sensor2F1KT7date20180324obs2 sosa:hasResult :sensor2F1KT7date20180324obs2result . ' +
-					':sensor2F1KT7date20180324obs2 sosa:resultTime "2018-03-24T23:59:58.657Z"^^xsd:dateTime . ' +
-					':sensor2F1KT7 sosa:madeObservation :sensor2F1KT7date20180324obs2 . ' +
+					'<http://example/egbook> dc:title  "Probando probando..." ' +
 			 	'} ' +
 			'} ';
 
-		// const querystring = require('querystring');
-		// axios.post('http://localhost:8890/sparql/',
+		console.log(query);
+
+		// axios.post(usedURL,
 		// 	querystring.stringify({'query': query}))
 		// .then((response) => {
 		// 	console.log(response);
@@ -82,7 +93,7 @@ export class HTTPPrueba extends React.Component {
 		// .catch((error) => {
 		// 	console.log(error);
 		// });
-		Virtuoso.performQuery(query, console.log);
+		// Virtuoso.performQuery(query, console.log);
 		// console.log(response);
 	}
 

@@ -1,8 +1,7 @@
 const maxPoints = 4500;
 const _ = require('lodash');
 
-// Prepare data of the queries
-export function parseResponseData(sensorResponse, sensorId, info){
+export function getFormInfo(info){
 	// const results = responseData["results"]["bindings"];
 	let selectedValues = [];
 	let selectedDateTime = '';
@@ -33,6 +32,12 @@ export function parseResponseData(sensorResponse, sensorId, info){
 		selectedValues.push('resultValue');
 		selectedDateTime = "resultTime";
 	}
+
+	return {selectedValues: selectedValues, selectedDateTime: selectedDateTime}
+}
+
+// Prepare data of the queries
+export function parseResponseData(sensorResponse, selectedValues, selectedDateTime, sensorId, info){
 
 	let parsedResults = parseSensorValues(sensorResponse, sensorId, selectedValues, selectedDateTime, info['parMotor']);
 
@@ -92,11 +97,7 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 				var resultDateTimeValue = result[selectDateTime]["value"];
 				var datetime;
 				if (selectDateTime === 'resultDate'){
-					// var indexT = resultDateTimeValue.indexOf('T'); 
-					// Cambiar a espacio con los fixed dates
-					var indexT = resultDateTimeValue.indexOf(' ');
-					var date = resultDateTimeValue.substring(0, indexT);
-					datetime = new Date(date);
+					datetime = new Date(resultDateTimeValue);
 				}
 				else if (selectDateTime === 'resultHour'){
 					var indexFirstSep = resultDateTimeValue.indexOf(':');

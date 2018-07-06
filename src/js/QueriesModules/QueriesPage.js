@@ -287,13 +287,15 @@ export class SensorsInfo extends React.Component {
 		let numberOfResponses = 0;
 		let sensorValues = {};
 		let sensorDatetimes = {};
+		let formInfo = DataFunctions.getFormInfo({'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor', 'parMotor':{}});
+		let sensorsWithData = [];
 
 		// let split = {firstSegment: false, lastTimestamp: '2018-03-18T02:46:40.039Z', limit:10000};
 
-		this.recursiveInforCall_New(sensors, groupBy, filter, filterValues, numberOfResponses, sensorValues, sensorDatetimes);
+		this.recursiveInforCall_New(sensors, groupBy, filter, filterValues, numberOfResponses, sensorValues, sensorDatetimes, formInfo['selectedValues'], formInfo['selectedDateTime'], sensorsWithData);
 	}
 
-	recursiveInforCall_New(selectedSensors, groupBy, filter, filterValues, nResponses, sensorValues, sensorDatetimes){
+	recursiveInforCall_New(selectedSensors, groupBy, filter, filterValues, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData){
 		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], groupBy, filter, filterValues, orderBy);
 		// console.log(query);
 		axios.post(usedURL,
@@ -307,12 +309,15 @@ export class SensorsInfo extends React.Component {
 				// Sustituir y tratar aquí los datos, ponerlos en el formato adecuado y reducirlos
 				var result = DataFunctions.parseResponseData(
 					response.data["results"]["bindings"],
+					selectedValues,
+					selectedDateTime,
 					sensorId,
-					{'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor', 'parMotor':{}}
+					{'sensors': selectedSensors, 'type': 'infor', 'parMotor':{}},
 				);
 				console.log(result);
 				sensorValues[sensorId] = result['values'];
 				sensorDatetimes[sensorId] = result['datetimes'];
+				sensorsWithData.push(sensorId);
  			}
 			else{
 				let noDataCharts = this.state.noDataCharts;
@@ -331,8 +336,8 @@ export class SensorsInfo extends React.Component {
 					allChartData = DataFunctions.prepareGoogleChartsData(
 						sensorValues,
 						sensorDatetimes,
-						selectedSensors,
-						{type: 'infor', parMotor:{}, selectedValues: result['selectedValues']},
+						sensorsWithData,
+						{type: 'infor', parMotor:{}, selectedValues: selectedValues},
 						this.props.infoSensores
 					);
 				}
@@ -346,7 +351,7 @@ export class SensorsInfo extends React.Component {
 			}
 			else{
 				// console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveInforCall_New(selectedSensors, groupBy, filter, filterValues, nResponses, sensorValues, sensorDatetimes);
+				this.recursiveInforCall_New(selectedSensors, groupBy, filter, filterValues, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData);
 			}
 		})
 		.catch((error) => {
@@ -1044,7 +1049,6 @@ export class SensorsInfo extends React.Component {
 				</Row>
 				<Row s={12}>
 					{loadingChartCard}
-					{noDataCard}
 					{noAnomCard}
 					<div className={chartClass}>
 						<GoogleChart
@@ -1053,6 +1057,7 @@ export class SensorsInfo extends React.Component {
 							longDateFormat={longDateFormat}
 						/>
 					</div>
+					{noDataCard}
 				</Row>
 			</div>
 		);
