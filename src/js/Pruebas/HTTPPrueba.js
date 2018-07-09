@@ -29,10 +29,12 @@ export class HTTPPrueba extends React.Component {
 
 	handleClickSelect(){
 		const query = 'select * ' +
-					'from <http://www.pruebas.com/maquina_virtual/prueba_insert> ' +
+					'from <http://www.pruebas.com/maquina_virtual/prueba_insert#> ' +
 					'where { ' +
 					  '?o ?p ?q ' +
 					'} ';
+
+		console.log(query);
 
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
@@ -76,17 +78,24 @@ export class HTTPPrueba extends React.Component {
 		// 	'} ';
 
 		const query = 'PREFIX dc: <http://purl.org/dc/elements/1.1/> ' +
-			'insert data { ' +
+			'insert into ' +
 				'graph <http://www.pruebas.com/maquina_virtual/prueba_insert#> ' +
 				'{ ' +
-					'<http://example/egbook> dc:title  "Probando probando..." ' +
-			 	'} ' +
-			'} ';
-
+					'<http://example/egbook> dc:title  "Tercera prueba desde aplicación." . ' +
+			 	'} ';
+		//
 		console.log(query);
 
-		// axios.post(usedURL,
-		// 	querystring.stringify({'query': query}))
+		axios.post(usedURL,
+			querystring.stringify({'query': query}))
+		.then((response) => {
+			console.log(response);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+
+		// axios.post("http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insertprueba")
 		// .then((response) => {
 		// 	console.log(response);
 		// })

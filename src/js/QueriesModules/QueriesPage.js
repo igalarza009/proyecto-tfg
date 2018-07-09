@@ -1,4 +1,5 @@
 // GRANT EXECUTE ON DB.DBA.L_O_LOOK TO "SPARQL";
+// grant execute on "DB.DBA.SPARQL_INSERT_DICT_CONTENT" to "SPARQL";
 
 import React from 'react';
 import '../../index.css';
@@ -106,7 +107,7 @@ export class SensorsInfo extends React.Component {
 
 		const sensorDivs = sensors.map((value) => {
 			const sensorId = value.indicatorId;
-			const sensorClass = value.class;
+			const sensorClass = "sensor" + value.indicatorId;
 			const sensorIndex = selectedSensors.indexOf(sensorId);
 			let classes;
 			if (sensorIndex < 0)

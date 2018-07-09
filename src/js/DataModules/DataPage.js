@@ -8,6 +8,8 @@ import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
 import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
 
+const _ = require('lodash');
+
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insertfile';
 
@@ -27,6 +29,7 @@ export class ParseData extends React.Component {
 			fileName: null,
 			fileUploaded: false,
 			uploadingFile: false,
+			noSensor: false,
 	    }
  	}
 
@@ -37,26 +40,45 @@ export class ParseData extends React.Component {
 		let parsedValues = [];
 		let parsedTimestamps = [];
 
-		this.setState({
-			parsingFile: true,
-			selectFile: false,
-			fileName: fileName,
-		});
+		const indexOfDot = fileName.indexOf('.');
+		const sensorIndicator = fileName.substring(0, indexOfDot);
 
-		Papa.parse(selectedFile[0], {
-			step: function(row, i) {
-				// parsedData.push(row.data[0]);
-				if (row.data[0][0] !== "" && !isNaN(row.data[0][1])){
-					parsedTimestamps.push(row.data[0][0]);
-					parsedValues.push(parseFloat(row.data[0][1]));
-				}
-			},
-			complete: (results) => {
-				parsedTimestamps.reverse();
-				parsedValues.reverse();
-				this.parsingCompleted(fileName, parsedValues, parsedTimestamps, [], []);
-			},
-		});
+		console.log(sensorIndicator);
+		console.log(this.props.infoSensores);
+
+		const currentSensor = _.find(this.props.infoSensores, {indicatorId:sensorIndicator});
+
+		console.log(currentSensor);
+
+		if (currentSensor === undefined){
+			this.setState({
+				noSensor: true,
+			});
+		}
+		else{
+			this.setState({
+				noSensor: false,
+				parsingFile: true,
+				selectFile: false,
+				fileName: fileName,
+			});
+
+			Papa.parse(selectedFile[0], {
+				step: function(row, i) {
+					// parsedData.push(row.data[0]);
+					if (row.data[0][0] !== "" && !isNaN(row.data[0][1])){
+						parsedTimestamps.push(row.data[0][0]);
+						parsedValues.push(parseFloat(row.data[0][1]));
+					}
+				},
+				complete: (results) => {
+					parsedTimestamps.reverse();
+					parsedValues.reverse();
+					this.parsingCompleted(fileName, parsedValues, parsedTimestamps, [], []);
+				},
+			});
+		}
+
 	}
 
 	parsingCompleted(fileName, parsedValues, parsedTimestamps, fixedValues, fixedTimestamps){
@@ -160,6 +182,7 @@ export class ParseData extends React.Component {
 			fileName: null,
 			fileUploaded: false,
 			uploadingFile: false,
+			noSensor: false,
 		});
 	}
 
@@ -170,6 +193,11 @@ export class ParseData extends React.Component {
 					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
 				</div>)
 			: (null);
+
+		const errorSensor = (this.state.noSensor) &&
+			(<div className="center red-text">
+					<p> El sensor no corresponde a los cotemplados para esta máquina. </p>
+				</div>);
 
 		const loadingInsertData = (this.state.uploadingFile)
 			? (<div className="center">
@@ -246,6 +274,7 @@ export class ParseData extends React.Component {
 							{loadingParseFile}
 							{fileParsedOptions}
 							{loadingInsertData}
+							{errorSensor}
 						</Card>
 					</Col>
 				</Row>

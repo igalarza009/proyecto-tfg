@@ -1,10 +1,9 @@
 // const infoSensores = require('../../infoSensores.json');
 // const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
+const _ = require('lodash');
 
 export function parseDataToRDF(filename, values, timestamps, infoSensores){
-
-	var _ = require('lodash');
 
 	const prefixes = "@prefix : " + graphURI + " . \n" +
 					"@prefix owl: <http://www.w3.org/2002/07/owl#> . \n" +
@@ -13,6 +12,8 @@ export function parseDataToRDF(filename, values, timestamps, infoSensores){
 					"@prefix sosa: <http://www.w3.org/ns/sosa/> . \n" +
 					"@base " + graphURI + " . \n";
 
+	console.log(filename);
+
 	const indexOfDot = filename.indexOf('.');
 	const sensorIndicator = filename.substring(0, indexOfDot);
 	const sensorName = 'sensor' + sensorIndicator;
@@ -20,7 +21,7 @@ export function parseDataToRDF(filename, values, timestamps, infoSensores){
 	console.log(sensorIndicator);
 	console.log(infoSensores);
 
-	const currentSensor = _.find(infoSensores, {'indicatorId':sensorIndicator});
+	const currentSensor = _.find(infoSensores, {indicatorId:sensorIndicator});
 
 	console.log(currentSensor);
 
