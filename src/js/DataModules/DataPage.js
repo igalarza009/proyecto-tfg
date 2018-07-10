@@ -278,9 +278,9 @@ export class ParseData extends React.Component {
 						</Card>
 					</Col>
 				</Row>
-				<Row>
+				{/* <Row>
 					<HTTPPrueba />
-				</Row>
+				</Row> */}
 			</div>
 		)
 	}

@@ -288,7 +288,7 @@ export class SensorsInfo extends React.Component {
 		let numberOfResponses = 0;
 		let sensorValues = {};
 		let sensorDatetimes = {};
-		let formInfo = DataFunctions.getFormInfo({'sensors': sensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor', 'parMotor':{}});
+		let formInfo = DataFunctions.getFormInfo({'groupBy': groupBy, 'type': 'infor'});
 		let sensorsWithData = [];
 
 		// let split = {firstSegment: false, lastTimestamp: '2018-03-18T02:46:40.039Z', limit:10000};
@@ -297,7 +297,13 @@ export class SensorsInfo extends React.Component {
 	}
 
 	recursiveInforCall_New(selectedSensors, groupBy, filter, filterValues, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData){
-		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], groupBy, filter, filterValues, orderBy);
+		let query = Queries.getInformationQueryIndividual(
+						selectedSensors[nResponses],
+						groupBy,
+						filter,
+						filterValues,
+						orderBy
+					);
 		// console.log(query);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
@@ -335,12 +341,12 @@ export class SensorsInfo extends React.Component {
 					// allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'}, this.props.infoSensores);
 					// Preparar los datos de la gráfica de Google con los datos ya reducidos.
 					allChartData = DataFunctions.prepareGoogleChartsData(
-						sensorValues,
-						sensorDatetimes,
-						sensorsWithData,
-						{type: 'infor', parMotor:{}, selectedValues: selectedValues},
-						this.props.infoSensores
-					);
+										sensorValues,
+										sensorDatetimes,
+										sensorsWithData,
+										{type: 'infor', parMotor:{}, selectedValues: selectedValues},
+										this.props.infoSensores
+									);
 				}
 				console.log(allChartData);
 				this.setState({
@@ -534,12 +540,20 @@ export class SensorsInfo extends React.Component {
 		let numberOfResponses = 0;
 		let sensorValues = {};
 		let sensorDatetimes = {};
+		let formInfo = DataFunctions.getFormInfo({'groupBy': {}, 'type': 'otro'});
+		let sensorsWithData = [];
 
-		this.recursiveOtroSensorCall_New(askedSensors, knownSensors, filterValues, filter, numberOfResponses, sensorValues, sensorDatetimes);
+		this.recursiveOtroSensorCall_New(askedSensors, knownSensors, filterValues, filter, numberOfResponses, sensorValues, sensorDatetimes, formInfo['selectedValues'], formInfo['selectedDateTime'], sensorsWithData);
 	}
 
-	recursiveOtroSensorCall_New(askedSensors, knownSensors, filterValues, filter, nResponses, sensorValues, sensorDatetimes){
-		var query = Queries.getOtherSensorQueryIndividual(knownSensors, askedSensors[nResponses], filterValues, filter, orderBy);
+	recursiveOtroSensorCall_New(askedSensors, knownSensors, filterValues, filter, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData){
+		let query = Queries.getOtherSensorQueryIndividual(
+						knownSensors,
+						askedSensors[nResponses],
+						filterValues,
+						filter,
+						orderBy
+					);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
@@ -549,13 +563,16 @@ export class SensorsInfo extends React.Component {
 			if (response.data["results"]["bindings"].length > 1){
 				// sensorsResponse[sensorId] = response.data["results"]["bindings"];
 				var result = DataFunctions.parseResponseData(
-					response.data["results"]["bindings"],
-					sensorId,
-					{'sensors': askedSensors, 'type': 'otro', 'parMotor':{}}
-				);
+								response.data["results"]["bindings"],
+								selectedValues,
+								selectedDateTime,
+								sensorId,
+								{'sensors': askedSensors, 'type': 'otro', 'parMotor':{}}
+							);
 				console.log(result);
 				sensorValues[sensorId] = result['values'];
 				sensorDatetimes[sensorId] = result['datetimes'];
+				sensorsWithData.push(sensorId);
 			}
 			else{
 				let noDataCharts = this.state.noDataCharts;
@@ -571,12 +588,12 @@ export class SensorsInfo extends React.Component {
 				if (_.size(sensorValues) > 0){
 					// allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'}, this.props.infoSensores);
 					allChartData = DataFunctions.prepareGoogleChartsData(
-						sensorValues,
-						sensorDatetimes,
-						askedSensors,
-						{type: 'otro', parMotor:{}},
-						this.props.infoSensores
-					);
+										sensorValues,
+										sensorDatetimes,
+										sensorsWithData,
+										{type: 'otro', parMotor:{}, selectedValues: selectedValues},
+										this.props.infoSensores
+									);
 				}
 				console.log(allChartData);
 				this.setState({
@@ -587,7 +604,7 @@ export class SensorsInfo extends React.Component {
 				console.log("Tiempo fin " + Date.now());
 			}
 			else{
-				this.recursiveOtroSensorCall_New(askedSensors, knownSensors, filterValues, filter, nResponses, sensorValues, sensorDatetimes);
+				this.recursiveOtroSensorCall_New(askedSensors, knownSensors, filterValues, filter, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData);
 			}
 		})
 		.catch((error) => {
@@ -702,15 +719,21 @@ export class SensorsInfo extends React.Component {
 		// let sensorsResponse = {};
 		let sensorValues = {};
 		let sensorDatetimes = {};
-
+		let formInfo = DataFunctions.getFormInfo({'groupBy': {}, 'type': 'anom'});
 		let sensorsWithData = [];
 
 		// console.log("First axios call with nResponses: " + numberOfResponses);
-		this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorValues, sensorDatetimes, sensorsWithData);
+		this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorValues, sensorDatetimes, formInfo['selectedValues'], formInfo['selectedDateTime'], sensorsWithData);
 	}
 
-	recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes, sensorsWithData){
-		var query = Queries.getInformationQueryIndividual(selectedSensors[nResponses], {}, filter, {}, orderBy);
+	recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData){
+		var query = Queries.getInformationQueryIndividual(
+						selectedSensors[nResponses],
+						{},
+						filter,
+						{},
+						orderBy
+					);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
@@ -720,10 +743,12 @@ export class SensorsInfo extends React.Component {
 			if (response.data["results"]["bindings"].length > 1){
 				// sensorsResponse[sensorId] = response.data["results"]["bindings"];
 				var result = DataFunctions.parseResponseData(
-					response.data["results"]["bindings"],
-					sensorId,
-					{'sensors': selectedSensors, 'type': 'anom', 'parMotor':parMotor}
-				);
+								response.data["results"]["bindings"],
+								selectedValues,
+								selectedDateTime,
+								sensorId,
+								{'sensors': selectedSensors, 'type': 'anom', 'parMotor':parMotor}
+							);
 				console.log(result);
 				sensorValues[sensorId] = result['values'];
 				sensorDatetimes[sensorId] = result['datetimes'];
@@ -743,19 +768,19 @@ export class SensorsInfo extends React.Component {
 				if (_.size(sensorValues) > 0){
 					// allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor, this.props.infoSensores);
 					let anomResults = DataFunctions.getAnomaliasValues(
-						sensorsWithData,
-						sensorsDir,
-						sensorValues,
-						sensorDatetimes,
-						parMotor
-					);
+										sensorsWithData,
+										sensorsDir,
+										sensorValues,
+										sensorDatetimes,
+										parMotor
+									);
 					allChartData = DataFunctions.prepareGoogleChartsData(
-						anomResults['anomValues'],
-						anomResults['anomDatetimes'],
-						selectedSensors,
-						{type:'anom', parMotor:parMotor},
-						this.props.infoSensores
-					);
+										anomResults['anomValues'],
+										anomResults['anomDatetimes'],
+										selectedSensors,
+										{type:'anom', parMotor:parMotor},
+										this.props.infoSensores
+									);
 				}
 				console.log(allChartData);
 				if (allChartData.length > 0){
@@ -777,7 +802,7 @@ export class SensorsInfo extends React.Component {
 			}
 			else{
 				// console.log("New axios call with nResponse: " + nResponses);
-				this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes, sensorsWithData);
+				this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData);
 			}
 		})
 		.catch((error) => {
