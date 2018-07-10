@@ -17,10 +17,11 @@ const debianVirtuosoURL = 'http://35.237.195.239:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 // const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
 const usedURL = virtuosoURL;
-const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
 // const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
 // const graphURI = "<http://www.sensores.com/ontology/prueba09/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
 
 class SelectedPage extends React.Component {
 	constructor(props){
@@ -42,22 +43,20 @@ class SelectedPage extends React.Component {
 				'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
 				'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
 				'prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#> ' +
-				'select ?sensorId ?name ?class ?sensorType ?observationType ?resultType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
+				'select ?sensorId ?name ?class ?sensorType ?observationType ?valueType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
 				'from ' + graphURI + ' ' +
 				'where { ' +
-				    '{ ?sensorType rdfs:subClassOf :DoubleValueSensor . } ' +
-				     'union ' +
-				    '{ ?sensorType rdfs:subClassOf :BooleanSensor . } ' +
-				    '?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+				    '?metaSensorType rdf:type owl:Class ; ' +
+				     'rdfs:subClassOf sosa:Sensor . ' +
+				    '?sensorType rdfs:subClassOf ?metaSensorType .  ' +
+				    '?metaSensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
 				                                    'owl:onProperty sosa:madeObservation ; ' +
 				                                    'owl:allValuesFrom ?observationType ' +
 				                                '] . ' +
-				    '?observationType rdf:type owl:Class ; ' +
-							        'rdfs:subClassOf ?metaObservationType . ' +
-					'?metaObservationType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
-							                                'owl:onProperty sosa:hasResult ; ' +
-							                                'owl:allValuesFrom ?resultType ' +
-							                             '] . ' +
+					'?observationType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+													'owl:onProperty sosa:hasSimpleResult ; ' +
+													'owl:allValuesFrom ?valueType ' +
+												'] . ' +
 				    'optional { ' +
 				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
 				                                        'owl:onProperty sosa:observes ; ' +
@@ -83,8 +82,7 @@ class SelectedPage extends React.Component {
 				    '?sensorName rdf:type ?sensorType ; ' +
 				                'rdf:type owl:NamedIndividual ; ' +
 				                ':indicatorId ?sensorId ; ' +
-				                ':sensorName ?name ; ' +
-				                ':htmlClass ?class . ' +
+				                ':sensorName ?name . ' +
 				    'optional { ?sensorName :zone ?zone . } ' +
 				'} ';
 
@@ -227,7 +225,7 @@ function getInfoSensores(results){
 
 		infoSensor['indicatorId'] = object['sensorId']['value'];
 		infoSensor['name'] = object['name']['value'];
-		infoSensor['class'] = object['class']['value'];
+		// infoSensor['class'] = object['class']['value'];
 
 		var sensType = object['sensorType']['value'];
 		var iSensType = sensType.indexOf('#');
@@ -239,10 +237,14 @@ function getInfoSensores(results){
 		var obsTypeParsed = obsType.substring(iObsType+1, obsType.length);
 		infoSensor['observationType'] = obsTypeParsed;
 
-		var resType = object['resultType']['value'];
-		var iResType = resType.indexOf('#');
-		var resTypeParsed = resType.substring(iResType+1, resType.length);
-		infoSensor['resultType'] = resTypeParsed;
+		// var resType = object['resultType']['value'];
+		// var iResType = resType.indexOf('#');
+		// var resTypeParsed = resType.substring(iResType+1, resType.length);
+		// infoSensor['resultType'] = resTypeParsed;
+		var valType = object['valueType']['value'];
+		var iValType = valType.indexOf('#');
+		var valTypeParsed = valType.substring(iValType+1, valType.length);
+		infoSensor['valueType'] = valTypeParsed;
 
 		if (object['zone']){
 			infoSensor['zone'] = object['zone']['value'];

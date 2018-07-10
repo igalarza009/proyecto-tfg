@@ -1,6 +1,7 @@
 // const infoSensores = require('../../infoSensores.json');
 // const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
-const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
+// const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
+const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
 const _ = require('lodash');
 
 export function parseDataToRDF(filename, values, timestamps, infoSensores){
@@ -27,11 +28,12 @@ export function parseDataToRDF(filename, values, timestamps, infoSensores){
 
 	let observationResult = '';
 	const observationType = currentSensor.observationType;
-	const resultType = currentSensor.resultType;
+	// const resultType = currentSensor.resultType;
+	const valueType = 'xsd:' + currentSensor.valueType;
 
-	const valueType = (resultType === 'DoubleValueResult')
-			? ("xsd:double")
-			: ("xsd:boolean");
+	// const valueType = (resultType === 'DoubleValueResult')
+	// 		? ("xsd:double")
+	// 		: ("xsd:boolean");
 
 	values.forEach((value, index) => {
 		// if (value !== ""){
@@ -41,7 +43,7 @@ export function parseDataToRDF(filename, values, timestamps, infoSensores){
 			// var value = element[1];
 
 			var observationName = sensorName + "date" + date + "obs" + index;
-			var observationResultName = observationName + "result";
+			// var observationResultName = observationName + "result";
 
 			let fixedValue = value;
 			if (value === 'NA'){
@@ -51,10 +53,10 @@ export function parseDataToRDF(filename, values, timestamps, infoSensores){
 			observationResult = observationResult +
 				':' + observationName + ' rdf:type owl:NamedIndividual , \n' +
 					':' + observationType + ' . \n' +
-				':' + observationResultName + ' rdf:type owl:NamedIndividual , \n' +
-					':' + resultType + ' . \n' +
-				':' + observationResultName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . \n' +
-				':' + observationName + ' sosa:hasResult :' + observationResultName + ' . \n' +
+				// ':' + observationResultName + ' rdf:type owl:NamedIndividual , \n' +
+				// 	':' + resultType + ' . \n' +
+				':' + observationName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . \n' +
+				// ':' + observationName + ' sosa:hasResult :' + observationResultName + ' . \n' +
 				':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . \n' + //Añadir ^^xsd:dateTime
 				':' + sensorName + ' sosa:madeObservation :' + observationName + ' . \n';
 		// }

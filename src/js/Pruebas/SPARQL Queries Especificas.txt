@@ -7,23 +7,22 @@ prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#>
 
-select ?sensorId ?name ?class ?sensorType ?observationType ?resultType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue
+select ?sensorId ?name ?sensorType ?observationType ?valueType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue
 from <http://www.sensores.com/ontology/prueba05/extrusoras#>
 where {
-        { ?sensorType rdfs:subClassOf :DoubleValueSensor . }
-         union
-        { ?sensorType rdfs:subClassOf :BooleanSensor . }
+        ?metaSensorType rdf:type owl:Class ;
+                        rdfs:subClassOf sosa:Sensor .
 
-        ?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
+        ?sensorType rdfs:subClassOf ?metaSensorType .
+
+        ?metaSensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
                                         owl:onProperty sosa:madeObservation ;
                                         owl:allValuesFrom ?observationType
                                     ] .
-        ?observationType rdf:type owl:Class ;
-    			        rdfs:subClassOf ?metaObservationType .
-    	?metaObservationType rdfs:subClassOf [ rdf:type owl:Restriction ;
-    			                                owl:onProperty sosa:hasResult ;
-    			                                owl:allValuesFrom ?resultType
-    			                             ] .
+        ?observationType rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                        owl:onProperty sosa:hasSimpleResult ;
+                                        owl:allValuesFrom ?valueType
+                                    ] .
         optional {
         	?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
                                             owl:onProperty sosa:observes ;
@@ -49,8 +48,7 @@ where {
         ?sensorName rdf:type ?sensorType ;
                     rdf:type owl:NamedIndividual ;
                     :indicatorId ?sensorId ;
-                    :sensorName ?name ;
-                    :htmlClass ?class .
+                    :sensorName ?name .
         optional { ?sensorName :zone ?zone .}
 }
 

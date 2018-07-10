@@ -1,7 +1,8 @@
 // const graphURI = '<http://www.sensores.com/ontology/prueba04/extrusoras#>';
 // const graphURI = '<http://www.sensores.com/ontology/prueba08/extrusoras#>';
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
+// const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
+const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
 
 var _ = require('lodash');
 
@@ -49,7 +50,7 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 	let where = 'where { ';
 
 	where += '?sensorName sosa:madeObservation ?obsName . ' +
-			'?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue . ' +
+			'?obsName sosa:hasSimpleResult ?resultValue . ' +
 			'?obsName sosa:resultTime ?resultTime . ';
 
 	if (filterValues['filter'] && filterValues['values'][sensorId]){
@@ -113,7 +114,7 @@ export function getInformationQueryIndividualSplit(sensorId, groupBy, filter, fi
 	let where = 'where { ';
 
 	where += '?sensorName sosa:madeObservation ?obsName . ' +
-			'?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue . ' +
+			'?obsName sosa:hasSimpleResult ?resultValue . ' +
 			'?obsName sosa:resultTime ?resultTime . ';
 
 	if (filterValues['filter'] && filterValues['values'][sensorId]){
@@ -292,7 +293,7 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 			}
 			where += 'where { ' +
 				'<#sensor' + sensorName + '> sosa:madeObservation ?' + calObsName + ' . ' +
-				'?' + calObsName + ' sosa:hasResult/sosa:hasSimpleResult ?calResultValue . ';
+				'?' + calObsName + ' sosa:hasSimpleResult ?calResultValue . ';
 
 			if (filterValues['filter'] && filterValues['values'][sensorName]){
 					where += 'filter(?calResultValue  ';
@@ -310,12 +311,12 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 			where += ' } } ' ;
 
 			where += '<#sensor' + sensorName + '> sosa:madeObservation ?' + obsName + ' . ' +
-				'?' + obsName + ' sosa:hasResult/sosa:hasSimpleResult ?' + calValName + ' . ' +
+				'?' + obsName + ' sosa:hasSimpleResult ?' + calValName + ' . ' +
 				'?' + obsName + ' sosa:resultTime ?resultTime . ';
 		}
 		else {
 			where += '<#sensor' + sensorName + '> sosa:madeObservation ?' + obsName + ' . ' +
-				'?' + obsName + ' sosa:hasResult/sosa:hasSimpleResult "' + value + '"^^xsd:double . ' +
+				'?' + obsName + ' sosa:hasSimpleResult "' + value + '"^^xsd:double . ' +
 				'?' + obsName + ' sosa:resultTime ?resultTime . ';
 		}
 		i++;
