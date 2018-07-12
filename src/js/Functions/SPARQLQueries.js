@@ -2,7 +2,8 @@
 // const graphURI = '<http://www.sensores.com/ontology/prueba08/extrusoras#>';
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
 // const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
-const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
 var _ = require('lodash');
 
@@ -37,6 +38,8 @@ var _ = require('lodash');
   // 		- split['limit']: Integer
 
 export function getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy){
+
+	console.log(filter);
 
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
@@ -459,18 +462,24 @@ function getSelect(groupBy){
 function getFilter(filter){
 	let where = 'filter( ';
     	if (filter['filterTime'] && filter['filterDate']){
-   			where += ' xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime && ' +
-            	'xsd:dateTime(?resultTime) <= "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime && ' +
-    			'xsd:time(xsd:dateTime(?resultTime)) >= "' + filter['startTime'] + '.000Z"^^xsd:time && ' +
-            	'xsd:time(xsd:dateTime(?resultTime)) <= "' + filter['endTime'] + '.999Z"^^xsd:time ';
+			// let endDate = new Date(filter['endDate']);
+			// endDate.setDate(endDate.getDate() + 1);
+			// let endDateISO = endDate.toISOString();
+   			where += ' (xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime) && ' +
+            	'(xsd:dateTime(?resultTime) < "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime) && ' +
+    			'(xsd:time(xsd:dateTime(?resultTime)) >= "' + filter['startTime'] + '.000Z"^^xsd:time) && ' +
+            	'(xsd:time(xsd:dateTime(?resultTime)) <= "' + filter['endTime'] + '.000Z"^^xsd:time) ';
     	}
     	else if (filter['filterDate']){
-    		where += ' xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime && ' +
-            	'xsd:dateTime(?resultTime) <= "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime ';
+			// let endDate = new Date(filter['endDate']);
+			// endDate.setDate(endDate.getDate() + 1);
+			// let endDateISO = endDate.toISOString();
+    		where += ' (xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime) && ' +
+            	'(xsd:dateTime(?resultTime) <= "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime) ';
     	}
     	else if (filter['filterTime']){
-    		where += 'xsd:time(xsd:dateTime(?resultTime)) >= "' + filter['startTime'] + '.000Z"^^xsd:time && ' +
-            	'xsd:time(xsd:dateTime(?resultTime)) <= "' + filter['endTime'] + '.999Z"^^xsd:time ';
+    		where += '(xsd:time(xsd:dateTime(?resultTime)) >= "' + filter['startTime'] + '.000Z"^^xsd:time) && ' +
+            	'(xsd:time(xsd:dateTime(?resultTime)) <= "' + filter['endTime'] + '.000Z"^^xsd:time) ';
     	}
     where += ') ';
 

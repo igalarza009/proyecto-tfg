@@ -38,7 +38,7 @@ export class AnomaliasQueryForm extends React.Component{
 		        props.selectedSensors.forEach((sensorId) => {
 		            if (!sensorDir[sensorId]){
 						const sensor = _.find(props.infoSensores, ['indicatorId', sensorId]);
-						if (sensor['resultType'] === 'DoubleValueResult')
+						if (sensor['valueType'] === 'double')
 							newSensorDir[sensorId] = 'up';
 						else
 							newSensorDir[sensorId] = 'off';
@@ -70,7 +70,7 @@ export class AnomaliasQueryForm extends React.Component{
 		let sensorDir = {};
 		this.state.selectedSensors.forEach((sensorId) => {
 			const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
-			if (sensor['resultType'] === 'DoubleValueResult')
+			if (sensor['valueType'] === 'double')
 				sensorDir[sensorId] = 'up';
 			else
 				sensorDir[sensorId] = 'off';
@@ -261,7 +261,7 @@ export class AnomaliasQueryForm extends React.Component{
 					</Col>)
 				: (null);
 
-			const valueType = (sensor['resultType'] === 'DoubleValueResult')
+			const valueType = (sensor['valueType'] === 'double')
 				? (<Button floating className='white'
 						onClick={() => this.handleClick(sensorId)}>
 						{arrowIcon}
@@ -392,7 +392,7 @@ export class AnomaliasQueryForm extends React.Component{
 							className={fechasClass}/>
 					 	<Input s={12} l={6} type='date' label="Hasta..."
 							options={{format: 'yyyy-mm-dd'}}
-					 		onChange={(e, value) => {this.handleFechaFin(e, value);}} 
+					 		onChange={(e, value) => {this.handleFechaFin(e, value);}}
 							className={fechasClass}/>
 						{erroresFechas}
 					</Row>

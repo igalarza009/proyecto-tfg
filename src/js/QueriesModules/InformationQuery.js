@@ -44,7 +44,7 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			openedTabs: openedTabs,
 		});
-		console.log(openedTabs);
+		// console.log(openedTabs);
 	}
 
 	removeFromTabs(id){
@@ -54,7 +54,7 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			openedTabs: openedTabs,
 		});
-		console.log(openedTabs);
+		// console.log(openedTabs);
 	}
 
 	handleOpenForm(index){
@@ -78,8 +78,8 @@ export class InformationQueryForm extends React.Component{
 				faltaFecha = true;
 			}
 			else{
-				var dateInicio = new Date(value + 'T00:00:00');
-				var dateFin = new Date(fechaFin + 'T00:00:00');
+				var dateInicio = new Date(value);
+				var dateFin = new Date(fechaFin);
 				if (dateInicio.getTime() > dateFin.getTime()){
 					fechasMal = true;
 				}
@@ -108,8 +108,8 @@ export class InformationQueryForm extends React.Component{
 				faltaFecha = true;
 			}
 			else{
-				var dateInicio = new Date(fechaInicio + 'T00:00:00');
-				var dateFin = new Date(value + 'T00:00:00');
+				var dateInicio = new Date(fechaInicio);
+				var dateFin = new Date(value);
 				if (dateInicio.getTime() > dateFin.getTime()){
 					fechasMal = true;
 				}
@@ -126,7 +126,7 @@ export class InformationQueryForm extends React.Component{
 			fechaFin: value,
 			errores: errores,
 		});
-		console.log(errores);
+		// console.log(errores);
 	}
 
 	handleTimeChange(event,  timeName, timeType){
@@ -173,7 +173,7 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			errores: errores,
 		});
-		console.log(errores);
+		// console.log(errores);
 	}
 
 	handleSwitch(event, sensorId){
@@ -339,7 +339,7 @@ export class InformationQueryForm extends React.Component{
 				? ([minValue, maxValue])
 				: ([values[sensorId][0], values[sensorId][1]]);
 
-			const valuePicker = (sensor['resultType'] === 'DoubleValueResult')
+			const valuePicker = (sensor['valueType'] === 'double')
 				? (<Range
 						min={minValue} max={maxValue}
 						defaultValue={defaultRange}

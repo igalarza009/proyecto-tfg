@@ -22,6 +22,7 @@ const usedURL = virtuosoURL;
 // const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
 // const graphURI = "<http://www.sensores.com/ontology/prueba09/extrusoras#>";
 const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
 class SelectedPage extends React.Component {
 	constructor(props){
@@ -57,17 +58,12 @@ class SelectedPage extends React.Component {
 													'owl:onProperty sosa:hasSimpleResult ; ' +
 													'owl:allValuesFrom ?valueType ' +
 												'] . ' +
+				    '?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+				                                    'owl:onProperty sosa:observes ; ' +
+				                                    'owl:hasValue ?observedProperty ' +
+				                                '] . ' +
 				    'optional { ' +
-				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
-				                                        'owl:onProperty sosa:observes ; ' +
-				                                        'owl:hasValue ?observedProperty ' +
-				                                    '] . ' +
-				    '} ' +
-				     'optional { ' +
-				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
-				                                        'owl:onProperty qu:unit ; ' +
-				                                        'owl:hasValue ?measureUnit ' +
-				                                    '] . ' +
+				    	'?observedProperty qu:unit ?measureUnit . ' +
 				    '} ' +
 				    'optional { ' +
 				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
@@ -92,18 +88,27 @@ class SelectedPage extends React.Component {
 		)
 		.then((response) => {
 			console.log(response);
-			let infoSensores = getInfoSensores(response.data["results"]["bindings"]);
-			this.setState({
-				infoSensores: infoSensores,
-				selectedPage: 'preguntas',
-				errorLoading: false,
-			})
+			let results = response.data["results"]["bindings"];
+			if (results.length > 0) {
+				let infoSensores = getInfoSensores(results);
+				this.setState({
+					infoSensores: infoSensores,
+					selectedPage: 'preguntas',
+					errorLoading: false,
+				});
+			}
+			else{
+				this.setState({
+					errorLoading: true,
+				});
+			}
+
 		})
 		.catch((error) => {
 			console.log(error);
 			this.setState({
 				errorLoading: true,
-			})
+			});
 		});
 	}
 
@@ -237,10 +242,6 @@ function getInfoSensores(results){
 		var obsTypeParsed = obsType.substring(iObsType+1, obsType.length);
 		infoSensor['observationType'] = obsTypeParsed;
 
-		// var resType = object['resultType']['value'];
-		// var iResType = resType.indexOf('#');
-		// var resTypeParsed = resType.substring(iResType+1, resType.length);
-		// infoSensor['resultType'] = resTypeParsed;
 		var valType = object['valueType']['value'];
 		var iValType = valType.indexOf('#');
 		var valTypeParsed = valType.substring(iValType+1, valType.length);
@@ -253,15 +254,10 @@ function getInfoSensores(results){
 			infoSensor['zone'] = '';
 		}
 
-		if (object['observedProperty']){
-			var obsProp = object['observedProperty']['value'];
-			var iObsProp = obsProp.indexOf('#');
-			var obsPropParsed = obsProp.substring(iObsProp+1, obsProp.length);
-			infoSensor['observedProperty'] = obsPropParsed;
-		}
-		else{
-			infoSensor['observedProperty'] = '';
-		}
+		var obsProp = object['observedProperty']['value'];
+		var iObsProp = obsProp.indexOf('#');
+		var obsPropParsed = obsProp.substring(iObsProp+1, obsProp.length);
+		infoSensor['observedProperty'] = obsPropParsed;
 
 		if (object['measureUnit']){
 			var unit = object['measureUnit']['value'];

@@ -306,7 +306,7 @@ export class OtroSensorQueryForm extends React.Component{
 						: (<Input s={3} label="Valor" className={valorClass}
 								onChange={(e) => {this.handleValueChange(e,sensorId);}}
 							/>);
-				const valuePickerType = (sensor['resultType'] === 'DoubleValueResult')
+				const valuePickerType = (sensor['valueType'] === 'double')
 						? (<Range
 								min={minValue} max={maxValue}
 								defaultValue={defaultRange}

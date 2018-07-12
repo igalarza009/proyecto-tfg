@@ -1,6 +1,21 @@
 const maxPoints = 4500;
 const _ = require('lodash');
 
+const propertyNames = {
+	temperature: 'Temperatura',
+	operationState: 'Estado del sensor',
+	power: 'Energía',
+	rotationalSpeed: 'velocidad de rotación',
+	pressure: 'Presión'
+}
+
+const unitSymbols = {
+	degreeCelsius: '℃',
+	ampere: 'A',
+	revolutionsPerMinute: 'RPM',
+	barUnitOfPressure: 'bar'
+}
+
 export function getFormInfo(info){
 	// const results = responseData["results"]["bindings"];
 	let selectedValues = [];
@@ -204,10 +219,16 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 			chartFullData['title'] = "Información del sensor: "+ sensorId;
 
 			var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
-			var axisTitle = sensor['observedProperty'];
-			var unit = sensor['measureUnit'];
-			var axisLabel = axisTitle + " (" + unit + ")"
-			var axisData = [axisTitle, axisLabel];
+			var property = sensor['observedProperty'];
+			var axisLabel;
+			if (sensor['measureUnit'] !== ''){
+				var unit = sensor['measureUnit'];
+				axisLabel = propertyNames[property] + " (" + unitSymbols[unit] + ")";
+			}
+			else{
+				axisLabel = propertyNames[property] + " (Encendido/Apagado)";
+			}
+			var axisData = [property, axisLabel];
 			chartFullData['y-axis'] = [];
 			infoQuery['selectedValues'].forEach((value) => {
 				chartFullData['y-axis'].push(axisData);
@@ -262,10 +283,16 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 				}
 				else{
 					var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
-					var axisTitle = sensor['observedProperty'];
-					var unit = sensor['measureUnit'];
-					var axisLabel = axisTitle + " (" + unit + ")"
-					var axisData = [axisTitle, axisLabel];
+					var property = sensor['observedProperty'];
+					var axisLabel;
+					if (sensor['measureUnit'] !== ''){
+						var unit = sensor['measureUnit'];
+						axisLabel = propertyNames[property] + " (" + unitSymbols[unit] + ")";
+					}
+					else{
+						axisLabel = propertyNames[property] + " (Encendido/Apagado)";
+					}
+					var axisData = [property, axisLabel];
 					chartFullData['y-axis'].push(axisData);
 				}
 		});

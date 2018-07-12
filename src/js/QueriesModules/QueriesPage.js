@@ -311,7 +311,7 @@ export class SensorsInfo extends React.Component {
 		.then((response) => {
 			console.log(response);
 			const sensorId = selectedSensors[nResponses];
-			if (response.data["results"]["bindings"].length > 1){
+			if (response.data["results"]["bindings"].length > 0){
 				// sensorsResponse[sensorId] = response.data["results"]["bindings"];
 				// Sustituir y tratar aquí los datos, ponerlos en el formato adecuado y reducirlos
 				var result = DataFunctions.parseResponseData(

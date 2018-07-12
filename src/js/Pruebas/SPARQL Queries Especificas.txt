@@ -1,6 +1,6 @@
 ==================================== GET VALUES FROM ONTOLOGY ====================================
 
-prefix : <http://www.sensores.com/ontology/prueba05/extrusoras#>
+prefix : <http://www.sensores.com/ontology/nuevo_02/extrusoras#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix sosa: <http://www.w3.org/ns/sosa/>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -8,7 +8,7 @@ prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#>
 
 select ?sensorId ?name ?sensorType ?observationType ?valueType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue
-from <http://www.sensores.com/ontology/prueba05/extrusoras#>
+from <http://www.sensores.com/ontology/nuevo_02/extrusoras#>
 where {
         ?metaSensorType rdf:type owl:Class ;
                         rdfs:subClassOf sosa:Sensor .
@@ -23,18 +23,15 @@ where {
                                         owl:onProperty sosa:hasSimpleResult ;
                                         owl:allValuesFrom ?valueType
                                     ] .
+
+        ?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                      owl:onProperty sosa:observes ;
+                                      owl:hasValue ?observedProperty
+                                    ] .
         optional {
-        	?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
-                                            owl:onProperty sosa:observes ;
-                                            owl:hasValue ?observedProperty
-                                        ] .
+        	?observedProperty qu:unit ?measureUnit .
         }
-        optional {
-        	?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
-                                            owl:onProperty qu:unit ;
-                                            owl:hasValue ?measureUnit
-                                        ] .
-        }
+
         optional {
         	?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ;
                                             owl:onProperty :maxValue ;
@@ -51,6 +48,7 @@ where {
                     :sensorName ?name .
         optional { ?sensorName :zone ?zone .}
 }
+
 
 ==================================== INFORMATION QUERIES ====================================
 

@@ -105,7 +105,19 @@ export class ParseData extends React.Component {
 				console.log("No hay más datos");
 				// console.log(newFixedValues);
 				// console.log(newFixedTimestamps);
-				var file = Parser.parseDataToRDF(fileName, newFixedValues, newFixedTimestamps, this.props.infoSensores);
+				let fixedTimestampsISOFormat = [];
+				newFixedTimestamps.forEach((value) => {
+					let date = new Date(value+'Z');
+					fixedTimestampsISOFormat.push(date.toISOString());
+					// if (i < 100){
+					// 	console.log(value);
+					// 	console.log(date);
+					// 	console.log(date.toISOString());
+					// }
+				});
+				// console.log(fixedTimestampsISOFormat);
+				var file = Parser.parseDataToRDF(fileName, newFixedValues, fixedTimestampsISOFormat, this.props.infoSensores);
+				// var file = Parser.parseDataToRDF(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
 				console.log("TTL file created");
 				this.setState({
 					file: file,
