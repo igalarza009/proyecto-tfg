@@ -14,8 +14,8 @@ export class OtroSensorQueryForm extends React.Component{
 		super(props);
 		this.state = {
 			knownSensors:{},
-			selectedSensors: this.props.selectedSensors,
-			askedSensors: [this.props.selectedSensors[0]],
+			selectedSensors: [],
+			askedSensors: [],
 			quitarAnomalias: false,
 			filterValues: [],
 			values: {},
@@ -28,21 +28,27 @@ export class OtroSensorQueryForm extends React.Component{
 		};
 	}
 
-	componentDidMount(){
-		const askedSensors = this.state.askedSensors;
-		const selectedSensors = this.state.selectedSensors;
-		const knownSensors = this.state.knownSensors;
-		let newKnownSensors = {};
-		selectedSensors.forEach((value,i) => {
-			if (askedSensors.indexOf(value) === -1){
-				newKnownSensors[value] = null;
-			}
-		});
-
-		this.setState({
-			knownSensors: newKnownSensors,
-		});
-	}
+	// componentDidMount(){
+	// 	// const askedSensors = this.state.askedSensors;
+	// 	// const selectedSensors = this.state.selectedSensors;
+	// 	// const knownSensors = this.state.knownSensors;
+	// 	// // let newKnownSensors = {};
+	// 	// // selectedSensors.forEach((value,i) => {
+	// 	// // 	if (askedSensors.indexOf(value) === -1){
+	// 	// // 		newKnownSensors[value] = null;
+	// 	// // 	}
+	// 	// // });
+	// 	// //
+	// 	// // this.setState({
+	// 	// // 	knownSensors: newKnownSensors,
+	// 	// // });
+	// 	// console.log(askedSensors);
+	// 	// console.log(knownSensors);
+	// 	this.setState({
+	// 		selectedSensors: this.props.selectedSensors,
+	// 		askedSensors: [this.props.selectedSensors[0]],
+	// 	})
+	// }
 
 	static getDerivedStateFromProps(props, state){
         if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
@@ -54,17 +60,22 @@ export class OtroSensorQueryForm extends React.Component{
 			let newFilterValues = [];
 			const selectedSensors = props.selectedSensors;
 			selectedSensors.forEach((value,i) => {
-				if (askedSensors.indexOf(value) !==-1){
+				if (state.selectedSensors.length === 0){
 					newAskedSensors.push(value);
 				}
-				else if (!knownSensors[value]){
-					newKnownSensors[value] = null;
-				}
 				else{
-					newKnownSensors[value] = knownSensors[value];
-				}
-				if (filterValues[value]){
-					newFilterValues.push(value);
+					if (askedSensors.indexOf(value) !==-1){
+						newAskedSensors.push(value);
+					}
+					else if (!knownSensors[value]){
+						newKnownSensors[value] = null;
+					}
+					else{
+						newKnownSensors[value] = knownSensors[value];
+					}
+					if (filterValues[value]){
+						newFilterValues.push(value);
+					}
 				}
 			});
 			return {
@@ -381,6 +392,9 @@ export class OtroSensorQueryForm extends React.Component{
 			erroresFechas = (<p className='red-text'> La fecha de inicio no puede ser posterior a la fecha final. </p>);
 			buttonDisabled = true;
 			fechasClass = 'error';
+		}
+		else if (askedSensors.length === 0 || askedSensors.length === selectedSensors.length){
+			buttonDisabled = true;
 		}
 
 		return(

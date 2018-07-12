@@ -80,7 +80,8 @@ class SelectedPage extends React.Component {
 				                ':indicatorId ?sensorId ; ' +
 				                ':sensorName ?name . ' +
 				    'optional { ?sensorName :zone ?zone . } ' +
-				'} ';
+				'} ' +
+				'order by asc(?name)';
 
 		const querystring = require('querystring');
 		axios.post(usedURL,
@@ -167,34 +168,34 @@ class SelectedPage extends React.Component {
 
 		const navBar = (selectedPage === 'cargando')
 			? (<div className="nav-wrapper">
-					<a href="#" className="brand-logo center">Información sobre sensores</a>
+					<a href="#" className="brand-logo center">Análisis de datos de sensores</a>
 				</div>)
 			: (<div className="nav-wrapper">
-					<a href="#" className="brand-logo center">Información sobre sensores</a>
+					<a href="#" className="brand-logo center">Análisis de datos de sensores</a>
 					<a href="#" data-activates="mobile-demo" className="button-collapse">
 						<i className="material-icons">menu</i>
 					</a>
 					<ul id="nav-mobile" className="left hide-on-med-and-down">
 						<li className={preguntasClass}>
 							<a href="#" onClick={() => this.mostrarPreguntas()}>
-								Preguntas
+								Consultar datos
 							</a>
 						</li>
 						<li className={traductorClass}>
 							<a href="#" onClick={() => this.mostrarTraductorDatos()}>
-								Traductor datos
+								Insertar datos
 							</a>
 						</li>
 					</ul>
 					<ul id="mobile-demo" className="side-nav">
 						<li className={preguntasClass}>
 							<a href="#" onClick={() => this.mostrarPreguntas()}>
-								Preguntas
+								Consultar datos
 							</a>
 						</li>
 						<li className={traductorClass}>
 							<a href="#" onClick={() => this.mostrarTraductorDatos()}>
-								Traductor datos
+								Insertar datos
 							</a>
 						</li>
 					</ul>

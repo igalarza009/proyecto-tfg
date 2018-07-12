@@ -134,13 +134,11 @@ export class SensorsInfo extends React.Component {
 			);
 		});
 
-		const selectedSensorsNames = selectedSensors.map((value) => {
-			const sensor = _.find(this.props.infoSensores, ['indicatorId', value]);
-			const sensorName = value + ' (' + sensor.name + ')';
+		const selectedSensorsNames = selectedSensors.map((sensorId) => {
+			const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
+			const sensorName = sensor.name;
 			return(
-				<li key={value}>
-					{sensorName}
-				</li>
+				<li key={sensorId}><span className="bold">{sensorName}</span> ({sensorId})</li>
 			);
 		});
 
@@ -158,7 +156,7 @@ export class SensorsInfo extends React.Component {
 
 		const cardValue = (selectedSensors.length === 0)
 			? (<p className='center'>
-					Selecciona uno o varios sensores para realizar preguntas personalizadas.
+					Selecciona uno o varios sensores para realizar consultas personalizadas.
 				</p>)
 			: (cardContent);
 
@@ -850,6 +848,7 @@ export class SensorsInfo extends React.Component {
 			tipoDePregunta = 'Información sobre los sensores: ';
 			sensores = info['sensors'].map((sensorId, i) => {
 				const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
+				const sensorName = sensor.name;
 				let filtroValores = '';
 				if (info['filterValues']['filter']){ //Hay filtros de valores
 					if (info['filterValues']['values'][sensorId]){
@@ -862,41 +861,45 @@ export class SensorsInfo extends React.Component {
 						}
 					}
 				}
-				const sensorName = sensorId + ' (' + sensor.name + ')' + filtroValores;
 				return(
 					<li key={sensorId}>
-						{sensorName}
+						<span className="bold">{sensorName}</span> ({sensorId}) {filtroValores}
 					</li>
 				);
 			});
 			if (info['filter']['filter']){ //Hay filtros de fechas y/o horas
 				if(info['filter']['filterDate']){ //Hay filtro de fechas
-					filtroFechas = 'Entre las fechas ' + info['filter']['startDate'] + ' y ' + info['filter']['endDate'] + '. \n ';
+					let dateInicio = new Date(info['filter']['startDate']);
+					let dateFinal = new Date(info['filter']['endDate']);
+					let options = {year: 'numeric', month: 'long', day: 'numeric' };
+					let formDateInicio = dateInicio.toLocaleString('es-ES', options);
+					let formDateFinal = dateFinal.toLocaleString('es-ES', options);
+					filtroFechas = 'Entre el ' + formDateInicio + ' y el ' + formDateFinal + '. \n ';
 				}
 				if(info['filter']['filterTime']){ //Hay filtro de horas
-					filtroHoras = 'Entre los tiempos ' + info['filter']['startTime'] + ' y ' + info['filter']['endTime'] + '. \n ';
+					filtroHoras = 'Entre las ' + info['filter']['startTime'] + ' y las ' + info['filter']['endTime'] + '. \n ';
 				}
 			}
 			if (info['groupBy']['groupBy']){ //Hay agrupaciones de datos
 				agrupVal = 'Se mostrará el valor '
 				if (info['groupBy']['avg']){ //Agrupados por día
-					agrupVal += ' medio ';
+					agrupVal += ' medio,';
 				}
 				if (info['groupBy']['min']){ //Agrupados por día
-					agrupVal += ' mínimo ';
+					agrupVal += ' mínimo,';
 				}
 				if (info['groupBy']['max']){ //Agrupados por día
-					agrupVal += ' máximo ';
+					agrupVal += ' máximo,';
 				}
 				agrupVal += 'de los sensores '
 				if (info['groupBy']['groupByDate']){ //Agrupados por día
-					agrupVal += ' agrupados por días, mostrando un valor por día.';
+					agrupVal += ' agrupado por días, mostrando un valor por día.';
 				}
 				else if (info['groupBy']['groupByHour']){ //Agrupados por día
-					agrupVal += ' agrupados por horas, mostrando un valor por hora.';
+					agrupVal += ' agrupado por horas, mostrando un valor por hora.';
 				}
 				else if (info['groupBy']['groupByAll']){ //Agrupados por día
-					agrupVal += ' agrupados en un único valor por cada sensor.';
+					agrupVal += ' agrupado en un único valor por cada sensor.';
 				}
 			}
 			resumenInfo = (<div>
@@ -907,18 +910,28 @@ export class SensorsInfo extends React.Component {
 		}
 		else if (type === 'otro'){
 			tipoDePregunta = 'Valores de los sensores: ';
+			let filtroFechas = '';
+			if(info['filter']['filterDate']){ //Hay filtro de fechas
+				let dateInicio = new Date(info['filter']['startDate']);
+				let dateFinal = new Date(info['filter']['endDate']);
+				let options = {year: 'numeric', month: 'long', day: 'numeric' };
+				let formDateInicio = dateInicio.toLocaleString('es-ES', options);
+				let formDateFinal = dateFinal.toLocaleString('es-ES', options);
+				filtroFechas = 'Entre el ' + formDateInicio + ' y el ' + formDateFinal + '. \n ';
+			}
 			sensores = info['sensors'].map((sensorId, i) => {
 				const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
-				const sensorName = sensorId + ' (' + sensor.name + ')';
+				const sensorName = sensor.name;
 				return(
 					<li key={sensorId}>
-						{sensorName}
+						<span className="bold">{sensorName}</span> ({sensorId})
 					</li>
 				);
 			});
 			let sentenceOtros = 'Cuando los siguientes sensores toman estos valores: ';
 			let otrosSensores = _.map(info['knownSensors'], (value, sensorId) => {
 				const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
+				const sensorName = sensor.name;
 				let filtroValores = '';
 				if (info['filterValues']['filter']){ //Hay filtros de valores
 					if (info['filterValues']['values'][sensorId]){
@@ -938,10 +951,9 @@ export class SensorsInfo extends React.Component {
 				else if (value === 'max'){
 					finalValue = 'su valor máximo';
 				}
-				const sensorName = sensorId + ' (' + sensor.name + '): ' + finalValue + filtroValores;
 				return(
 					<li key={sensorId}>
-						{sensorName}
+						<span className="bold">{sensorName}</span> ({sensorId}): {finalValue} {filtroValores}
 					</li>
 				);
 			});
@@ -950,6 +962,9 @@ export class SensorsInfo extends React.Component {
 								<div className='margin-left margin-top'>
 									 {otrosSensores}
 								 </div>
+								 <div className='margin-top'>
+									 <p>{filtroFechas}</p>
+								 </div>
 							</div>);
 		}
 		else { // 'sensorsDir':sensorsDir, 'parMotor':parMotor}
@@ -957,7 +972,7 @@ export class SensorsInfo extends React.Component {
 			resumenInfo = null;
 			sensores = _.map(info['sensorsDir'], (value, sensorId) => {
 				const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
-				const sensorName = sensorId + ' (' + sensor.name + '): ';
+				const sensorName = sensor.name;
 				let icon;
 				if (value === 'up'){
 					icon = (<Icon>arrow_upward</Icon>);
@@ -974,26 +989,28 @@ export class SensorsInfo extends React.Component {
 				// const icon = (<Icon>{iconName}</Icon>);
 				return(
 					<li key={sensorId}>
-						{sensorName}
-						{icon}
+						<span className="bold">{sensorName}</span> ({sensorId}) {icon}
 					</li>
 				);
 			});
 		}
 
 		return (
-			<Card title='Resumen de la pregunta'>
-				<p> {tipoDePregunta} </p>
-				<div className='margin-left margin-top'>
-					 {sensores}
-				 </div>
-				<div className='margin-top'>
-					 {resumenInfo}
+			<div className="card">
+	            <div className="card-content">
+	              <span className="card-title blue-text text-darken-3">Resumen de la pregunta: </span>
+					<p> {tipoDePregunta} </p>
+					<div className='margin-left margin-top'>
+						 {sensores}
+					 </div>
+					<div className='margin-top'>
+						 {resumenInfo}
+					</div>
+					<div className='center margin-top'>
+						{newQueryButton}
+					</div>
 				</div>
-				<div className='center margin-top'>
-					{newQueryButton}
-				</div>
-			</Card>
+			</div>
 		);
 	}
 

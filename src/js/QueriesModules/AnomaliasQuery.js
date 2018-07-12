@@ -298,6 +298,7 @@ export class AnomaliasQueryForm extends React.Component{
 			});
 			const sensorRels = sensorIdDirs.map((value, iPar) => {
 				const arrowDir = (value === 'up') ? "arrow_upward" : "arrow_downward";
+				const color = (value === 'up') ? "green-text" : "red-text";
 				const icon = (<Icon>{arrowDir}</Icon>);
 				const sensorId = sensorIds[iPar];
 				let sensorName;
@@ -306,11 +307,12 @@ export class AnomaliasQueryForm extends React.Component{
 				}
 				else{
 					const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
-					sensorName = 'Sensor ' + sensorId + ' (' + sensor.name + ')';
+					sensorName = sensor.name + ' (' + sensorId + ')';
 				}
 				const key = "keyRel" + iRel + "par" + iPar;
+				const className = "valign-wrapper " + color;
 				return(
-					(<p key={key}> {sensorName} {icon}</p>)
+					(<p key={key} className="valign-wrapper "> {sensorName} {icon}</p>)
 				);
 			});
 			const id = "sensorRel" + iRel;

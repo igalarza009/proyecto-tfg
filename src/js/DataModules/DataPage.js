@@ -15,6 +15,16 @@ const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/
 
 const maxReqLength = 250000;
 
+// const coloresLeyenda = {
+// 		TemperatureSensor: 'red-text text-darken-2',
+// 		ResistanceSensor: 'orange-text text-darken-1',
+// 		VentilationSensor: 'yellow-text text-accent-4',
+// 		EngineRPMSensor: 'green-text',
+// 		EngineConsumptionSensor: 'blue-text',
+// 		PressureSensor: 'purple-text',
+// 		MeltingTemperatureSensor: 'pink-text text-lighten-2'
+// };
+
 // const querystring = require('querystring');
 
 export class ParseData extends React.Component {
@@ -29,53 +39,66 @@ export class ParseData extends React.Component {
 			fileName: null,
 			fileUploaded: false,
 			uploadingFile: false,
-			noSensor: false,
+			error: "",
+			showLeyenda: true,
+			showInformation: false,
 	    }
  	}
 
+	showLeyenda(){
+		const showLeyenda = this.state.showLeyenda;
+		this.setState({
+			showLeyenda: !showLeyenda,
+		})
+	}
+
 	handleParseFile(){
-		const selectedFile = this.fileInput.files;
-		const fileName = selectedFile[0].name;
-		// let parsedData = [];
-		let parsedValues = [];
-		let parsedTimestamps = [];
+		// let error = this.state.error;
+		if (this.fileInput.files.length > 0){
+			const selectedFile = this.fileInput.files;
+			const fileName = selectedFile[0].name;
+			// let parsedData = [];
+			let parsedValues = [];
+			let parsedTimestamps = [];
 
-		const indexOfDot = fileName.indexOf('.');
-		const sensorIndicator = fileName.substring(0, indexOfDot);
+			const indexOfDot = fileName.indexOf('.');
+			const sensorIndicator = fileName.substring(0, indexOfDot);
+			const currentSensor = _.find(this.props.infoSensores, {indicatorId:sensorIndicator});
 
-		console.log(sensorIndicator);
-		console.log(this.props.infoSensores);
+			if (currentSensor === undefined){
+				this.setState({
+					error: 'wrongFile',
+				});
+			}
+			else{
+				this.setState({
+					error: '',
+					parsingFile: true,
+					// showLeyenda:false,
+					selectFile: false,
+					fileName: fileName,
+				});
 
-		const currentSensor = _.find(this.props.infoSensores, {indicatorId:sensorIndicator});
-
-		console.log(currentSensor);
-
-		if (currentSensor === undefined){
-			this.setState({
-				noSensor: true,
-			});
+				Papa.parse(selectedFile[0], {
+					step: function(row, i) {
+						// parsedData.push(row.data[0]);
+						if (row.data[0][0] !== "" && !isNaN(row.data[0][1])){
+							parsedTimestamps.push(row.data[0][0]);
+							parsedValues.push(parseFloat(row.data[0][1]));
+						}
+					},
+					complete: (results) => {
+						parsedTimestamps.reverse();
+						parsedValues.reverse();
+						this.parsingCompleted(fileName, parsedValues, parsedTimestamps, [], []);
+					},
+				});
+			}
 		}
 		else{
+			// errors['noFile'] = true;
 			this.setState({
-				noSensor: false,
-				parsingFile: true,
-				selectFile: false,
-				fileName: fileName,
-			});
-
-			Papa.parse(selectedFile[0], {
-				step: function(row, i) {
-					// parsedData.push(row.data[0]);
-					if (row.data[0][0] !== "" && !isNaN(row.data[0][1])){
-						parsedTimestamps.push(row.data[0][0]);
-						parsedValues.push(parseFloat(row.data[0][1]));
-					}
-				},
-				complete: (results) => {
-					parsedTimestamps.reverse();
-					parsedValues.reverse();
-					this.parsingCompleted(fileName, parsedValues, parsedTimestamps, [], []);
-				},
+				error: 'noFile',
 			});
 		}
 
@@ -176,7 +199,7 @@ export class ParseData extends React.Component {
 			this.setState({
 				uploadingFile: false,
 				fileUploaded: true,
-				parsingEnded: true,
+				// parsingEnded: false,
 			})
 		})
 		.catch((error) => {
@@ -194,100 +217,187 @@ export class ParseData extends React.Component {
 			fileName: null,
 			fileUploaded: false,
 			uploadingFile: false,
-			noSensor: false,
+			error: "",
 		});
 	}
 
 	render(){
-		const loadingParseFile = (this.state.parsingFile)
-			? (<div className="center">
-					<p> Traduciendo fichero... </p>
+		const parsingFile = this.state.parsingFile;
+		const noSensor = this.state.noSensor;
+		const uploadingFile = this.state.uploadingFile;
+		const fileUploaded = this.state.fileUploaded;
+		const selectFile = this.state.selectFile;
+		const parsingEnded = this.state.parsingEnded;
+		const fileName = this.state.fileName;
+		const error = this.state.error;
+		const infoSensores = this.props.infoSensores;
+		const showLeyenda = this.state.showLeyenda;
+
+		const listaSensores = infoSensores.map((sensor, i) => {
+			const sensorId = sensor['indicatorId'];
+			const sensorName = sensor['name'];
+			const sensorType = sensor['sensorType'];
+			return(
+				<li className="margin-left-big" key={sensorId}> <span className="bold"> {sensorId} </span>: {sensorName} </li>
+			);
+		});
+
+		console.log(showLeyenda);
+		const leyendaSensores = (selectFile && showLeyenda) &&
+			(<div className="card">
+	            <div className="card-content">
+	              <span className="card-title blue-text text-darken-3">Sensores disponibles: </span>
+					<p> Los sensores disponibles actualmente en el sistema para esta máquina son: </p>
+					<div className="margin-top">
+						{listaSensores}
+					</div>
+				</div>
+			</div>);
+
+		let errorCard = null;
+
+		if (error === 'noFile'){
+			errorCard = (<Row className="red-text">
+						<p className="margin-left"> No se ha seleccionado ningún archivo de datos. </p>
+					</Row>);
+		}
+		else if (error === 'wrongFile'){
+			errorCard = (<Row className="red-text ">
+						<p className="margin-left"> El nombre del fichero no corresponde a ningún indicador de los sensores contemplados para esta máquina. </p>
+					</Row>);
+		}
+
+		const selectFileOption = (selectFile) &&
+		(<div className="card">
+            <div className="card-content">
+              <span className="card-title blue-text text-darken-3">Seleccionar archivo de datos a insertar</span>
+			  <p>El archivo deberá estar en formato CSV y tener por nombre el indicador del sensor del que aporta los datos. </p>
+			  <p> Los datos a insertar deberán corresponder con alguno de los sensores disponibles en el sistema para la máquina actual.
+				  {/* <i className="tiny grey-text text-darken-3 material-icons pointer"
+					  onClick={() => {this.showLeyenda();}}>
+					  info
+				  </i> */}
+			  </p>
+			  <form action="#">
+				  <div className="file-field input-field">
+					  <div className="btn blue darken-3">
+						  <span>Fichero</span>
+						  <input type="file"
+							  ref={input => {this.fileInput = input;}}
+							  accept=".csv"/>
+					  </div>
+					  <div className="file-path-wrapper">
+						  <input className="file-path validate"
+							  type="text"
+							  placeholder="Ejemplo: 123XYZ.csv"/>
+					  </div>
+				  </div>
+			  </form>
+			  {errorCard}
+			  <Row>
+				  <a href='#' className="margin-left-data blue-text text-darken-3 valign-wrapper" onClick={() => this.handleParseFile()}>
+					  <Icon className='blue-text text-darken-3'>play_circle_filled</Icon>
+					  Empezar anotación de datos.
+				  </a>
+			  </Row>
+            </div>
+          </div>);
+
+		// const uploadDataButton = (fileUploaded)
+		// 	? (<Button className="blue darken-3 valign-wrapper" disabled>
+		// 			Datos insertados
+		// 			<Icon left>done</Icon>
+		// 		</Button>)
+		// 	: (<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
+		// 			Insertar datos
+		// 			<Icon left>publish</Icon>
+		// 		</Button>);
+
+		const loadingParseFile = (parsingFile)
+			? (<Card className="center" title="Anotando datos...">
+					<p> Anotación de datos del fichero {fileName} en curso. </p>
+					<p> Este proceso puede tardar varios minutos. </p>
 					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
-				</div>)
+				</Card>)
 			: (null);
 
-		const errorSensor = (this.state.noSensor) &&
-			(<div className="center red-text">
-					<p> El sensor no corresponde a los cotemplados para esta máquina. </p>
-				</div>);
-
-		const loadingInsertData = (this.state.uploadingFile)
-			? (<div className="center">
-					<p> Insertando los datos en Virtuoso... </p>
-					<p> La operación puede tardar varios minutos. </p>
-					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
-				</div>)
-			: (null);
-
-		const uploadDataButton = (this.state.fileUploaded)
-			? (<Button className="blue darken-3 valign-wrapper" disabled>
-					Datos insertados
-					<Icon left>done</Icon>
-				</Button>)
-			: (<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
-					Insertar datos
-					<Icon left>publish</Icon>
-				</Button>);
-
-		const selectFileOption = (this.state.selectFile)
-			? (<div className="upload_file">
-					<form action="#">
-						<div className="file-field input-field">
-							<div className="btn blue darken-3">
-								<span>File</span>
-								<input type="file"
-									ref={input => {this.fileInput = input;}} />
-							</div>
-							<div className="file-path-wrapper">
-								<input className="file-path validate"
-									type="text"
-									placeholder="Subir archivo para traducir"/>
-							</div>
-						</div>
-					</form>
-					<a href='#' className="blue-text text-darken-3 valign-wrapper" onClick={() => this.handleParseFile()}>
-							<Icon className='blue-text text-darken-3'>cached</Icon>
-							Traducir archivo a formato RDF.
-					</a>
-				</div>)
-			: (null);
-
-		const fileParsedOptions = (this.state.parsingEnded)
-			? (<Row>
-					<Col s={12} className="center">
-						<p>El fichero  {this.state.fileName}  ha sido correctamente traducido a RDF.</p>
-						<br/>
-					</Col>
-					<Col s={6} className="center">
-					 	<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
-							Descargar RDF
-							<Icon left>file_download</Icon>
-					 	</Button>
-					 </Col>
-					 <Col s={6} className="center">
-			 			{uploadDataButton}
-			 	 	</Col>
-					<Col s={12}>
-						<br/>
+		const fileParsedOptions = (parsingEnded) &&
+			(<Card title='Datos correctamente anotados.'>
+				<Row>
+					<p className="margin-left">El fichero {fileName} ha sido correctamente anotado en formato RDF.</p>
+					<p className="margin-left">Los datos están ahora listos para ser insertados.</p>
+				</Row>
+				<Row className="center">
+					<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
+						Insertar datos
+						<Icon left>publish</Icon>
+					</Button>
+				</Row>
+				<Row>
+					<Col l={6} s={12}>
 						<a href="#" className="blue-text text-darken-3" onClick={() => {this.hanldeNewFile();}}>
-						 	<Icon left>insert_drive_file</Icon>
-							Traducir otro archivo
+							<Icon left>insert_drive_file</Icon>
+							Insertar datos de otro fichero.
 						</a>
 					</Col>
-				</Row>)
-			: (null);
+					<Col l={6} s={12}>
+						<a href="#" className="blue-text text-darken-3" onClick={() => this.handleDownload()}>
+							Descargar fichero en formato RDF.
+							<Icon left>file_download</Icon>
+						</a>
+					</Col>
+				</Row>
+			</Card>);
+
+		const loadingInsertData = (uploadingFile) &&
+			(<Card title="Insertando datos." className="center">
+					<p> Insertando los datos del fichero {fileName} en el respositorio de datos. </p>
+					<p> La operación puede tardar varios minutos. </p>
+					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+				</Card>);
+
+		const dataInserted = (fileUploaded) &&
+			(<Card title='Datos correctamente insertados.'>
+				<Row>
+					<p className="margin-left">Los datos contenidos en el fichero {fileName} han sido correctamente insertados en el repositorio de datos.</p>
+				</Row>
+				<Row>
+					<Col l={6} s={12}>
+						<a href="#" className="blue-text text-darken-3" onClick={() => {this.hanldeNewFile();}}>
+							<Icon left>insert_drive_file</Icon>
+							Insertar datos de otro fichero.
+						</a>
+					</Col>
+					<Col l={6} s={12}>
+						<a href="#" className="blue-text text-darken-3" onClick={() => this.handleDownload()}>
+							Descargar fichero en formato RDF.
+							<Icon left>file_download</Icon>
+						</a>
+					</Col>
+				</Row>
+			</Card>);
+
+		const offsetMainCard = (showLeyenda)
+			? "m1"
+			: "m1 l2";
 
 		return(
 			<div>
 				<Row>
-					<Col s={12} m={10} l={8} offset="m1 l2">
-						<Card>
+					<Col s={12} m={10} l={8} offset={offsetMainCard}>
+						<Row>
 							{selectFileOption}
 							{loadingParseFile}
 							{fileParsedOptions}
 							{loadingInsertData}
-							{errorSensor}
-						</Card>
+							{dataInserted}
+						</Row>
+						{/* <Row>
+							<Card>Hola</Card>
+						</Row> */}
+					</Col>
+					<Col s={12} m={10} l={4} offset="m1">
+						{leyendaSensores}
 					</Col>
 				</Row>
 				{/* <Row>
