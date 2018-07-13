@@ -2,6 +2,14 @@
 
  /*----------- CLASES VARIADAS -------------*/
 
+[type="radio"]:checked+label .my-green{
+	 color: #2E7D32 !important;
+ }
+
+[type="radio"]:checked+label .my-red{
+	 color: #C62828 !important;
+ }
+
 .padding{
 	padding: 1%;
 }
@@ -123,6 +131,7 @@
 .tabs .tab a:hover,.tabs .tab a.active {
 	background-color: transparent;
 	color: #135bac;
+	font-weight: 480;
 }
 .tabs .tab.disabled a,.tabs .tab.disabled a:hover {
 	color:grey;

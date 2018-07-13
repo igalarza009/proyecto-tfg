@@ -25,6 +25,7 @@ export class AnomaliasQueryForm extends React.Component{
 				fechasMal:false,
 				faltaFecha: false,
 			},
+			// parMotorId: '79PWN7',
 		};
 	}
 
@@ -229,13 +230,13 @@ export class AnomaliasQueryForm extends React.Component{
 			filter['endDate'] = fechaFin;
 		}
 
-		this.props.getAnomaliasQuery(sensorDir, {'parMotorId': parMotorId, 'calParMotor': calParMotor}, filter);
+		this.props.getAnomaliasQuery(sensorDir, {'parMotorId':parMotorId, 'calParMotor': calParMotor}, filter);
 	}
 
 	render(){
         const sensorDir = this.state.sensorDir;
         const selectedSensors = this.props.selectedSensors;
-		const parMotorId = this.state.parMotorId;
+		// const parMotorId = this.state.parMotorId;
 		const relType = this.state.relType;
 		const errores = this.state.errores;
 
@@ -250,16 +251,15 @@ export class AnomaliasQueryForm extends React.Component{
             const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 			const sensorName = sensor.name;
             const arrowIcon = (sensorDir[sensorId] === 'up')
-                ? (<Icon className='blue-text text-darken-3'> arrow_upward </Icon>)
-                : (<Icon className='blue-text text-darken-3'> arrow_downward </Icon>);
-			const parMotor = (sensorId === parMotorId)
-				? (<Col s={12}>
+                ? (<Icon className='green-text text-darken-3'> arrow_upward </Icon>)
+                : (<Icon className='red-text text-darken-3'> arrow_downward </Icon>);
+			const parMotor = (sensorId === parMotorId) &&
+				(<Col>
 						<Input name='filterValue' type='checkbox' className='filled-in'
 							label="Calcular Par Motor"
 							onChange={(e) => {this.handleParMotorChecked(e);}}
 						/>
-					</Col>)
-				: (null);
+					</Col>);
 
 			const valueType = (sensor['valueType'] === 'double')
 				? (<Button floating className='white'
@@ -268,18 +268,18 @@ export class AnomaliasQueryForm extends React.Component{
 					</Button>)
 				: (<div className="switch">
 						<label>
-							False
+							Inactivo
 							<input type="checkbox"
 								onChange={(e) => {this.handleSwitch(e,sensorId);}}
 							/>
 							<span className="lever"></span>
-							True
+							Activo
 						</label>
 					</div>);
             return(
                 <Row key={this.props.selectedSensors[i]} className="valign-wrapper">
                     <Col>
-                        <p> Sensor {sensorId} ({sensorName}): </p>
+                        <p> <span className="bold"> {sensorName} </span> ({sensorId}): </p>
                     </Col>
                     <Col>
                         {valueType}
@@ -298,12 +298,12 @@ export class AnomaliasQueryForm extends React.Component{
 			});
 			const sensorRels = sensorIdDirs.map((value, iPar) => {
 				const arrowDir = (value === 'up') ? "arrow_upward" : "arrow_downward";
-				const color = (value === 'up') ? "green-text" : "red-text";
-				const icon = (<Icon>{arrowDir}</Icon>);
+				const color = (value === 'up') ? "my-green" : "my-red";
+				const icon = (<Icon className={color}>{arrowDir}</Icon>);
 				const sensorId = sensorIds[iPar];
 				let sensorName;
 				if (sensorId === 'ParMotor'){
-					sensorName = "Cálculo del par motor (Consumo del motor)";
+					sensorName = "Cálculo del par motor";
 				}
 				else{
 					const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);

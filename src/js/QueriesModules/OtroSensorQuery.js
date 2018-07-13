@@ -287,20 +287,22 @@ export class OtroSensorQueryForm extends React.Component{
 			const defChecked = (i === 0)
 				? (true)
 				: (false);
-			const checkValue = sensorId + ' (' + sensor.name + ')';
+			const checkValue = sensor.name + ' (' + sensorId + ')';
+			const sensorName = sensor.name;
 			return(
 				<Input s={12} key={sensorId} name='checkboxesSensores'
 					type='checkbox' value={sensorId} label={checkValue}
 					className='filled-in' checked={defChecked}
 					onChange={(e) => {this.handleCheckedSensor(e);}}
 				/>
+				
 			);
 		});
 
 		let restoSensores = selectedSensors.map((sensorId, i) => {
 			if (askedSensors.indexOf(sensorId) === -1){
 				const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
-				const sensorName = sensorId + ' (' + sensor.name + ')';
+				const sensorName = sensor.name;
 				const minValue = sensor["minValue"];
 				const maxValue = sensor["maxValue"];
 				const valorClass = (knownSensors[sensorId] === null)
@@ -326,12 +328,12 @@ export class OtroSensorQueryForm extends React.Component{
 							/>)
 						: (<div className="switch">
 								<label>
-									Off
+									Inactivo
 									<input type="checkbox" disabled={disabled}
 										onChange={(e) => {this.handleSwitch(e,sensorId);}}
 									/>
 									<span className="lever"></span>
-									On
+									Activo
 								</label>
 							</div>);
 				const showFilterValues = (isNaN(knownSensors[sensorId]))
@@ -353,7 +355,7 @@ export class OtroSensorQueryForm extends React.Component{
 				return(
 					<Row key={sensorId}>
 						<Col s={12}>
-							<p>El sensor {sensorName} tenga: </p>
+							<p>El sensor de <span className="bold">{sensorName}</span> ({sensorId}) tenga: </p>
 						</Col>
 						<Input s={6} type='select' defaultValue='esp'
 							onChange={(e) => {this.handleSelectChange(e,sensorId);}}

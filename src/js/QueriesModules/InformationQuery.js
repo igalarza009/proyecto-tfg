@@ -328,7 +328,7 @@ export class InformationQueryForm extends React.Component{
 		const filtrarValores = selectedSensors.map((sensorId) => {
 			const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
 			const sensorName = sensor['name'];
-			const labelCheckbox = "Sensor " + sensorId + " (" + sensorName + ") : ";
+			const labelCheckbox = sensorName + " (" + sensorId + ") : ";
 			const minValue = sensor["minValue"];
 			const maxValue = sensor["maxValue"];
 			const disabled = (filterValues.indexOf(sensorId) === -1)
@@ -348,12 +348,12 @@ export class InformationQueryForm extends React.Component{
 					/>)
 				: (<div className="switch">
 						<label>
-							False
+							Inactivo
 							<input type="checkbox" disabled={disabled}
 								onChange={(r) => {this.handleSwitch(r,sensorId);}}
 							/>
 							<span className="lever"></span>
-							True
+							Activo
 						</label>
 					</div>);
 			return(
@@ -528,19 +528,19 @@ export class InformationQueryForm extends React.Component{
 								<Row>
 									<Col s={12}>
 								 		<Input name='groupBy' type='checkbox' className='filled-in'
-											value='avg' label='Valor medio del sensor (AVG)'
+											value='avg' label='Valor medio (Media aritmética)'
 											onChange={(e) => {this.handleAggregates(e);}}
 										/>
 									</Col>
 									<Col s={12}>
 										<Input name='groupBy' type='checkbox' className='filled-in'
-											value='max' label='Valor máximo del sensor (MAX)'
+											value='max' label='Valor máximo'
 											onChange={(e) => {this.handleAggregates(e);}}
 										/>
 									</Col>
 									<Col s={12}>
 										<Input name='groupBy' type='checkbox' className='filled-in'
-											value='min' label='Valor mínimo del sensor (MIN)'
+											value='min' label='Valor mínimo'
 											onChange={(e) => {this.handleAggregates(e);}}
 										/>
 									</Col>

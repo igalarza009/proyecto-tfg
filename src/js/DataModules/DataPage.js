@@ -40,7 +40,7 @@ export class ParseData extends React.Component {
 			fileUploaded: false,
 			uploadingFile: false,
 			error: "",
-			showLeyenda: true,
+			showLeyenda: false,
 			showInformation: false,
 	    }
  	}
@@ -273,10 +273,10 @@ export class ParseData extends React.Component {
               <span className="card-title blue-text text-darken-3">Seleccionar archivo de datos a insertar</span>
 			  <p>El archivo deberá estar en formato CSV y tener por nombre el indicador del sensor del que aporta los datos. </p>
 			  <p> Los datos a insertar deberán corresponder con alguno de los sensores disponibles en el sistema para la máquina actual.
-				  {/* <i className="tiny grey-text text-darken-3 material-icons pointer"
+				  <i className="tiny grey-text text-darken-3 material-icons pointer"
 					  onClick={() => {this.showLeyenda();}}>
 					  info
-				  </i> */}
+				  </i>
 			  </p>
 			  <form action="#">
 				  <div className="file-field input-field">
