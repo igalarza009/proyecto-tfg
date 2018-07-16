@@ -21,8 +21,8 @@ const usedURL = virtuosoURL;
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
 // const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
 // const graphURI = "<http://www.sensores.com/ontology/prueba09/extrusoras#>";
-const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
-// const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
 class SelectedPage extends React.Component {
 	constructor(props){

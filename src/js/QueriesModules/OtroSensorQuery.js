@@ -78,6 +78,11 @@ export class OtroSensorQueryForm extends React.Component{
 					}
 				}
 			});
+			console.log(selectedSensors);
+			console.log(knownSensors);
+			console.log(newKnownSensors);
+			console.log(askedSensors);
+			console.log(newAskedSensors);
 			return {
 				selectedSensors: selectedSensors,
 				knownSensors: newKnownSensors,
@@ -266,7 +271,6 @@ export class OtroSensorQueryForm extends React.Component{
 		}
 
 		// this.resetValues();
-
 		this.props.getOtherSensorQuery(knownSensors, askedSensors, filterValues, filter);
 	}
 
@@ -295,7 +299,7 @@ export class OtroSensorQueryForm extends React.Component{
 					className='filled-in' checked={defChecked}
 					onChange={(e) => {this.handleCheckedSensor(e);}}
 				/>
-				
+
 			);
 		});
 

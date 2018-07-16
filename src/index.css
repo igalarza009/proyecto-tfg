@@ -87,6 +87,10 @@
 	visibility: hidden;
 }
 
+circle {
+   r: 3;
+}
+
 /*--------------- DATE PICKER -------------*/
 
 .picker__year-display{

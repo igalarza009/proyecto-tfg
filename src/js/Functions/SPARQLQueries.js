@@ -326,7 +326,7 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 	});
 
 	where += '<#sensor' + askedSensorId +'> sosa:madeObservation ?askedObs . ' +
-			'?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue . ' +
+			'?askedObs sosa:hasSimpleResult ?resultValue . ' +
 			'?askedObs sosa:resultTime ?resultTime . ' +
 			'bind(<#sensor' + askedSensorId +'> as ?sensorName) ';
 

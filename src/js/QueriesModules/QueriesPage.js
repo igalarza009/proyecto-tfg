@@ -267,9 +267,9 @@ export class SensorsInfo extends React.Component {
 			chartType = barChartName;
 			longDateFormat = false;
 		}
-		else if (filter['filter'] && filter['filterTime']){
-			chartType = scatterChartName;
-		}
+		// else if (filter['filter'] && filter['filterTime']){
+		// 	chartType = scatterChartName;
+		// }
 		else if (filterValues['filter']) {
 			chartType = scatterChartName;
 		}
@@ -318,6 +318,7 @@ export class SensorsInfo extends React.Component {
 					selectedDateTime,
 					sensorId,
 					{'sensors': selectedSensors, 'type': 'infor', 'parMotor':{}},
+					this.props.infoSensores
 				);
 				console.log(result);
 				sensorValues[sensorId] = result['values'];
@@ -532,6 +533,7 @@ export class SensorsInfo extends React.Component {
 			queryInfor: infor,
 			queryType: 'otro',
 			chartType: chartType,
+			longDateFormat: true,
 		});
 
 		const querystring = require('querystring');
@@ -552,6 +554,7 @@ export class SensorsInfo extends React.Component {
 						filter,
 						orderBy
 					);
+		console.log(query);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
@@ -565,7 +568,8 @@ export class SensorsInfo extends React.Component {
 								selectedValues,
 								selectedDateTime,
 								sensorId,
-								{'sensors': askedSensors, 'type': 'otro', 'parMotor':{}}
+								{'sensors': askedSensors, 'type': 'otro', 'parMotor':{}},
+								this.props.infoSensores
 							);
 				console.log(result);
 				sensorValues[sensorId] = result['values'];
@@ -711,6 +715,7 @@ export class SensorsInfo extends React.Component {
 			queryInfor: infor,
 			queryType: 'anom',
 			chartType: chartType,
+			longDateFormat: true,
 		});
 
 		let numberOfResponses = 0;
@@ -745,7 +750,8 @@ export class SensorsInfo extends React.Component {
 								selectedValues,
 								selectedDateTime,
 								sensorId,
-								{'sensors': selectedSensors, 'type': 'anom', 'parMotor':parMotor}
+								{'sensors': selectedSensors, 'type': 'anom', 'parMotor':parMotor},
+								this.props.infoSensores
 							);
 				console.log(result);
 				sensorValues[sensorId] = result['values'];
@@ -1050,7 +1056,7 @@ export class SensorsInfo extends React.Component {
 				/>
 			</Card>);
 
-		const chartClass = (showChart)
+		const chartClass = (showChart && !noAnom)
 			? ("")
 			: ("hidden");
 
@@ -1069,6 +1075,13 @@ export class SensorsInfo extends React.Component {
 			(<Card className='center green-text'>
 				No se ha encontrado ninguna anomalía en la relación especificada.
 			</Card>);
+
+		const chartCard = (showChart && !noAnom) &&
+			(<GoogleChart
+				allChartData={allChartData}
+				chartType={chartType}
+				longDateFormat={longDateFormat}
+			/>);
 
 		// const chartCard =
 		// 	(<GoogleChart
@@ -1093,13 +1106,14 @@ export class SensorsInfo extends React.Component {
 				<Row s={12}>
 					{loadingChartCard}
 					{noAnomCard}
-					<div className={chartClass}>
+					{/* <div className={chartClass}>
 						<GoogleChart
 							allChartData={allChartData}
 							chartType={chartType}
 							longDateFormat={longDateFormat}
 						/>
-					</div>
+					</div> */}
+					{chartCard}
 					{noDataCard}
 				</Row>
 			</div>

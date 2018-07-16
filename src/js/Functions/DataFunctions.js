@@ -52,9 +52,9 @@ export function getFormInfo(info){
 }
 
 // Prepare data of the queries
-export function parseResponseData(sensorResponse, selectedValues, selectedDateTime, sensorId, info){
+export function parseResponseData(sensorResponse, selectedValues, selectedDateTime, sensorId, info, infoSensores){
 
-	let parsedResults = parseSensorValues(sensorResponse, sensorId, selectedValues, selectedDateTime, info['parMotor']);
+	let parsedResults = parseSensorValues(sensorResponse, sensorId, selectedValues, selectedDateTime, info['parMotor'], infoSensores);
 
 	let finalResults;
 	if (info['type'] === 'anom' || selectedValues.length > 1){
@@ -67,7 +67,7 @@ export function parseResponseData(sensorResponse, selectedValues, selectedDateTi
     return {'values': finalResults['values'], 'datetimes': finalResults['datetimes'], 'selectedValues': selectedValues};
 }
 
-function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTime, parMotor){
+function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTime, parMotor, infoSensores){
     let sensorValues;
 	let datetimes = [];
 
@@ -81,10 +81,11 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 		datetimes.push("Fecha y hora");
 	}
 
+	var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
     // --------- Teniendo en cuenta más de un valor agregado ---------
 	if (selectValues.length === 1){
 		sensorValues = [];
-		sensorValues.push(sensorId);
+		sensorValues.push(sensor.name);
 	}
 	else{
 		sensorValues = {};
@@ -240,17 +241,6 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 		});
 	}
 	else{ // Sólo una gráfica
-		var dataToZip = [largestDatetimes];
-
-		selectedSensors.forEach((sensorId) => {
-			dataToZip.push(sensorValues[sensorId]);
-		});
-
-		var chartData = _.zip.apply(_,dataToZip);
-
-		console.log(chartData);
-
-		// let reducedChartData = reduceChartPoints(chartData, maxChartPoints);
 
 		var chartFullData = {};
 
@@ -276,6 +266,7 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 			}
 		})
 
+		let properties = [];
 		chartFullData['y-axis'] = [];
 		selectedSensors.forEach((sensorId, i) => {
 				if (infoQuery['parMotor']['parMotorId'] && infoQuery['parMotor']['parMotorId'] === sensorId && infoQuery['parMotor']['calParMotor'] === true){
@@ -284,6 +275,9 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 				else{
 					var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
 					var property = sensor['observedProperty'];
+					if (properties.indexOf(property) === -1){
+						properties.push(property);
+					}
 					var axisLabel;
 					if (sensor['measureUnit'] !== ''){
 						var unit = sensor['measureUnit'];
@@ -296,6 +290,34 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 					chartFullData['y-axis'].push(axisData);
 				}
 		});
+
+		var dataToZip = [largestDatetimes];
+
+		selectedSensors.forEach((sensorId) => {
+			dataToZip.push(sensorValues[sensorId]);
+		});
+
+		if (properties.length === 1 && infoQuery['type']==='infor'){
+			let sensorId = selectedSensors[0];
+			let actualSensor = _.find(infoSensores, ['indicatorId', sensorId]);
+			// let headerMax = 'Outlier superior ' + actualSensor.name;
+			// let headerMin = 'Outlier inferior ' + actualSensor.name;
+			let outlierMax = ['Outlier superior'];
+			let outlierMin = ['Outlier inferior'];
+			sensorValues[sensorId].forEach((value) => {
+				outlierMax.push(actualSensor.maxValue);
+				outlierMin.push(actualSensor.minValue);
+			});
+			dataToZip.push(outlierMax);
+			dataToZip.push(outlierMin);
+			let preAxisData = chartFullData['y-axis'][0];
+			chartFullData['y-axis'].push(preAxisData);
+			chartFullData['y-axis'].push(preAxisData);
+		}
+
+		var chartData = _.zip.apply(_,dataToZip);
+
+		console.log(chartData);
 
 		chartFullData['data'] = chartData;
 

@@ -314,70 +314,96 @@ export class ParseData extends React.Component {
 		// 		</Button>);
 
 		const loadingParseFile = (parsingFile)
-			? (<Card className="center" title="Anotando datos...">
-					<p> Anotación de datos del fichero {fileName} en curso. </p>
-					<p> Este proceso puede tardar varios minutos. </p>
-					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
-				</Card>)
+			? (<div className="card">
+		            <div className="card-content center">
+		              	<span className="card-title blue-text text-darken-3">Anotando datos... </span>
+						<p> Anotación de datos del fichero <span className="bold">{fileName}</span> en curso. </p>
+						<p> Este proceso puede tardar varios minutos. </p>
+						<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+					</div>
+				</div>)
 			: (null);
 
 		const fileParsedOptions = (parsingEnded) &&
-			(<Card title='Datos correctamente anotados.'>
-				<Row>
-					<p className="margin-left">El fichero {fileName} ha sido correctamente anotado en formato RDF.</p>
-					<p className="margin-left">Los datos están ahora listos para ser insertados.</p>
-				</Row>
-				<Row className="center">
-					<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
-						Insertar datos
-						<Icon left>publish</Icon>
-					</Button>
-				</Row>
-				<Row>
-					<Col l={6} s={12}>
-						<a href="#" className="blue-text text-darken-3" onClick={() => {this.hanldeNewFile();}}>
-							<Icon left>insert_drive_file</Icon>
-							Insertar datos de otro fichero.
-						</a>
-					</Col>
-					<Col l={6} s={12}>
-						<a href="#" className="blue-text text-darken-3" onClick={() => this.handleDownload()}>
-							Descargar fichero en formato RDF.
-							<Icon left>file_download</Icon>
-						</a>
-					</Col>
-				</Row>
+			(<div className="card">
+			 	<div className="card-content center">
+			    	<span className="card-title blue-text text-darken-3">Datos listos para insertar. </span>
+					<Row>
+						<p className="margin-left">El fichero <span className="bold">{fileName}</span> ha sido correctamente anotado en formato RDF.</p>
+						<p className="margin-left">Los datos están ahora listos para ser insertados.</p>
+					</Row>
+					<Row className="center">
+						<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
+							Insertar datos
+							<Icon left>publish</Icon>
+						</Button>
+					</Row>
+					<Row>
+						<Col l={6} s={12}>
+							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => {this.hanldeNewFile();}}>
+								<Icon>insert_drive_file</Icon>
+								Insertar datos de otro fichero.
+							</a>
+						</Col>
+						<Col l={6} s={12}>
+							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
+								<Icon>file_download</Icon>
+								Descargar fichero en formato RDF.
+							</a>
+						</Col>
+					</Row>
+				</div>
+			</div>);
+
+		const explicacionAnotacion = (parsingEnded) &&
+			(<Card>
+				<p className="bold">Datos contenidos en el CSV:</p>
+				<li className="margin-left-big">Timestamp</li>
+				<li className="margin-left-big">Valor</li>
+				<br/>
+				<p className="bold">Datos anotados en RDF:</p>
+				<li className="margin-left-big">Sensor al que peretencen los datos</li>
+				<li className="margin-left-big">Tipo de datos de los valores: booleanos o numéricos.</li>
+				<li className="margin-left-big">Propiedad observada.</li>
+				<li className="margin-left-big">En datos numéricos, unidades de medida utilizadas</li>
+				<li className="margin-left-big">Outlier superior y outlier inferior del sensor</li>
 			</Card>);
 
 		const loadingInsertData = (uploadingFile) &&
-			(<Card title="Insertando datos." className="center">
-					<p> Insertando los datos del fichero {fileName} en el respositorio de datos. </p>
+			(<div className="card">
+			 	<div className="card-content center">
+			    	<span className="card-title blue-text text-darken-3">Insertando datos... </span>
+					<p> Insertando los datos del fichero <span className="bold">{fileName}</span> en el respositorio de datos. </p>
 					<p> La operación puede tardar varios minutos. </p>
 					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
-				</Card>);
+				</div>
+			</div>);
 
 		const dataInserted = (fileUploaded) &&
-			(<Card title='Datos correctamente insertados.'>
-				<Row>
-					<p className="margin-left">Los datos contenidos en el fichero {fileName} han sido correctamente insertados en el repositorio de datos.</p>
-				</Row>
-				<Row>
-					<Col l={6} s={12}>
-						<a href="#" className="blue-text text-darken-3" onClick={() => {this.hanldeNewFile();}}>
-							<Icon left>insert_drive_file</Icon>
-							Insertar datos de otro fichero.
-						</a>
-					</Col>
-					<Col l={6} s={12}>
-						<a href="#" className="blue-text text-darken-3" onClick={() => this.handleDownload()}>
-							Descargar fichero en formato RDF.
-							<Icon left>file_download</Icon>
-						</a>
-					</Col>
-				</Row>
-			</Card>);
+			(<div className="card">
+				<div className="card-content center">
+					<span className="card-title green-text green-darken-3"><Icon>done</Icon> Datos correctamente insertados.</span>
+					<Row>
+						<p className="margin-left">Los datos contenidos en el fichero <span className="bold">{fileName}</span> han sido correctamente insertados en el repositorio de datos.</p>
+					</Row>
+					<Row>
+						<Col l={6} s={12}>
+							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => {this.hanldeNewFile();}}>
+								<Icon>insert_drive_file</Icon>
+								Insertar datos de otro fichero.
+							</a>
+						</Col>
+						<Col l={6} s={12}>
+							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
+								<Icon>file_download</Icon>
+								Descargar fichero en formato RDF.
+							</a>
+						</Col>
+					</Row>
+				</div>
+			</div>);
 
-		const offsetMainCard = (showLeyenda)
+		const offsetMainCard = (showLeyenda && selectFile)
 			? "m1"
 			: "m1 l2";
 
@@ -392,9 +418,9 @@ export class ParseData extends React.Component {
 							{loadingInsertData}
 							{dataInserted}
 						</Row>
-						{/* <Row>
-							<Card>Hola</Card>
-						</Row> */}
+						<Row>
+							{explicacionAnotacion}
+						</Row>
 					</Col>
 					<Col s={12} m={10} l={4} offset="m1">
 						{leyendaSensores}
