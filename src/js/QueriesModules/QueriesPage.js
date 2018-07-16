@@ -17,7 +17,8 @@ const querystring = require('querystring');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const usedURL = virtuosoURL;
+const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
+const usedURL = virtuosoDebianUrl;
 
 const lineChartName = 'Line';
 const barChartName = 'Bar';

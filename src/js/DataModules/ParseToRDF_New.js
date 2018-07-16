@@ -5,16 +5,19 @@ import axios from 'axios';
 const querystring = require('querystring');
 const _ = require('lodash');
 // const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
-const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 const virtuosoUrl =  'http://localhost:8890/sparql/';
+const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
+const usedURL = virtuosoDebianUrl;
 
 export function parseDataToRDF_Sin(filename, values, timestamps, infoSensores){
-	const prefixes = "prefix : " + graphURI + " " +
-					"prefix owl: <http://www.w3.org/2002/07/owl#> " +
-					"prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-					"prefix xsd: <http://www.w3.org/2001/XMLSchema#> " +
-					"prefix sosa: <http://www.w3.org/ns/sosa/> ";
-					// "base " + graphURI + " . ";
+	const virtPrefixes = "prefix : " + graphURI + " " +
+						"prefix owl: <http://www.w3.org/2002/07/owl#> " +
+						"prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+						"prefix xsd: <http://www.w3.org/2001/XMLSchema#> " +
+						"prefix sosa: <http://www.w3.org/ns/sosa/> ";
+						// "base " + graphURI + " . ";
 
 	const indexOfDot = filename.indexOf('.');
 	const sensorIndicator = filename.substring(0, indexOfDot);
@@ -25,80 +28,79 @@ export function parseDataToRDF_Sin(filename, values, timestamps, infoSensores){
 	let observationResult = '';
 	let dataToInsert = '';
 	const observationType = currentSensor.observationType;
-	const resultType = currentSensor.resultType;
-
-	const valueType = (resultType === 'DoubleValueResult')
-			? ("xsd:double")
-			: ("xsd:boolean");
+	const valueType = 'xsd:' + currentSensor.valueType;
 
 	let cont = 0;
 	let i = 0;
 
-	insertDataRecursive(i, cont, values, timestamps, prefixes, sensorName, observationType, resultType, valueType, dataToInsert);
+	insertDataRecursive(i, cont, values, timestamps, virtPrefixes, sensorName, observationType, valueType, dataToInsert);
 
 }
 
-function insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, resultType, valueType, dataToInsert){
+function insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert){
 	const value = values[index];
 	if (index !== 0 && value !== ""){
 		cont++;
 		var dateTime = timestamps[index];
 		var posGuion = dateTime.indexOf('-');
 		var date = dateTime.substring(0, posGuion) + dateTime.substring(posGuion+1, posGuion+3) + dateTime.substring(posGuion+4, posGuion+6);
-		// var value = element[1];
 
 		var observationName = sensorName + "date" + date + "obs" + index;
 		var observationResultName = observationName + "result";
 
-		dataToInsert += ':' + observationName + ' rdf:type owl:NamedIndividual , ' +
-			':' + observationType + ' . ' +
-			':' + observationResultName + ' rdf:type owl:NamedIndividual , ' +
-				':' + resultType + ' . ' +
-			':' + observationResultName + ' sosa:hasSimpleResult "' + value + '"^^' + valueType + ' . ' +
-			':' + observationName + ' sosa:hasResult :' + observationResultName + ' . ' +
-			':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . ' + //Añadir ^^xsd:dateTime
-			':' + sensorName + ' sosa:madeObservation :' + observationName + ' . ';
+		let fixedValue = value;
+		if (value === 'NA'){
+			fixedValue = 0;
+		}
+
+		dataToInsert += ':' + observationName + ' rdf:type owl:NamedIndividual , \n' +
+			':' + observationType + ' . \n' +
+			':' + observationName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . \n' +
+			':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . \n' +
+			':' + sensorName + ' sosa:madeObservation :' + observationName + ' . \n';
 
 		index++;
 
 		if(index < values.length){
 			if (cont === 160){
 				var query = Queries.getInsertQuery(prefixes, dataToInsert);
-				axios.post(virtuosoUrl,
-					querystring.stringify({'query': query})
-				)
-				.then((response) => {
-					console.log(response);
+				// axios.post(usedURL,
+				// 	querystring.stringify({'query': query})
+				// )
+				// .then((response) => {
+				// 	console.log(response);
 					dataToInsert = '';
 					cont = 0;
-					insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, resultType, valueType, dataToInsert);
-				})
-				.catch((error) => {
-					console.log(error);
-				});
+					insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+				// })
+				// .catch((error) => {
+				// 	console.log(error);
+				// });
 			}
 			else{
-				insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, resultType, valueType, dataToInsert);
+				insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
 			}
 		}
 		else{
 			if (cont > 0) {
+				console.log('Ultima request');
 				var query = Queries.getInsertQuery(prefixes, dataToInsert);
-				axios.post(virtuosoUrl,
-					querystring.stringify({'query': query})
-				)
-				.then((response) => {
-					console.log("Última request");
-					console.log(response);
-				})
-				.catch((error) => {
-					console.log(error);
-				});
+				console.log(query);
+				// axios.post(usedURL,
+				// 	querystring.stringify({'query': query})
+				// )
+				// .then((response) => {
+				// 	console.log("Última request");
+				// 	console.log(response);
+				// })
+				// .catch((error) => {
+				// 	console.log(error);
+				// });
 			}
 		}
 	}
 	else{
 		index++;
-		insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, resultType, valueType, dataToInsert);
+		insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
 	}
 }

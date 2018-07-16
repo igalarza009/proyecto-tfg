@@ -347,9 +347,9 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 
 export function getInsertQuery(prefixes, dataToInsert){
 	let query = prefixes;
-	query += ' insert data { graph ' + graphURI + ' { ';
+	query += ' insert into graph ' + graphURI + ' { ';
 	query += dataToInsert;
-	query += ' } } ';
+	query += ' } ';
 
 	return query;
 }

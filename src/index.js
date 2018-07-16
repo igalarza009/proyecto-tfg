@@ -5,7 +5,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {ParseData} from './js/DataModules/DataPage.js'
+import {ParseData} from './js/DataModules/DataPage_New.js'
 import M from 'materialize-css';
 import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
 import axios from 'axios';
@@ -13,10 +13,10 @@ import {Card} from 'react-materialize'
 import $ from 'jquery';
 
 const virtuosoURL = 'http://localhost:8890/sparql';
-const debianVirtuosoURL = 'http://35.237.195.239:8890/sparql';
+const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 // const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-const usedURL = virtuosoURL;
+const usedURL = virtuosoDebianUrl;
 // const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
 // const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
@@ -84,6 +84,7 @@ class SelectedPage extends React.Component {
 				'order by asc(?name)';
 
 		const querystring = require('querystring');
+		console.log('Realizamos la consulta de información a Virtuoso');
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)

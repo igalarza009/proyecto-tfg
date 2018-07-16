@@ -8,8 +8,7 @@ import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
 import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
 
-const virtuosoURL = 'http://localhost:8890/sparql';
-const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insertfile';
+const maxReqLength = 250000;
 
 export class ParseData extends React.Component {
 	constructor(props) {
@@ -37,20 +36,53 @@ export class ParseData extends React.Component {
 		});
 
 		Papa.parse(selectedFile[0], {
-			step: function(row) {
+			step: function(row, i) {
 				// parsedData.push(row.data[0]);
-				let parsedValues = [];
-				let parsedTimestamps = [];
+				if (row.data[0][0] !== "" && !isNaN(row.data[0][1])){
+					parsedTimestamps.push(row.data[0][0]);
+					parsedValues.push(parseFloat(row.data[0][1]));
+				}
 			},
-			complete: (results) => {this.jsonParsingCompleted(fileName, parsedValues, parsedTimestamps);},
+			complete: (results) => {
+				console.log("CSV file parsed to JSON");
+				parsedTimestamps.reverse();
+				parsedValues.reverse();
+				this.parsingCompleted(fileName, parsedValues, parsedTimestamps, [], []);
+			},
 		});
 	}
 
-	jsonParsingCompleted(fileName, parsedValues, parsedTimestamps){
-			console.log("CSV file parsed to JSON");
+	parsingCompleted(fileName, parsedValues, parsedTimestamps, fixedValues, fixedTimestamps){
+		const firstValues = parsedValues.splice(0, maxReqLength);
+		const firstTimestamps = parsedTimestamps.splice(0, maxReqLength);
+		axios.post("http://35.224.159.30/api/fix/",
+			{timestamps: firstTimestamps, values:firstValues}
+		)
+		.then((response) => {
+			let newFixedValues = fixedValues.concat(response['data']['values']);
+			let newFixedTimestamps = fixedTimestamps.concat(response['data']['timestamps']);
+			if (parsedValues.length > 0){
+				this.parsingCompleted(fileName, parsedValues, parsedTimestamps, newFixedValues, newFixedTimestamps);
+			}
+			else{
+				console.log("Data fixed.");
+				let fixedTimestampsISOFormat = [];
+				newFixedTimestamps.forEach((value) => {
+					let date = new Date(value+'Z');
+					fixedTimestampsISOFormat.push(date.toISOString());
+				});
+				console.log("Data converted to ISO");
+				this.fixingCompleted(fileName, newFixedValues, fixedTimestampsISOFormat)
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+	}
+
+	fixingCompleted(fileName, parsedValues, parsedTimestamps){
 			var file = Parser.parseDataToRDF_Sin(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
-			// Parser.parseDataToRDF_Sin(fileName, parsedData, this.props.infoSensores);
-            console.log("Data inserted and TTL file created");
+            console.log("TTL file created");
             this.setState({
                 // file: file,
                 dataInserted: true,

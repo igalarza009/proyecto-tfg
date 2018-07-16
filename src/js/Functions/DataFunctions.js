@@ -217,9 +217,35 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 
 			let chartFullData = {};
 
-			chartFullData['title'] = "Información del sensor: "+ sensorId;
-
 			var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
+
+			chartFullData['title'] = "Información del sensor: "+ sensor.name;
+			chartFullData['subtitle'] = "";
+			infoQuery['selectedValues'].forEach((value, i) => {
+				if (i === 0){
+					if (value === 'minValue'){
+						chartFullData['subtitle'] += "Valor mínimo";
+					}
+					else if (value === 'maxValue'){
+						chartFullData['subtitle'] += "Valor máximo";
+					}
+					else{
+						chartFullData['subtitle'] += "Valor medio";
+					}
+				}
+				else{
+					if (value === 'minValue'){
+						chartFullData['subtitle'] += ", valor mínimo.";
+					}
+					else if (value === 'maxValue'){
+						chartFullData['subtitle'] += ", valor máximo.";
+					}
+					else{
+						chartFullData['subtitle'] += ", valor medio.";
+					}
+				}
+			});
+
 			var property = sensor['observedProperty'];
 			var axisLabel;
 			if (sensor['measureUnit'] !== ''){
@@ -257,14 +283,27 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 		chartFullData['title'] = title;
 
 		chartFullData['subtitle'] = "";
-		selectedSensors.forEach((sensorId, i) => {
-			if (i !== (selectedSensors.length - 1)){
-				chartFullData['subtitle'] += sensorId + ", ";
+		if (infoQuery['selectedValues'][0] === 'resultValue'){
+			selectedSensors.forEach((sensorId, i) => {
+				if (i !== (selectedSensors.length - 1)){
+					chartFullData['subtitle'] += sensorId + ", ";
+				}
+				else{
+					chartFullData['subtitle'] += sensorId;
+				}
+			});
+		}
+		else{
+			if (infoQuery['selectedValues'][0] === 'minValue'){
+				chartFullData['subtitle'] = "Valor mínimo.";
+			}
+			else if (infoQuery['selectedValues'][0] === 'maxValue'){
+				chartFullData['subtitle'] = "Valor máximo.";
 			}
 			else{
-				chartFullData['subtitle'] += sensorId;
+				chartFullData['subtitle'] = "Valor medio.";
 			}
-		})
+		}
 
 		let properties = [];
 		chartFullData['y-axis'] = [];
@@ -297,7 +336,7 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 			dataToZip.push(sensorValues[sensorId]);
 		});
 
-		if (properties.length === 1 && infoQuery['type']==='infor'){
+		if (properties.length === 1 && infoQuery['type']==='infor' && infoQuery['selectedValues'][0] === 'resultValue'){
 			let sensorId = selectedSensors[0];
 			let actualSensor = _.find(infoSensores, ['indicatorId', sensorId]);
 			// let headerMax = 'Outlier superior ' + actualSensor.name;
