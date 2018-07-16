@@ -59,29 +59,30 @@ export class OtroSensorQueryForm extends React.Component{
 			const filterValues = state.filterValues;
 			let newFilterValues = [];
 			const selectedSensors = props.selectedSensors;
-			selectedSensors.forEach((value,i) => {
+			selectedSensors.forEach((sensorId,i) => {
 				if (state.selectedSensors.length === 0){
-					newAskedSensors.push(value);
+					if (i === 0)
+						newAskedSensors.push(sensorId);
+					else
+						newKnownSensors[sensorId] = null;
 				}
 				else{
-					if (askedSensors.indexOf(value) !==-1){
-						newAskedSensors.push(value);
+					if (askedSensors.indexOf(sensorId) !==-1){
+						newAskedSensors.push(sensorId);
 					}
-					else if (!knownSensors[value]){
-						newKnownSensors[value] = null;
+					else if (!knownSensors[sensorId]){
+						newKnownSensors[sensorId] = null;
 					}
 					else{
-						newKnownSensors[value] = knownSensors[value];
+						newKnownSensors[sensorId] = knownSensors[sensorId];
 					}
-					if (filterValues[value]){
-						newFilterValues.push(value);
+					if (filterValues[sensorId]){
+						newFilterValues.push(sensorId);
 					}
 				}
 			});
 			console.log(selectedSensors);
-			console.log(knownSensors);
 			console.log(newKnownSensors);
-			console.log(askedSensors);
 			console.log(newAskedSensors);
 			return {
 				selectedSensors: selectedSensors,
@@ -99,22 +100,23 @@ export class OtroSensorQueryForm extends React.Component{
 		const value = event.target.value;
 		let askedSensors = this.state.askedSensors.slice();
 		let knownSensors = this.state.knownSensors;
-		const iAskedSensor = askedSensors.indexOf(value);
+		let newAskedSensors = askedSensors;
 		let newKnownSensors = knownSensors;
-		if ( iAskedSensor !== -1){
-			askedSensors.splice(iAskedSensor, 1);
+		const iAskedSensor = askedSensors.indexOf(value);
+		if (iAskedSensor !== -1){
+			newAskedSensors.splice(iAskedSensor, 1);
 			newKnownSensors[value] = null;
 		}
 		else{
-			askedSensors.push(value);
+			newAskedSensors.push(value);
 			newKnownSensors = _.omit(knownSensors, [value]);
 		}
 		this.setState({
-			askedSensors: askedSensors,
+			askedSensors: newAskedSensors,
 			knownSensors: newKnownSensors,
 		});
-		console.log("askedSensors: " + JSON.stringify(askedSensors));
-		console.log("knownSensors: " + JSON.stringify(knownSensors));
+		console.log("askedSensors: " + JSON.stringify(newAskedSensors));
+		console.log("knownSensors: " + JSON.stringify(newKnownSensors));
 	}
 
 	handleValueChange(event, sensorId){
@@ -288,7 +290,7 @@ export class OtroSensorQueryForm extends React.Component{
 
 		const checkboxesSensores = selectedSensors.map((sensorId, i) => {
 			const sensor = _.find(this.props.infoSensores, ['indicatorId', sensorId]);
-			const defChecked = (i === 0)
+			const defChecked = (askedSensors.indexOf(sensorId) !== -1)
 				? (true)
 				: (false);
 			const checkValue = sensor.name + ' (' + sensorId + ')';
