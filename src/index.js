@@ -5,7 +5,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {ParseData} from './js/DataModules/DataPage_New.js'
+import {ParseData} from './js/DataModules/DataPage.js'
 import M from 'materialize-css';
 import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
 import axios from 'axios';
@@ -16,7 +16,7 @@ const virtuosoURL = 'http://localhost:8890/sparql';
 const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 // const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-const usedURL = virtuosoDebianUrl;
+const usedURL = virtuosoURL;
 // const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
 // const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';

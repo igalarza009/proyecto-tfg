@@ -81,13 +81,15 @@ export class ParseData extends React.Component {
 	}
 
 	fixingCompleted(fileName, parsedValues, parsedTimestamps){
-			var file = Parser.parseDataToRDF_Sin(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
-            console.log("TTL file created");
-            this.setState({
-                // file: file,
-                dataInserted: true,
-                insertingData: false,
-            });
+		console.log(parsedValues);
+		console.log(parsedTimestamps);
+		var file = Parser.parseDataToRDF_Sin(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
+        console.log("TTL file created");
+        this.setState({
+            // file: file,
+            dataInserted: true,
+            insertingData: false,
+        });
 	}
 
 	handleDownload(){

@@ -356,7 +356,7 @@ export class OtroSensorQueryForm extends React.Component{
 							</div>)
 						: (null);
 				const errorValor = (knownSensors[sensorId] === null)
-					? (<p className='red-text'> Falta especificar el valor especifico del sensor.</p>)
+					? (<p className='red-text'> Falta indicar el valor especifico del sensor.</p>)
 					: (null);
 				return(
 					<Row key={sensorId}>

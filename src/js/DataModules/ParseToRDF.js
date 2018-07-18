@@ -14,18 +14,11 @@ export function parseDataToRDF(filename, values, timestamps, infoSensores){
 					"@prefix sosa: <http://www.w3.org/ns/sosa/> . \n" +
 					"@base " + graphURI + " . \n";
 
-	console.log(filename);
-
 	const indexOfDot = filename.indexOf('.');
 	const sensorIndicator = filename.substring(0, indexOfDot);
 	const sensorName = 'sensor' + sensorIndicator;
 
-	console.log(sensorIndicator);
-	console.log(infoSensores);
-
 	const currentSensor = _.find(infoSensores, {indicatorId:sensorIndicator});
-
-	console.log(currentSensor);
 
 	let observationResult = '';
 	const observationType = currentSensor.observationType;

@@ -26,81 +26,82 @@ export function parseDataToRDF_Sin(filename, values, timestamps, infoSensores){
 	const currentSensor = _.find(infoSensores, ['indicatorId', sensorIndicator]);
 
 	let observationResult = '';
-	let dataToInsert = '';
 	const observationType = currentSensor.observationType;
 	const valueType = 'xsd:' + currentSensor.valueType;
 
+	let dataToInsert = '';
 	let cont = 0;
 	let i = 0;
 
+	console.log("Tiempo inicio " + Date.now());
 	insertDataRecursive(i, cont, values, timestamps, virtPrefixes, sensorName, observationType, valueType, dataToInsert);
 
 }
 
 function insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert){
+
 	const value = values[index];
-	if (index !== 0 && value !== ""){
-		cont++;
-		var dateTime = timestamps[index];
-		var posGuion = dateTime.indexOf('-');
-		var date = dateTime.substring(0, posGuion) + dateTime.substring(posGuion+1, posGuion+3) + dateTime.substring(posGuion+4, posGuion+6);
+	// if (index !== 0 && value !== ""){
+	let dateTime = timestamps[index];
+	let posGuion = dateTime.indexOf('-');
+	let date = dateTime.substring(0, posGuion) + dateTime.substring(posGuion+1, posGuion+3) + dateTime.substring(posGuion+4, posGuion+6);
 
-		var observationName = sensorName + "date" + date + "obs" + index;
-		var observationResultName = observationName + "result";
+	let observationName = sensorName + "date" + date + "obs" + index;
+	// var observationResultName = observationName + "result";
 
-		let fixedValue = value;
-		if (value === 'NA'){
-			fixedValue = 0;
-		}
+	let fixedValue = value;
+	if (value === 'NA'){
+		fixedValue = 0;
+	}
 
-		dataToInsert += ':' + observationName + ' rdf:type owl:NamedIndividual , \n' +
-			':' + observationType + ' . \n' +
-			':' + observationName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . \n' +
-			':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . \n' +
-			':' + sensorName + ' sosa:madeObservation :' + observationName + ' . \n';
+	dataToInsert += ':' + observationName + ' rdf:type owl:NamedIndividual , \n' +
+		':' + observationType + ' . \n' +
+		':' + observationName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . \n' +
+		':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . \n' +
+		':' + sensorName + ' sosa:madeObservation :' + observationName + ' . \n';
 
-		index++;
-
-		if(index < values.length){
-			if (cont === 160){
-				var query = Queries.getInsertQuery(prefixes, dataToInsert);
-				// axios.post(usedURL,
-				// 	querystring.stringify({'query': query})
-				// )
-				// .then((response) => {
-				// 	console.log(response);
-					dataToInsert = '';
-					cont = 0;
-					insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
-				// })
-				// .catch((error) => {
-				// 	console.log(error);
-				// });
-			}
-			else{
+	index++;
+	cont++;
+	if(index < values.length){
+		if (cont === 160){
+			var query = Queries.getInsertQuery(prefixes, dataToInsert);
+			axios.post(usedURL,
+				querystring.stringify({'query': query})
+			)
+			.then((response) => {
+				// console.log(response);
+				dataToInsert = '';
+				cont = 0;
 				insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
-			}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 		}
 		else{
-			if (cont > 0) {
-				console.log('Ultima request');
-				var query = Queries.getInsertQuery(prefixes, dataToInsert);
-				console.log(query);
-				// axios.post(usedURL,
-				// 	querystring.stringify({'query': query})
-				// )
-				// .then((response) => {
-				// 	console.log("Última request");
-				// 	console.log(response);
-				// })
-				// .catch((error) => {
-				// 	console.log(error);
-				// });
-			}
+			insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
 		}
 	}
 	else{
-		index++;
-		insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+		if (cont > 0) {
+			console.log('Ultima petición');
+			var query = Queries.getInsertQuery(prefixes, dataToInsert);
+			console.log(query);
+			axios.post(usedURL,
+				querystring.stringify({'query': query})
+			)
+			.then((response) => {
+				console.log(response);
+				console.log("Tiempo Final " + Date.now());
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+		}
 	}
+	// }
+	// else{
+	// 	index++;
+	// 	insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+	// }
 }
