@@ -133,7 +133,9 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 					sensorValues.push(parMotorValue);
 				}
 				else{
-					sensorValues.push(parseFloat(result[selectValues[0]]["value"]));
+					var aux = parseFloat(result[selectValues[0]]["value"]);
+					// aux = aux >= 196.4 ? NaN : aux;
+					sensorValues.push(aux);
 				}
 			}
 			else{
@@ -155,13 +157,20 @@ function reduceSensorValues(values, datetimes, selectedSensors){
         const splitLength = Math.ceil(values.length / maxPoints) * selectedSensors.length;
         values.forEach((value, i) => {
             if (i !== 0){
-				prevValues.push(value);
+				if (!isNaN(value)){
+					prevValues.push(value);
+				}
 				let datetime = datetimes[i].getTime();
 				if (!isNaN(datetime)){
 					prevDatetimes.push(datetime);
 				}
-                if (prevValues.length === splitLength){ // hacer la media, introducir, vaciar y seguir
-                    reducedValues.push(_.mean(prevValues));
+                if (prevDatetimes.length === splitLength){ // hacer la media, introducir, vaciar y seguir
+					if (prevValues.length > 0){
+						reducedValues.push(_.mean(prevValues));
+					}
+                    else{
+						reducedValues.push(NaN);
+					}
                     reducedDatetimes.push(new Date(Math.round(_.mean(prevDatetimes))));
 
                     prevValues = [];
@@ -387,7 +396,7 @@ export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sen
 	let restoSensores = selectedSensors.slice(1,selectedSensors.length);
 	let prevValues = {};
 	sensorValues[primSensor].forEach((value, i) => {
-		if (i > 1){
+		if (prevValues[primSensor] && !isNaN(value)){
 			// console.log("Anteriores: " + JSON.stringify(prevValues));
 			// console.log("Actual: " + value);
 			var booleans = [];
@@ -417,7 +426,7 @@ export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sen
 				});
 			}
 		}
-		if (i !== 0){
+		else if (!prevValues[primSensor] && !isNaN(value)){
 			prevValues[primSensor] = value;
 			restoSensores.forEach((sensorId) => {
 				prevValues[sensorId] = sensorValues[sensorId][i];

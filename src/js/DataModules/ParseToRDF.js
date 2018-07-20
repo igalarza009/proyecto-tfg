@@ -41,7 +41,7 @@ export function parseDataToRDF(filename, values, timestamps, infoSensores){
 
 			let fixedValue = value;
 			if (value === 'NA'){
-				fixedValue = 0;
+				fixedValue = 'NaN';
 			}
 
 			observationResult = observationResult +

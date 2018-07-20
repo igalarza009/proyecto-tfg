@@ -783,7 +783,7 @@ export class SensorsInfo extends React.Component {
 										anomResults['anomValues'],
 										anomResults['anomDatetimes'],
 										selectedSensors,
-										{type:'anom', parMotor:parMotor},
+										{type:'anom', parMotor:parMotor, selectedValues: selectedValues},
 										this.props.infoSensores
 									);
 				}
