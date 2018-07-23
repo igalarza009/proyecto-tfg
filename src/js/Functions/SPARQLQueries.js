@@ -433,6 +433,54 @@ export function getInsertQuery(prefixes, dataToInsert){
 // 	return finalQuery;
 // }
 
+export function getInfoSensoresQuery(){
+	let query = 'prefix : ' + graphURI + ' ' +
+			'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
+			'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
+			'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
+			'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
+			'prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#> ' +
+			'select ?sensorId ?name ?class ?sensorType ?observationType ?valueType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
+			'from ' + graphURI + ' ' +
+			'where { ' +
+				'?metaSensorType rdf:type owl:Class ; ' +
+				 'rdfs:subClassOf sosa:Sensor . ' +
+				'?sensorType rdfs:subClassOf ?metaSensorType .  ' +
+				'?metaSensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+												'owl:onProperty sosa:madeObservation ; ' +
+												'owl:allValuesFrom ?observationType ' +
+											'] . ' +
+				'?observationType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+												'owl:onProperty sosa:hasSimpleResult ; ' +
+												'owl:allValuesFrom ?valueType ' +
+											'] . ' +
+				'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+												'owl:onProperty sosa:observes ; ' +
+												'owl:hasValue ?observedProperty ' +
+											'] . ' +
+				'optional { ' +
+					'?observedProperty qu:unit ?measureUnit . ' +
+				'} ' +
+				'optional { ' +
+					'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
+													'owl:onProperty :maxValue ; ' +
+													'owl:hasValue ?maxValue ' +
+												'] , ' +
+												'[ rdf:type owl:Restriction ; ' +
+													'owl:onProperty :minValue ; ' +
+													'owl:hasValue ?minValue ' +
+												'] . ' +
+				'} ' +
+				'?sensorName rdf:type ?sensorType ; ' +
+							'rdf:type owl:NamedIndividual ; ' +
+							':indicatorId ?sensorId ; ' +
+							':sensorName ?name . ' +
+				'optional { ?sensorName :zone ?zone . } ' +
+			'} ' +
+			'order by asc(?name)';
+	return query;
+}
+
 function getSelect(groupBy){
 	let select = 'select ?sensorName ';
 	if (groupBy['groupBy']){

@@ -446,6 +446,67 @@ export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sen
 	return {'anomValues':reducedAnomResults, 'anomDatetimes':reducedAnomDatetimes};
 }
 
+export function getInfoSensores(results){
+	let infoSensores = [];
+	results.forEach((object) => {
+		var infoSensor = {};
+
+		infoSensor['indicatorId'] = object['sensorId']['value'];
+		infoSensor['name'] = object['name']['value'];
+		// infoSensor['class'] = object['class']['value'];
+
+		var sensType = object['sensorType']['value'];
+		var iSensType = sensType.indexOf('#');
+		var sensTypeParsed = sensType.substring(iSensType+1, sensType.length);
+		infoSensor['sensorType'] = sensTypeParsed;
+
+		var obsType = object['observationType']['value'];
+		var iObsType = obsType.indexOf('#');
+		var obsTypeParsed = obsType.substring(iObsType+1, obsType.length);
+		infoSensor['observationType'] = obsTypeParsed;
+
+		var valType = object['valueType']['value'];
+		var iValType = valType.indexOf('#');
+		var valTypeParsed = valType.substring(iValType+1, valType.length);
+		infoSensor['valueType'] = valTypeParsed;
+
+		if (object['zone']){
+			infoSensor['zone'] = object['zone']['value'];
+		}
+		else{
+			infoSensor['zone'] = '';
+		}
+
+		var obsProp = object['observedProperty']['value'];
+		var iObsProp = obsProp.indexOf('#');
+		var obsPropParsed = obsProp.substring(iObsProp+1, obsProp.length);
+		infoSensor['observedProperty'] = obsPropParsed;
+
+		if (object['measureUnit']){
+			var unit = object['measureUnit']['value'];
+			var iUnit = unit.indexOf('#');
+			var unitParsed = unit.substring(iUnit+1, unit.length);
+			infoSensor['measureUnit'] = unitParsed;
+		}
+		else{
+			infoSensor['measureUnit'] = '';
+		}
+
+		if (object['minValue']){
+			infoSensor['minValue'] = parseInt(object['minValue']['value'], 10);
+			infoSensor['maxValue'] = parseInt(object['maxValue']['value'], 10);
+		}
+		else{
+			infoSensor['minValue'] = '';
+			infoSensor['maxValue'] = '';
+		}
+
+		infoSensores.push(infoSensor);
+	});
+
+	return infoSensores;
+}
+
 function allTrue(value){
 	return value === true;
 }

@@ -2,6 +2,10 @@
 
  /*----------- CLASES VARIADAS -------------*/
 
+.img-maq{
+    width: 100%;
+}
+
  .height-big{
 	 height: 120px;
  }

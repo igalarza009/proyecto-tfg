@@ -66,32 +66,32 @@ export class PruebaTabsMat extends React.Component {
 					 </ul>
 				 </div>
 				 <div id="infor" className="col s12">
-					 {/* <InformationQueryForm
+					 <InformationQueryForm
 			             selectedSensors={selectedSensors}
 			             getInformationQuery={(s,g,f,fv) => {this.props.getInformationQuery(s,g,f,fv);}}
 						 infoSensores={this.props.infoSensores}
-			         /> */}
-					 <Card className="center">
+			         />
+					 {/* <Card className="center">
 						 Formulario información general.
-					 </Card>
+					 </Card> */}
 				 </div>
 				 <div id="otro" className="col s12">
-					 {/* <OtroSensorQueryForm
+					 <OtroSensorQueryForm
 			             selectedSensors={selectedSensors}
 			             getOtherSensorQuery={(k,a,v,f) => {this.props.getOtherSensorQuery(k,a,v,f);}}
 						 infoSensores={this.props.infoSensores}
-			         /> */}
-					 <Card className="center">
+			         />
+					 {/* <Card className="center">
 						 Formulario relación entre sensores.
-					 </Card>
+					 </Card> */}
 				 </div>
 				 <div id="anom" className="col s12">
-					 {/* <AnomaliasQueryForm
+					 <AnomaliasQueryForm
 			             selectedSensors={selectedSensors}
 						 getAnomaliasQuery={(s,p,f) => {this.props.getAnomaliasQuery(s,p,f);}}
 						 infoSensores={this.props.infoSensores}
-			         /> */}
-					 <Card >
+			         />
+					 {/* <Card >
 						 <Row>
 							 <Input s={12} l={6} type='select' defaultValue='predef'>
 								   <option value='predef'>Relación predefinida</option>
@@ -101,7 +101,7 @@ export class PruebaTabsMat extends React.Component {
 						<Row className="center">
 							 Formulario anomalías predefinidas.
 						</Row>
-					 </Card>
+					 </Card> */}
 				 </div>
 			 </div>
 		 </div>

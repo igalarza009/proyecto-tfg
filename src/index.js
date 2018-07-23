@@ -6,6 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import {ParseData} from './js/DataModules/DataPage.js'
+import {DataSelectMachine} from './js/DataModules/DataSelectMachine.js'
 import M from 'materialize-css';
 import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
 import {QueriesSelectMachine} from './js/QueriesModules/QueriesSelectMachine.js'
@@ -26,15 +27,16 @@ const usedURL = virtuosoURL;
 // const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
 const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
-const machines = ['maquina1', 'maquina2', 'maquina3', 'maquina4'];
+const machinesQueries = ['maquina1', 'maquina2', 'maquina3', 'maquina4'];
+const machinesData = ['maquina1', 'maquina2'];
 
 class SelectedPage extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			preguntasSelected: {},
-			infoSensores: [],
-			selectedPage: 'cargando',
+			preguntasSelected: true,
+			// infoSensores: [],
+			selectedPage: 'preguntas',
 			errorLoading: false,
 		};
 	}
@@ -46,81 +48,6 @@ class SelectedPage extends React.Component {
 		  	closeOnClick: true, // Closes side-nav on <a> clicks, useful for Angular/Meteor
 		  	draggable: true, // Choose whether you can drag to open on touch screens,
 	  	});
-
-		let query = 'prefix : ' + graphURI + ' ' +
-				'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
-				'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
-				'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
-				'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
-				'prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#> ' +
-				'select ?sensorId ?name ?class ?sensorType ?observationType ?valueType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
-				'from ' + graphURI + ' ' +
-				'where { ' +
-				    '?metaSensorType rdf:type owl:Class ; ' +
-				     'rdfs:subClassOf sosa:Sensor . ' +
-				    '?sensorType rdfs:subClassOf ?metaSensorType .  ' +
-				    '?metaSensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
-				                                    'owl:onProperty sosa:madeObservation ; ' +
-				                                    'owl:allValuesFrom ?observationType ' +
-				                                '] . ' +
-					'?observationType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
-													'owl:onProperty sosa:hasSimpleResult ; ' +
-													'owl:allValuesFrom ?valueType ' +
-												'] . ' +
-				    '?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
-				                                    'owl:onProperty sosa:observes ; ' +
-				                                    'owl:hasValue ?observedProperty ' +
-				                                '] . ' +
-				    'optional { ' +
-				    	'?observedProperty qu:unit ?measureUnit . ' +
-				    '} ' +
-				    'optional { ' +
-				    	'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
-				                                        'owl:onProperty :maxValue ; ' +
-				                                        'owl:hasValue ?maxValue ' +
-				                                    '] , ' +
-				                                    '[ rdf:type owl:Restriction ; ' +
-				                                        'owl:onProperty :minValue ; ' +
-				                                        'owl:hasValue ?minValue ' +
-				                                    '] . ' +
-				    '} ' +
-				    '?sensorName rdf:type ?sensorType ; ' +
-				                'rdf:type owl:NamedIndividual ; ' +
-				                ':indicatorId ?sensorId ; ' +
-				                ':sensorName ?name . ' +
-				    'optional { ?sensorName :zone ?zone . } ' +
-				'} ' +
-				'order by asc(?name)';
-
-		const querystring = require('querystring');
-		console.log('Realizamos la consulta de información a Virtuoso');
-		axios.post(usedURL,
-			querystring.stringify({'query': query})
-		)
-		.then((response) => {
-			console.log(response);
-			let results = response.data["results"]["bindings"];
-			if (results.length > 0) {
-				let infoSensores = getInfoSensores(results);
-				this.setState({
-					infoSensores: infoSensores,
-					selectedPage: 'preguntas',
-					errorLoading: false,
-				});
-			}
-			else{
-				this.setState({
-					errorLoading: true,
-				});
-			}
-
-		})
-		.catch((error) => {
-			console.log(error);
-			this.setState({
-				errorLoading: true,
-			});
-		});
 	}
 
 	mostrarPreguntas(){
@@ -140,29 +67,30 @@ class SelectedPage extends React.Component {
 	render(){
 		const preguntasSelected = this.state.preguntasSelected;
 		const selectedPage = this.state.selectedPage;
-		const infoSensores = this.state.infoSensores;
-		const errorLoading = this.state.errorLoading;
+		// const infoSensores = this.state.infoSensores;
+		// const errorLoading = this.state.errorLoading;
 
-		const cargando = (selectedPage === 'cargando' && !errorLoading)
-			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
-				<img className='loading' alt='Cargando...'
-						src={require('./img/loading_bars.gif')}
-					/>
-				</Card>)
-			: (null);
+		// const cargando = (selectedPage === 'cargando' && !errorLoading)
+		// 	? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
+		// 		<img className='loading' alt='Cargando...'
+		// 				src={require('./img/loading_bars.gif')}
+		// 			/>
+		// 		</Card>)
+		// 	: (null);
+		//
+		// const cardError = (selectedPage === 'cargando' && errorLoading) &&
+		// 	(<Card s={12} l={8} offset='l2' title="Error al cargar datos" className='center'>
+		// 		<p>Ha ocurrido un error al cargar los datos necesarios desde el servidor.</p>
+		// 		<p>Vuelva a cargar la página para intentar solucionarlo.</p>
+		// 	</Card>);
 
-		const cardError = (selectedPage === 'cargando' && errorLoading) &&
-			(<Card s={12} l={8} offset='l2' title="Error al cargar datos" className='center'>
-				<p>Ha ocurrido un error al cargar los datos necesarios desde el servidor.</p>
-				<p>Vuelva a cargar la página para intentar solucionarlo.</p>
-			</Card>);
+		const queries = (selectedPage === 'preguntas') &&
+			// (<SensorsInfo infoSensores={infoSensores}/>);
+			(<QueriesSelectMachine machines={machinesQueries}/>);
 
-		const queries = (selectedPage === 'preguntas' && !errorLoading) &&
-			(<SensorsInfo infoSensores={infoSensores}/>);
-			// (<QueriesSelectMachine machines={machines}/>);
-
-		const datos = (selectedPage === 'datos' && !errorLoading) &&
-			(<ParseData infoSensores={infoSensores}/>);
+		const datos = (selectedPage === 'datos') &&
+			// (<ParseData infoSensores={infoSensores}/>);
+			(<DataSelectMachine machines={machinesData}/>);
 
 		let preguntasClass = '';
 		let traductorClass = '';
@@ -175,6 +103,8 @@ class SelectedPage extends React.Component {
 			traductorClass = traductorClass + 'active ';
 		}
 
+		const navBarTitle = (preguntasSelected) ? "Consultar de datos de sensores" : "Insertar datos de sensores";
+
 		const navBar =
 		// (selectedPage === 'cargando')
 			// ? (
@@ -183,7 +113,7 @@ class SelectedPage extends React.Component {
 			// 		</div>)
 			(
 					<div className="nav-wrapper">
-						<a href="#" className="brand-logo center">Análisis de datos de sensores</a>
+						<a href="#" className="brand-logo center">{navBarTitle}</a>
 						<ul className="left">
 							<li>
 								<Button data-activates="slide-out" className="button-collapse show-on-medium-and-up btn-flat white-text">
@@ -209,29 +139,29 @@ class SelectedPage extends React.Component {
 			</li>
 			<li>
 				<a href="#" className={preguntasClass} onClick={() => this.mostrarPreguntas()}>
-					<i className="material-icons">bar_chart</i>
+					<i className="material-icons pink-text text-darken-3">bar_chart</i>
 					Consultar datos
 				</a>
 			</li>
 			<li>
 				<a href="#" className={traductorClass} onClick={() => this.mostrarTraductorDatos()}>
-					<i className="material-icons">publish</i>
+					<i className="material-icons yellow-text text-darken-3">publish</i>
 					Insertar datos
 				</a>
 			</li>
 		</ul>);
 
+		const navColor = (preguntasSelected) ? ('pink darken-3') : ('yellow darken-3')
+
 		return(
 			<div>
 				<div className='navBar'>
-					<nav className='blue darken-3'>
+					<nav className={navColor}>
 					    {navBar}
 						{sideNav}
 					</nav>
 				</div>
 				<div className='container'>
-					{cargando}
-					{cardError}
 					{queries}
 					{datos}
 				</div>
@@ -244,64 +174,3 @@ ReactDOM.render(
 	<SelectedPage />,
   	document.getElementById('root')
 );
-
-function getInfoSensores(results){
-	let infoSensores = [];
-	results.forEach((object) => {
-		var infoSensor = {};
-
-		infoSensor['indicatorId'] = object['sensorId']['value'];
-		infoSensor['name'] = object['name']['value'];
-		// infoSensor['class'] = object['class']['value'];
-
-		var sensType = object['sensorType']['value'];
-		var iSensType = sensType.indexOf('#');
-		var sensTypeParsed = sensType.substring(iSensType+1, sensType.length);
-		infoSensor['sensorType'] = sensTypeParsed;
-
-		var obsType = object['observationType']['value'];
-		var iObsType = obsType.indexOf('#');
-		var obsTypeParsed = obsType.substring(iObsType+1, obsType.length);
-		infoSensor['observationType'] = obsTypeParsed;
-
-		var valType = object['valueType']['value'];
-		var iValType = valType.indexOf('#');
-		var valTypeParsed = valType.substring(iValType+1, valType.length);
-		infoSensor['valueType'] = valTypeParsed;
-
-		if (object['zone']){
-			infoSensor['zone'] = object['zone']['value'];
-		}
-		else{
-			infoSensor['zone'] = '';
-		}
-
-		var obsProp = object['observedProperty']['value'];
-		var iObsProp = obsProp.indexOf('#');
-		var obsPropParsed = obsProp.substring(iObsProp+1, obsProp.length);
-		infoSensor['observedProperty'] = obsPropParsed;
-
-		if (object['measureUnit']){
-			var unit = object['measureUnit']['value'];
-			var iUnit = unit.indexOf('#');
-			var unitParsed = unit.substring(iUnit+1, unit.length);
-			infoSensor['measureUnit'] = unitParsed;
-		}
-		else{
-			infoSensor['measureUnit'] = '';
-		}
-
-		if (object['minValue']){
-			infoSensor['minValue'] = parseInt(object['minValue']['value'], 10);
-			infoSensor['maxValue'] = parseInt(object['maxValue']['value'], 10);
-		}
-		else{
-			infoSensor['minValue'] = '';
-			infoSensor['maxValue'] = '';
-		}
-
-		infoSensores.push(infoSensor);
-	});
-
-	return infoSensores;
-}
