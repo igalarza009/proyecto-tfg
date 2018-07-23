@@ -2,7 +2,7 @@ import React from 'react';
 import '../../index.css';
 import M from 'materialize-css';
 import $ from 'jquery';
-import {Icon} from 'react-materialize'
+import {Icon, Card, Input, Row} from 'react-materialize'
 import {InformationQueryForm} from './InformationQuery.js'
 import {OtroSensorQueryForm} from './OtroSensorQuery.js'
 import {AnomaliasQueryForm} from './AnomaliasQuery.js'
@@ -66,25 +66,42 @@ export class PruebaTabsMat extends React.Component {
 					 </ul>
 				 </div>
 				 <div id="infor" className="col s12">
-					 <InformationQueryForm
+					 {/* <InformationQueryForm
 			             selectedSensors={selectedSensors}
 			             getInformationQuery={(s,g,f,fv) => {this.props.getInformationQuery(s,g,f,fv);}}
 						 infoSensores={this.props.infoSensores}
-			         />
+			         /> */}
+					 <Card className="center">
+						 Formulario información general.
+					 </Card>
 				 </div>
 				 <div id="otro" className="col s12">
-					 <OtroSensorQueryForm
+					 {/* <OtroSensorQueryForm
 			             selectedSensors={selectedSensors}
 			             getOtherSensorQuery={(k,a,v,f) => {this.props.getOtherSensorQuery(k,a,v,f);}}
 						 infoSensores={this.props.infoSensores}
-			         />
+			         /> */}
+					 <Card className="center">
+						 Formulario relación entre sensores.
+					 </Card>
 				 </div>
 				 <div id="anom" className="col s12">
-					 <AnomaliasQueryForm
+					 {/* <AnomaliasQueryForm
 			             selectedSensors={selectedSensors}
 						 getAnomaliasQuery={(s,p,f) => {this.props.getAnomaliasQuery(s,p,f);}}
 						 infoSensores={this.props.infoSensores}
-			         />
+			         /> */}
+					 <Card >
+						 <Row>
+							 <Input s={12} l={6} type='select' defaultValue='predef'>
+								   <option value='predef'>Relación predefinida</option>
+								   <option value='custom'>Relación personalizada</option>
+							</Input>
+						 </Row>
+						<Row className="center">
+							 Formulario anomalías predefinidas.
+						</Row>
+					 </Card>
 				 </div>
 			 </div>
 		 </div>

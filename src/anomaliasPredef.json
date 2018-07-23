@@ -29,6 +29,13 @@
                         {"VMTKD6":"down", "84RATS":"up", "ParMotor":"up"}
                     ]
                 }
+                {
+                    "tipo":"Extrusora5Zonas",
+                    "id": "2771_1FP_RS123X_8",
+                    "anomalias": [
+                        
+                    ]
+                }
             ]
         }
     ],

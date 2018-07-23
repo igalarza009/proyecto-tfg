@@ -2,6 +2,10 @@
 
  /*----------- CLASES VARIADAS -------------*/
 
+ .height-big{
+	 height: 120px;
+ }
+
 [type="radio"]:checked+label .my-green{
 	 color: #2E7D32 !important;
  }

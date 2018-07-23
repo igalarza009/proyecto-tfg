@@ -3,16 +3,15 @@
 // <div>Icons made by <a href="https://www.flaticon.com/authors/epiccoders" title="EpicCoders">EpicCoders</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import {ParseData} from './js/DataModules/DataPage.js'
+// import ReactDOM from 'react-dom';
+import '../../index.css';
+// import {ParseData} from './js/DataModules/DataPage.js'
 import M from 'materialize-css';
-import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
-import {QueriesSelectMachine} from './js/QueriesModules/QueriesSelectMachine.js'
+// import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
 import axios from 'axios';
-import {Card, Button} from 'react-materialize'
-import $ from 'jquery';
-import {MainPage} from './main.js';
+import {Card, Button, Row, Col} from 'react-materialize'
+// import $ from 'jquery';
+// import {MainPage} from './main.js';
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
@@ -26,27 +25,32 @@ const usedURL = virtuosoURL;
 // const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
 const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
-const machines = ['maquina1', 'maquina2', 'maquina3', 'maquina4'];
-
-class SelectedPage extends React.Component {
+export class QueriesSelectMachine extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			preguntasSelected: {},
+			// preguntasSelected: {},
 			infoSensores: [],
-			selectedPage: 'cargando',
+			state: 'selecMaq',
 			errorLoading: false,
 		};
 	}
 
-	componentDidMount(){
-		$('.button-collapse').sideNav({
-			menuWidth: 300, // Default is 300
-		  	edge: 'left', // Choose the horizontal origin
-		  	closeOnClick: true, // Closes side-nav on <a> clicks, useful for Angular/Meteor
-		  	draggable: true, // Choose whether you can drag to open on touch screens,
-	  	});
+    // componentDidMount(){
+    //     const machines = this.props.machines;
+    //
+    //     const machines.forEach((value) => {
+    //         return(
+    //             <Col key={} s={12} m={6} l={4}>
+    //                 <Card>
+    //
+    //                 </Card>
+    //             </Col>
+    //         )
+    //     });
+    // }
 
+	loadMachineInfo(){
 		let query = 'prefix : ' + graphURI + ' ' +
 				'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
 				'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
@@ -123,127 +127,44 @@ class SelectedPage extends React.Component {
 		});
 	}
 
-	mostrarPreguntas(){
-		this.setState({
-			preguntasSelected: true,
-			selectedPage: 'preguntas',
-		});
-	}
-
-	mostrarTraductorDatos(){
-		this.setState({
-			preguntasSelected: false,
-			selectedPage: 'datos',
-		});
-	}
-
 	render(){
-		const preguntasSelected = this.state.preguntasSelected;
-		const selectedPage = this.state.selectedPage;
+		const state = this.state.selectedPage;
 		const infoSensores = this.state.infoSensores;
 		const errorLoading = this.state.errorLoading;
+        const machines = this.props.machines;
 
-		const cargando = (selectedPage === 'cargando' && !errorLoading)
+		const cargando = (state === 'cargando' && !errorLoading)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
 				<img className='loading' alt='Cargando...'
-						src={require('./img/loading_bars.gif')}
+						src={require('../../img/loading_bars.gif')}
 					/>
 				</Card>)
 			: (null);
 
-		const cardError = (selectedPage === 'cargando' && errorLoading) &&
+		const cardError = (state === 'cargando' && errorLoading) &&
 			(<Card s={12} l={8} offset='l2' title="Error al cargar datos" className='center'>
 				<p>Ha ocurrido un error al cargar los datos necesarios desde el servidor.</p>
 				<p>Vuelva a cargar la página para intentar solucionarlo.</p>
 			</Card>);
 
-		const queries = (selectedPage === 'preguntas' && !errorLoading) &&
-			(<SensorsInfo infoSensores={infoSensores}/>);
-			// (<QueriesSelectMachine machines={machines}/>);
-
-		const datos = (selectedPage === 'datos' && !errorLoading) &&
-			(<ParseData infoSensores={infoSensores}/>);
-
-		let preguntasClass = '';
-		let traductorClass = '';
-
-		if (selectedPage === 'preguntas'){
-			preguntasClass = preguntasClass + 'active ';
-		}
-
-		if (selectedPage === 'datos'){
-			traductorClass = traductorClass + 'active ';
-		}
-
-		const navBar =
-		// (selectedPage === 'cargando')
-			// ? (
-			// 		<div className="nav-wrapper">
-			// 			<a href="#" className="brand-logo center">Análisis de datos de sensores</a>
-			// 		</div>)
-			(
-					<div className="nav-wrapper">
-						<a href="#" className="brand-logo center">Análisis de datos de sensores</a>
-						<ul className="left">
-							<li>
-								<Button data-activates="slide-out" className="button-collapse show-on-medium-and-up btn-flat white-text">
-									<i className="material-icons">menu</i>
-								</Button>
-								{/* <a href="#" data-activates="slide-out" className="button-collapse show-on-medium-and-up">
-									<i className="material-icons">menu</i>
-								</a> */}
-							</li>
-						</ul>
-					</div>);
-
-		const sideNav = (<ul id="slide-out" className="side-nav">
-			<li className="blue darken-3">
-				<div className="user-view">
-					<a href="#!user" className="margin-left">
-						<img className="circle margin-top" src={require('./img/user.png')} height="100%"/>
-					</a>
-					<a href="#!email" className='margin-top'>
-						<span className="white-text email">example@example.com</span>
-					</a>
-				</div>
-			</li>
-			<li>
-				<a href="#" className={preguntasClass} onClick={() => this.mostrarPreguntas()}>
-					<i className="material-icons">bar_chart</i>
-					Consultar datos
-				</a>
-			</li>
-			<li>
-				<a href="#" className={traductorClass} onClick={() => this.mostrarTraductorDatos()}>
-					<i className="material-icons">publish</i>
-					Insertar datos
-				</a>
-			</li>
-		</ul>);
-
+        const listaMaq = machines.map((value) => {
+            return(
+                <Col key={value} s={12} m={6} l={4}>
+                    <Card>
+                        Aquí iría una imagen de la máquina {value}.
+                    </Card>
+                </Col>
+            )
+        });
 		return(
 			<div>
-				<div className='navBar'>
-					<nav className='blue darken-3'>
-					    {navBar}
-						{sideNav}
-					</nav>
-				</div>
-				<div className='container'>
-					{cargando}
-					{cardError}
-					{queries}
-					{datos}
-				</div>
+				<Row>
+                    {listaMaq}
+                </Row>
 			</div>
 		)
 	}
 }
-
-ReactDOM.render(
-	<SelectedPage />,
-  	document.getElementById('root')
-);
 
 function getInfoSensores(results){
 	let infoSensores = [];
