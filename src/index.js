@@ -15,20 +15,10 @@ import {Card, Button} from 'react-materialize'
 import $ from 'jquery';
 import {MainPage} from './main.js';
 
-const virtuosoURL = 'http://localhost:8890/sparql';
-const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
-const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-// const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-const usedURL = virtuosoURL;
-// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
-// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-// const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
-// const graphURI = "<http://www.sensores.com/ontology/prueba09/extrusoras#>";
-// const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
-const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
+// const machinesQueries = ['maquina1', 'maquina2', 'maquina3', 'maquina4'];
+// const machinesData = ['maquina1', 'maquina2'];
 
-const machinesQueries = ['maquina1', 'maquina2', 'maquina3', 'maquina4'];
-const machinesData = ['maquina1', 'maquina2'];
+const idOrg = '-L2PV1Ya30YR-SBlesmI';
 
 class SelectedPage extends React.Component {
 	constructor(props){
@@ -67,30 +57,14 @@ class SelectedPage extends React.Component {
 	render(){
 		const preguntasSelected = this.state.preguntasSelected;
 		const selectedPage = this.state.selectedPage;
-		// const infoSensores = this.state.infoSensores;
-		// const errorLoading = this.state.errorLoading;
-
-		// const cargando = (selectedPage === 'cargando' && !errorLoading)
-		// 	? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
-		// 		<img className='loading' alt='Cargando...'
-		// 				src={require('./img/loading_bars.gif')}
-		// 			/>
-		// 		</Card>)
-		// 	: (null);
-		//
-		// const cardError = (selectedPage === 'cargando' && errorLoading) &&
-		// 	(<Card s={12} l={8} offset='l2' title="Error al cargar datos" className='center'>
-		// 		<p>Ha ocurrido un error al cargar los datos necesarios desde el servidor.</p>
-		// 		<p>Vuelva a cargar la página para intentar solucionarlo.</p>
-		// 	</Card>);
 
 		const queries = (selectedPage === 'preguntas') &&
 			// (<SensorsInfo infoSensores={infoSensores}/>);
-			(<QueriesSelectMachine machines={machinesQueries}/>);
+			(<QueriesSelectMachine idOrganization={idOrg}/>);
 
 		const datos = (selectedPage === 'datos') &&
 			// (<ParseData infoSensores={infoSensores}/>);
-			(<DataSelectMachine machines={machinesData}/>);
+			(<DataSelectMachine idOrganization={idOrg}/>);
 
 		let preguntasClass = '';
 		let traductorClass = '';

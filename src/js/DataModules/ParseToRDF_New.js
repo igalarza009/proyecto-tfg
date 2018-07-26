@@ -8,7 +8,7 @@ const _ = require('lodash');
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
 const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 const virtuosoUrl =  'http://localhost:8890/sparql/';
-const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
+const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
 const usedURL = virtuosoDebianUrl;
 
 export function parseDataToRDF_Sin(filename, values, timestamps, infoSensores){

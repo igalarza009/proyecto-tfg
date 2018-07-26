@@ -15,11 +15,13 @@ import * as Queries from '../Functions/SPARQLQueries.js';
 // import $ from 'jquery';
 // import {MainPage} from './main.js';
 
+const _ = require('lodash');
+
 const virtuosoURL = 'http://localhost:8890/sparql';
-const virtuosoDebianUrl = 'http://104.196.204.155:8890/sparql';
+const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 // const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-const usedURL = virtuosoURL;
+const usedURL = virtuosoDebianUrl;
 
 export class QueriesSelectMachine extends React.Component {
 	constructor(props){
@@ -29,13 +31,30 @@ export class QueriesSelectMachine extends React.Component {
 			infoSensores: [],
 			state: 'selecMaq',
 			errorLoading: false,
+			machines: {},
+			selectedMachine: null,
+			// infoOrganizacion: {}
 		};
 	}
 
-	loadMachineInfo(){
+	componentDidMount(){
+		const idOrg = this.props.idOrganization;
+		const infoGeneral = require('../../semanticModule.json');
+		const maquinas = infoGeneral['SemanticModule']['Organizations'][idOrg];
+		// let maquinas = [];
+
+		this.setState({
+			// infoOrganizacion: orgActual,
+			machines: maquinas,
+		});
+	}
+
+	loadMachineInfo(id){
         this.setState({
             state: 'cargando',
         });
+		const machines = this.state.machines;
+		const machineInfo = machines[id];
 
         let query = Queries.getInfoSensoresQuery();
 
@@ -53,6 +72,7 @@ export class QueriesSelectMachine extends React.Component {
 					infoSensores: infoSensores,
 					state: 'showQueries',
 					errorLoading: false,
+					selectedMachine: machineInfo,
 				});
 			}
 			else{
@@ -74,7 +94,8 @@ export class QueriesSelectMachine extends React.Component {
 		const state = this.state.state;
 		const infoSensores = this.state.infoSensores;
 		const errorLoading = this.state.errorLoading;
-        const machines = this.props.machines;
+        const machines = this.state.machines;
+		const selectedMachine = this.state.selectedMachine;
 
 		const cargando = (state === 'cargando' && !errorLoading)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
@@ -90,29 +111,33 @@ export class QueriesSelectMachine extends React.Component {
 				<p>Vuelva a cargar la página para intentar solucionarlo.</p>
 			</Card>);
 
-        const listaMaq = machines.map((value) => {
-            const altValue = 'Imagen de la máquina ' + value;
-            return(
-                <Col key={value} s={12} m={6} l={4}>
-                    <Card header={
-        					<img width="100%" alt={altValue}
-        						src={require('../../img/extrusora_con_sensores.PNG')}
-        					/>}
-                            actions={
-                                [<Button className="blue-text text-darken-3 btn-flat" onClick={() => {this.loadMachineInfo();}}>
-                                    Seleccionar máquina {value}
-                                </Button>]
-                            }>
-        				La máquina {value}.
-        			</Card>
-                </Col>
-            )
+		let listaMaq = [];
+
+        _.forEach(machines, (value, key) => {
+			// const id = value['id'];
+			const tipo = value['type'];
+            const altValue = 'Imagen de la máquina ' + key;
+            listaMaq.push(
+					<Col s={12} m={6} l={4}>
+	                    <Card header={
+	        					<img width="100%" alt={altValue}
+	        						src={require('../../img/' + tipo + '.png')}
+	        					/>}
+	                            actions={
+	                                [<Button className="blue darken-3" onClick={() => {this.loadMachineInfo(key);}}>
+	                                    Seleccionar
+	                                </Button>]
+	                            }>
+	        				La máquina {key}.
+	        			</Card>
+	                </Col>
+            );
         });
 
         const maq = (state === 'selecMaq') && (listaMaq);
 
         const showPreguntas = (state === 'showQueries') &&
-            (<SensorsInfo infoSensores={infoSensores}/>);
+            (<SensorsInfo infoSensores={infoSensores} infoMaquina={selectedMachine}/>);
 
 		return(
 			<div>

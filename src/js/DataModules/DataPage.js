@@ -12,6 +12,7 @@ const _ = require('lodash');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insertfile';
+const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
 
 const maxReqLength = 250000;
 

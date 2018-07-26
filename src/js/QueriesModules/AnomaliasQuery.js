@@ -7,7 +7,7 @@ import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
 // const infoSensores = require('../../infoSensores.json');
-const paresValores = require('../../paresValores.json');
+// const paresValores = require('../../paresValores.json');
 
 const parMotorId = '79PWN7';
 
@@ -25,8 +25,15 @@ export class AnomaliasQueryForm extends React.Component{
 				fechasMal:false,
 				faltaFecha: false,
 			},
-			// parMotorId: '79PWN7',
+			paresValores: [],
 		};
+	}
+
+	componentDidMount(){
+		const paresValores = require('../../paresValores.json');
+		this.setState({
+			paresValores: paresValores,
+		})
 	}
 
     static getDerivedStateFromProps(props, state){
@@ -122,6 +129,7 @@ export class AnomaliasQueryForm extends React.Component{
 
 	handleRadioChange(event, i){
 		// const value = event.target.value;
+		const paresValores = this.state.paresValores;
 		// alert("selected radio " + i);
 		const selectedRel = paresValores[i];
 		let sensorDir = {};
@@ -233,12 +241,17 @@ export class AnomaliasQueryForm extends React.Component{
 		this.props.getAnomaliasQuery(sensorDir, {'parMotorId':parMotorId, 'calParMotor': calParMotor}, filter);
 	}
 
+	addParesValores(newValues){
+		
+	}
+
 	render(){
         const sensorDir = this.state.sensorDir;
         const selectedSensors = this.props.selectedSensors;
 		// const parMotorId = this.state.parMotorId;
 		const relType = this.state.relType;
 		const errores = this.state.errores;
+		const paresValores = this.state.paresValores;
 
 		const select = (selectedSensors.length > 1)
 			? (<Input s={12} l={6} type='select' defaultValue='predef' onChange={(e) => {this.handleSelectChange(e);}}>

@@ -1,0 +1,31 @@
+{
+    "SemanticModule": {
+        "Organizations": {
+            "-L2PV1Ya30YR-SBlesmI": {
+                "1086_WWN_BGY3MW_3":{
+                    "type":"extrusora_4_zonas",
+                    "anomalies": [
+                        {"T4C3B9":"down", "84RATS":"down", "ParMotor":"down"},
+                        {"T4C3B9":"up", "84RATS":"up", "ParMotor":"up"},
+                        {"VMTKD6":"up", "84RATS":"down", "ParMotor":"down"},
+                        {"VMTKD6":"down", "84RATS":"up", "ParMotor":"up"}
+                    ]
+                },
+                "9847_XVA_P1XX9E_A": {
+                    "type":"extrusora_4_zonas",
+                    "anomalies": [
+                        {"T4C3B9":"down", "84RATS":"down", "ParMotor":"down"},
+                        {"T4C3B9":"up", "84RATS":"up", "ParMotor":"up"},
+                        {"VMTKD6":"up", "84RATS":"down", "ParMotor":"down"},
+                        {"VMTKD6":"down", "84RATS":"up", "ParMotor":"up"}
+                    ]
+                },
+                "2771_1FP_RS123X_8":{
+                    "type":"extrusora_5_zonas",
+                    "anomalies": [
+                    ]
+                }
+            }
+        }
+    }
+}
