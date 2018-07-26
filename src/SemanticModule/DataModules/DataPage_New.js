@@ -158,7 +158,7 @@ export class ParseData extends React.Component {
             ? (<div className="center">
                     <p> Insertando datos del fichero {fileName} en Virtuoso... </p>
                     <p> La operación puede tardar varios minutos. </p>
-                    <img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+                    <img className='loading' alt='Cargando' src={require('../img/loading_bars.gif')}/>
                 </div>)
             : (null);
 
@@ -206,7 +206,7 @@ export class ParseData extends React.Component {
 class ParsingFile extends React.Component {
 	render(){
 		return(
-			<img alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+			<img alt='Cargando' src={require('../img/loading_bars.gif')}/>
 		)
 	}
 }

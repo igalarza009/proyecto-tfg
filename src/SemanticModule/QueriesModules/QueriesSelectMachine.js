@@ -100,7 +100,7 @@ export class QueriesSelectMachine extends React.Component {
 		const cargando = (state === 'cargando' && !errorLoading)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
 				<img className='loading' alt='Cargando...'
-						src={require('../../img/loading_bars.gif')}
+						src={require('../img/loading_bars.gif')}
 					/>
 				</Card>)
 			: (null);
@@ -121,7 +121,7 @@ export class QueriesSelectMachine extends React.Component {
 					<Col s={12} m={6} l={4}>
 	                    <Card header={
 	        					<img width="100%" alt={altValue}
-	        						src={require('../../img/' + tipo + '.png')}
+	        						src={require('../img/' + tipo + '.png')}
 	        					/>}
 	                            actions={
 	                                [<Button className="blue darken-3" onClick={() => {this.loadMachineInfo(key);}}>

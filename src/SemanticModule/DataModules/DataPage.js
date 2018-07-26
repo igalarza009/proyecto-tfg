@@ -320,7 +320,7 @@ export class ParseData extends React.Component {
 		              	<span className="card-title blue-text text-darken-3">Anotando datos... </span>
 						<p> Anotación de datos del fichero <span className="bold">{fileName}</span> en curso. </p>
 						<p> Este proceso puede tardar varios minutos. </p>
-						<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+						<img className='loading' alt='Cargando' src={require('../img/loading_bars.gif')}/>
 					</div>
 				</div>)
 			: (null);
@@ -376,7 +376,7 @@ export class ParseData extends React.Component {
 			    	<span className="card-title blue-text text-darken-3">Insertando datos... </span>
 					<p> Insertando los datos del fichero <span className="bold">{fileName}</span> en el respositorio de datos. </p>
 					<p> La operación puede tardar varios minutos. </p>
-					<img className='loading' alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+					<img className='loading' alt='Cargando' src={require('../img/loading_bars.gif')}/>
 				</div>
 			</div>);
 
@@ -438,7 +438,7 @@ export class ParseData extends React.Component {
 class ParsingFile extends React.Component {
 	render(){
 		return(
-			<img alt='Cargando' src={require('../../img/loading_bars.gif')}/>
+			<img alt='Cargando' src={require('../img/loading_bars.gif')}/>
 		)
 	}
 }

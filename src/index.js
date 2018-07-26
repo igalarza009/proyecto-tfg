@@ -5,11 +5,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {ParseData} from './js/DataModules/DataPage.js'
-import {DataSelectMachine} from './js/DataModules/DataSelectMachine.js'
+import {ParseData} from './SemanticModule/DataModules/DataPage.js'
+import {DataSelectMachine} from './SemanticModule/DataModules/DataSelectMachine.js'
 import M from 'materialize-css';
-import {SensorsInfo} from './js/QueriesModules/QueriesPage.js'
-import {QueriesSelectMachine} from './js/QueriesModules/QueriesSelectMachine.js'
+import {SensorsInfo} from './SemanticModule/QueriesModules/QueriesPage.js'
+import {QueriesSelectMachine} from './SemanticModule/QueriesModules/QueriesSelectMachine.js'
 import axios from 'axios';
 import {Card, Button} from 'react-materialize'
 import $ from 'jquery';
@@ -104,7 +104,7 @@ class SelectedPage extends React.Component {
 			<li className="blue darken-3">
 				<div className="user-view">
 					<a href="#!user" className="margin-left">
-						<img className="circle margin-top" src={require('./img/user.png')} height="100%"/>
+						<img className="circle margin-top" src={require('./SemanticModule/img/user.png')} height="100%"/>
 					</a>
 					<a href="#!email" className='margin-top'>
 						<span className="white-text email">example@example.com</span>
