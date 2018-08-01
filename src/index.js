@@ -13,7 +13,7 @@ import {QueriesSelectMachine} from './SemanticModule/QueriesModules/QueriesSelec
 import axios from 'axios';
 import {Card, Button} from 'react-materialize'
 import $ from 'jquery';
-import {MainPage} from './main.js';
+// import {MainPage} from './main.js';
 
 // const machinesQueries = ['maquina1', 'maquina2', 'maquina3', 'maquina4'];
 // const machinesData = ['maquina1', 'maquina2'];
@@ -135,10 +135,10 @@ class SelectedPage extends React.Component {
 						{sideNav}
 					</nav>
 				</div>
-				<div className='container'>
+				{/* <div className='container'> */}
 					{queries}
 					{datos}
-				</div>
+				{/* </div> */}
 			</div>
 		)
 	}

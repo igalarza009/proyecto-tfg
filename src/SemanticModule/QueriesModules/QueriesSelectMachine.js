@@ -140,7 +140,7 @@ export class QueriesSelectMachine extends React.Component {
             (<SensorsInfo infoSensores={infoSensores} infoMaquina={selectedMachine}/>);
 
 		return(
-			<div>
+			<div className='container'>
 				<Row>
                     {maq}
                     {cargando}

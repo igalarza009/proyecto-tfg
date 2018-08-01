@@ -134,7 +134,7 @@ export class DataSelectMachine extends React.Component {
             (<ParseData infoSensores={infoSensores}/>);
 
 		return(
-			<div>
+			<div className='container'>
 				<Row>
                     {maq}
                     {cargando}
