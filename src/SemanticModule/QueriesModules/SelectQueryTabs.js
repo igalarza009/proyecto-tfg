@@ -90,6 +90,7 @@ export class PruebaTabsMat extends React.Component {
 			             selectedSensors={selectedSensors}
 						 getAnomaliasQuery={(s,p,f) => {this.props.getAnomaliasQuery(s,p,f);}}
 						 infoSensores={this.props.infoSensores}
+						 infoMaquina={this.props.infoMaquina}
 			         />
 					 {/* <Card >
 						 <Row>

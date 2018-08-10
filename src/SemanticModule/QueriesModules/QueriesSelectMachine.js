@@ -21,7 +21,9 @@ const virtuosoURL = 'http://localhost:8890/sparql';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 // const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
-const usedURL = virtuosoDebianUrl;
+const usedURL = virtuosoURL;
+
+const machineId = "1086_WWN_BGY3MW_3";
 
 export class QueriesSelectMachine extends React.Component {
 	constructor(props){
@@ -31,6 +33,7 @@ export class QueriesSelectMachine extends React.Component {
 			infoSensores: [],
 			state: 'selecMaq',
 			errorLoading: false,
+			noMachineInfo: false,
 			machines: {},
 			selectedMachine: null,
 			// infoOrganizacion: {}
@@ -39,9 +42,11 @@ export class QueriesSelectMachine extends React.Component {
 
 	componentDidMount(){
 		const idOrg = this.props.idOrganization;
+
+		// ------------------Cambiar esta parte al hacer la unión con I4TSPS ------------------
 		const infoGeneral = require('../../semanticModule.json');
 		const maquinas = infoGeneral['SemanticModule']['Organizations'][idOrg];
-		// let maquinas = [];
+		// ------------------------------------------------------------------------------------
 
 		this.setState({
 			// infoOrganizacion: orgActual,
@@ -56,38 +61,54 @@ export class QueriesSelectMachine extends React.Component {
 		const machines = this.state.machines;
 		const machineInfo = machines[id];
 
-        let query = Queries.getInfoSensoresQuery();
+		if (id === machineId){
+			let query = Queries.getInfoSensoresQuery();
 
-		const querystring = require('querystring');
-		console.log('Realizamos la consulta de información a Virtuoso');
-		axios.post(usedURL,
-			querystring.stringify({'query': query})
-		)
-		.then((response) => {
-			console.log(response);
-			let results = response.data["results"]["bindings"];
-			if (results.length > 0) {
-				let infoSensores = DataFunctions.getInfoSensores(results);
-				this.setState({
-					infoSensores: infoSensores,
-					state: 'showQueries',
-					errorLoading: false,
-					selectedMachine: machineInfo,
-				});
-			}
-			else{
+			const querystring = require('querystring');
+			console.log('Realizamos la consulta de información a Virtuoso');
+			axios.post(usedURL,
+				querystring.stringify({'query': query})
+			)
+			.then((response) => {
+				console.log(response);
+				let results = response.data["results"]["bindings"];
+				if (results.length > 0) {
+					let infoSensores = DataFunctions.getInfoSensores(results);
+					this.setState({
+						infoSensores: infoSensores,
+						state: 'showQueries',
+						errorLoading: false,
+						selectedMachine: machineInfo,
+					});
+				}
+				else{
+					this.setState({
+						errorLoading: true,
+					});
+				}
+
+			})
+			.catch((error) => {
+				console.log(error);
 				this.setState({
 					errorLoading: true,
 				});
-			}
-
-		})
-		.catch((error) => {
-			console.log(error);
-			this.setState({
-				errorLoading: true,
 			});
-		});
+		}
+		else{
+			this.setState({
+				noMachineInfo: true,
+			})
+		}
+
+	}
+
+	selectNewMachine(){
+		this.setState({
+			state: 'selecMaq',
+			errorLoading: false,
+			noMachineInfo: false,
+		})
 	}
 
 	render(){
@@ -96,8 +117,9 @@ export class QueriesSelectMachine extends React.Component {
 		const errorLoading = this.state.errorLoading;
         const machines = this.state.machines;
 		const selectedMachine = this.state.selectedMachine;
+		const noMachineInfo = this.state.noMachineInfo;
 
-		const cargando = (state === 'cargando' && !errorLoading)
+		const cargando = (state === 'cargando' && !errorLoading && !noMachineInfo)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
 				<img className='loading' alt='Cargando...'
 						src={require('../img/loading_bars.gif')}
@@ -111,6 +133,18 @@ export class QueriesSelectMachine extends React.Component {
 				<p>Vuelva a cargar la página para intentar solucionarlo.</p>
 			</Card>);
 
+		const noMachineError = (state === 'cargando' && noMachineInfo) &&
+			(<Card s={12} l={8} offset='l2'
+				title="Información no disponible"
+				className='center'
+				actions={
+					<Button className="blue darken-3"
+						onClick={() => {this.selectNewMachine();}}>
+						Elegir otra máquina
+					</Button>}>
+				<p>Actualmente no hay información disponible sobre la máquina seleccionada.</p>
+			</Card>);
+
 		let listaMaq = [];
 
         _.forEach(machines, (value, key) => {
@@ -118,19 +152,12 @@ export class QueriesSelectMachine extends React.Component {
 			const tipo = value['type'];
             const altValue = 'Imagen de la máquina ' + key;
             listaMaq.push(
-					<Col s={12} m={6} l={4}>
-	                    <Card header={
-	        					<img width="100%" alt={altValue}
-	        						src={require('../img/' + tipo + '.png')}
-	        					/>}
-	                            actions={
-	                                [<Button className="blue darken-3" onClick={() => {this.loadMachineInfo(key);}}>
-	                                    Seleccionar
-	                                </Button>]
-	                            }>
-	        				La máquina {key}.
-	        			</Card>
-	                </Col>
+					<div className="col s12 m6 l4">
+						<Card className="center machine_card_consult pointer"  onClick={() => {this.loadMachineInfo(key);}}
+							header={<img width="100%" alt={altValue} src={require('../img/' + tipo + '.png')}/>}>
+		        			La máquina <span className='bold'> {key} </span>.
+		        		</Card>
+	                </div>
             );
         });
 
@@ -141,12 +168,13 @@ export class QueriesSelectMachine extends React.Component {
 
 		return(
 			<div className='container'>
-				<Row>
+				<div className="row">
                     {maq}
                     {cargando}
                     {cardError}
+					{noMachineError}
                     {showPreguntas}
-                </Row>
+                </div>
 			</div>
 		)
 	}

@@ -5,10 +5,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {ParseData} from './SemanticModule/DataModules/DataPage.js'
+// import {ParseData} from './SemanticModule/DataModules/DataPage_New.js'
 import {DataSelectMachine} from './SemanticModule/DataModules/DataSelectMachine.js'
 import M from 'materialize-css';
-import {SensorsInfo} from './SemanticModule/QueriesModules/QueriesPage.js'
+// import {SensorsInfo} from './SemanticModule/QueriesModules/QueriesPage.js'
 import {QueriesSelectMachine} from './SemanticModule/QueriesModules/QueriesSelectMachine.js'
 import axios from 'axios';
 import {Card, Button} from 'react-materialize'
@@ -19,6 +19,75 @@ import $ from 'jquery';
 // const machinesData = ['maquina1', 'maquina2'];
 
 const idOrg = '-L2PV1Ya30YR-SBlesmI';
+
+// class Welcome1 extends React.Component{
+//     render(){
+//         return <h1>Hello {this.props.name}!</h1>
+//     }
+// }
+//
+// class Welcome2 extends React.Component{
+//     constructor(props){
+// 		super(props)
+// 		this.state = {
+// 			helloGreeting: true,
+// 		}
+// 	}
+//
+//     changeGreeting(){
+//         let helloGreeting = this.state.helloGreeting;
+//         this.setState({
+//             helloGreeting: !helloGreeting,
+//         })
+//     }
+//
+//     render(){
+//         const helloGreeting = this.state.helloGreeting
+//         const greeting = (helloGreeting) ? 'Hello' : 'Goodbye'
+//
+//         return (
+//             <div className='greetings'>
+//                 <h1>{greeting} {this.props.name}!</h1>
+//                 <button onClick={() => {this.changeGreeting();}}>
+//                     Change greeting
+//                 </button>
+//             </div>
+//         )
+//     }
+// }
+
+
+// class Form extends React.Component {
+// 	constructor(props) {
+//     	super(props);
+//     	this.state = {
+//         	nameValue: '',
+//     	};
+//   	}
+//
+//   	handleNameChange(event) {
+//     	this.setState({
+//         	nameValue: event.target.value
+//     	});
+//   	}
+//
+//   	handleSubmit(event) {
+// 		alert('The form was submitted!! Name: ' + this.state.nameValue);
+// 		event.preventDefault();
+//   	}
+//
+//   	render() {
+// 		return (
+// 			<form onSubmit={(e) => {this.handleSubmit(e);}} className="container margin-top">
+// 				Name:
+// 				<input type="text"
+// 					onChange={(e) => {this.handleNameChange(e);}} />
+//
+// 			  	<input type="submit" value="Submit" />
+// 			</form>
+//     	);
+//   	}
+// }
 
 class SelectedPage extends React.Component {
 	constructor(props){
@@ -119,13 +188,13 @@ class SelectedPage extends React.Component {
 			</li>
 			<li>
 				<a href="#" className={traductorClass} onClick={() => this.mostrarTraductorDatos()}>
-					<i className="material-icons yellow-text text-darken-3">publish</i>
+					<i className="material-icons green-text text-darken-3">publish</i>
 					Insertar datos
 				</a>
 			</li>
 		</ul>);
 
-		const navColor = (preguntasSelected) ? ('pink darken-3') : ('yellow darken-3')
+		const navColor = (preguntasSelected) ? ('pink darken-3') : ('green darken-3')
 
 		return(
 			<div>

@@ -25,16 +25,17 @@ export class AnomaliasQueryForm extends React.Component{
 				fechasMal:false,
 				faltaFecha: false,
 			},
-			paresValores: [],
+			paresValores: this.props.infoMaquina['anomalies'],
 		};
 	}
 
-	componentDidMount(){
-		const paresValores = require('../../paresValores.json');
-		this.setState({
-			paresValores: paresValores,
-		})
-	}
+	// componentDidMount(){
+	// 	console.log(this.props.infoMaquina);
+	// 	// const paresValores = require('../../paresValores.json');
+	// 	this.setState({
+	// 		paresValores: this.props.infoMaquina,
+	// 	})
+	// }
 
     static getDerivedStateFromProps(props, state){
 		if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
@@ -73,6 +74,18 @@ export class AnomaliasQueryForm extends React.Component{
 			return null;
 		}
     }
+
+	// function anomalieInPredef(){
+	// 	const paresValores = this.state.paresValores;
+	// 	let sensorDir = this.state.sensorDir;
+	// 	let result = _.find(paresValores, sensorDir);
+	// 	if (result !== undefined){
+	// 		return true
+	// 	}
+	// 	else{
+	// 		return false
+	// 	}
+	// }
 
 	resetValues(){
 		let sensorDir = {};
@@ -241,8 +254,17 @@ export class AnomaliasQueryForm extends React.Component{
 		this.props.getAnomaliasQuery(sensorDir, {'parMotorId':parMotorId, 'calParMotor': calParMotor}, filter);
 	}
 
-	addParesValores(newValues){
-		
+	addSelectedAnomalie(){
+		const sensorDir = this.state.sensorDir;
+		let newParesValores = this.state.paresValores;
+
+		newParesValores.push(sensorDir);
+
+		// ------------ Añadir aquí el guardado de la relación en Firebase ------------
+
+		this.setState({
+			paresValores: newParesValores,
+		})
 	}
 
 	render(){
@@ -342,6 +364,25 @@ export class AnomaliasQueryForm extends React.Component{
 			);
 		});
 
+		const addAnomalieToPredef = (_.find(paresValores, sensorDir) !== undefined)
+			? (<div className="col s12">
+					<Button floating disabled>
+						<Icon>done</Icon>
+					</Button>
+					<span className='grey-text italic margin-left'>
+						Anomalía definida como predefinida.
+					</span>
+				</div>)
+			: (<div className="col s12">
+					<Button floating className='green darken-3'
+						onClick={() => {this.addSelectedAnomalie();}}>
+						<Icon>add</Icon>
+					</Button>
+					<span className='green-text text-darken-3 margin-left'>
+						Añadir anomalía como predefinida.
+					</span>
+				</div>);
+
 		const selectedRelType = (relType === 'custom')
 			? (<div>
 					<Row>
@@ -350,6 +391,9 @@ export class AnomaliasQueryForm extends React.Component{
 						</p>
 					</Row>
 					{sensores}
+					<div className="row">
+						{addAnomalieToPredef}
+					</div>
 				</div>)
 			: (<div>
 					<Row>

@@ -2,6 +2,18 @@
 
  /*----------- CLASES VARIADAS -------------*/
 
+ .machine_card_consult:hover{
+     border: 5px solid #ec407a;
+ }
+
+ .machine_card_insert:hover{
+     border: 5px solid #66bb6a;
+ }
+
+.italic{
+    font-style: italic;
+}
+
 .img-maq{
     width: 100%;
 }

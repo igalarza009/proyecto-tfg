@@ -42,7 +42,7 @@ export class ParseData extends React.Component {
 			uploadingFile: false,
 			error: "",
 			showLeyenda: false,
-			showInformation: false,
+			// showInformation: false,
 	    }
  	}
 
@@ -224,7 +224,7 @@ export class ParseData extends React.Component {
 
 	render(){
 		const parsingFile = this.state.parsingFile;
-		const noSensor = this.state.noSensor;
+		// const noSensor = this.state.noSensor;
 		const uploadingFile = this.state.uploadingFile;
 		const fileUploaded = this.state.fileUploaded;
 		const selectFile = this.state.selectFile;

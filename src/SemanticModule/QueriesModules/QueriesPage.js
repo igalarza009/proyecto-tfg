@@ -18,7 +18,7 @@ const querystring = require('querystring');
 const virtuosoURL = 'http://localhost:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
-const usedURL = virtuosoDebianUrl;
+const usedURL = virtuosoURL;
 
 const lineChartName = 'Line';
 const barChartName = 'Bar';
@@ -56,10 +56,6 @@ export class SensorsInfo extends React.Component {
 			queryType: '',
 			queryInfor: {}
 		};
-	}
-
-	componentDidMount(){
-
 	}
 
 	toggleSelectedSensor(sensor){
@@ -728,6 +724,7 @@ export class SensorsInfo extends React.Component {
 		          	getOtherSensorQuery={(k,a,v,f) => {this.getOtherSensorQuery(k,a,v,f);}}
 					getAnomaliasQuery={(s,p,f) => {this.getAnomaliasQuery(s,p,f);}}
 					infoSensores={this.props.infoSensores}
+					infoMaquina={this.props.infoMaquina}
 		        />)
 			: (null);
 
