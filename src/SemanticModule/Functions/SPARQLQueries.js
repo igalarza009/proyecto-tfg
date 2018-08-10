@@ -345,11 +345,20 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 	return finalQuery;
 }
 
-export function getInsertQuery(prefixes, dataToInsert){
+export function getInsertQueryDebian(prefixes, dataToInsert){
 	let query = prefixes;
 	query += ' insert into graph ' + graphURI + ' { ';
 	query += dataToInsert;
 	query += ' } ';
+
+	return query;
+}
+
+export function getInsertQueryLocal(prefixes, dataToInsert){
+	let query = prefixes;
+	query += ' insert data { graph ' + graphURI + ' { ';
+	query += dataToInsert;
+	query += ' } } ';
 
 	return query;
 }

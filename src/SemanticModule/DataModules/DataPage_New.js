@@ -17,7 +17,7 @@ const _ = require('lodash');
 const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 const virtuosoUrl =  'http://localhost:8890/sparql/';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
-const usedURL = virtuosoDebianUrl;
+const usedURL = virtuosoUrl;
 
 const maxReqLength = 250000;
 
@@ -128,6 +128,7 @@ export class ParseData extends React.Component {
 			}
 		})
 		.catch((error) => {
+			alert("Ha ocurrido un error. Mirar en la consola para más información.");
 			console.log(error);
 		});
 	}
@@ -147,25 +148,19 @@ export class ParseData extends React.Component {
 
 		console.log("Tiempo inicio " + Date.now());
 		this.insertDataRecursive(i, cont, parsedValues, parsedTimestamps, infoForParsing['virtPrefixes'], infoForParsing['sensorName'], infoForParsing['observationType'], infoForParsing['valueType'], dataToInsert);
-
-		// var file = Parser.parseDataToRDF_Sin(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
-        // console.log("TTL file created");
-        // this.setState({
-        //     // file: file,
-        //     dataInserted: true,
-        //     insertingData: false,
-        // });
 	}
 
 	insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert){
-		Parser.parseDataRecursive(index, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+		dataToInsert += Parser.parseDataRecursive(index, values, timestamps, prefixes, sensorName, observationType, valueType);
 
 		index++;
 		cont++;
 
 		if(index < values.length){
 			if (cont === 160){
-				var query = Queries.getInsertQuery(prefixes, dataToInsert);
+				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert);
+				// console.log(query);
+				// console.log(usedURL + encodeURIComponent(query));
 				axios.post(usedURL,
 					querystring.stringify({'query': query})
 				)
@@ -186,8 +181,7 @@ export class ParseData extends React.Component {
 		else{
 			if (cont > 0) {
 				console.log('Ultima petición');
-				var query = Queries.getInsertQuery(prefixes, dataToInsert);
-				console.log(query);
+				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert);
 				axios.post(usedURL,
 					querystring.stringify({'query': query})
 				)
@@ -342,7 +336,7 @@ export class ParseData extends React.Component {
 				  <a href='#' className="margin-left-data blue-text text-darken-3 valign-wrapper"
 					  onClick={() => this.handleInsertData()}>
 					  <Icon className='blue-text text-darken-3'>play_circle_filled</Icon>
-					  Comenzar con la isnerción de datos.
+					  <span className="margin-left"> Comenzar con la inserción de datos. </span>
 				  </a>
 			  </Row>
             </div>
