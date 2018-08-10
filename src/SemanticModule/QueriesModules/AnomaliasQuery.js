@@ -26,6 +26,7 @@ export class AnomaliasQueryForm extends React.Component{
 				faltaFecha: false,
 			},
 			paresValores: this.props.infoMaquina['anomalies'],
+			relSelected: -1,
 		};
 	}
 
@@ -61,7 +62,7 @@ export class AnomaliasQueryForm extends React.Component{
 		        return {
 		            sensorDir: newSensorDir,
 					selectedSensors: props.selectedSensors,
-					relType: relType
+					relType: relType,
 		        };
 			}
 			else{
@@ -75,18 +76,6 @@ export class AnomaliasQueryForm extends React.Component{
 		}
     }
 
-	// function anomalieInPredef(){
-	// 	const paresValores = this.state.paresValores;
-	// 	let sensorDir = this.state.sensorDir;
-	// 	let result = _.find(paresValores, sensorDir);
-	// 	if (result !== undefined){
-	// 		return true
-	// 	}
-	// 	else{
-	// 		return false
-	// 	}
-	// }
-
 	resetValues(){
 		let sensorDir = {};
 		this.state.selectedSensors.forEach((sensorId) => {
@@ -99,6 +88,7 @@ export class AnomaliasQueryForm extends React.Component{
         this.setState({
             sensorDir: sensorDir,
 			calParMotor: false,
+			relSelected: -1,
         });
 	}
 
@@ -159,6 +149,7 @@ export class AnomaliasQueryForm extends React.Component{
 
 		this.setState({
 			sensorDir: sensorDir,
+			relSelected: i,
 			calParMotor: calParMotor,
 		});
 
@@ -267,6 +258,35 @@ export class AnomaliasQueryForm extends React.Component{
 		})
 	}
 
+	removeSelectedAnomalie(){
+		const sensorDir = this.state.sensorDir;
+		let paresValores = this.state.paresValores;
+		const calParMotor = this.state.calParMotor;
+
+		let newSensorDir = {};
+		if (calParMotor && sensorDir[parMotorId]){
+			_.forEach(sensorDir, (value, key) =>{
+				if (key !== parMotorId){
+					newSensorDir[key] = value;
+				}
+				else{
+					newSensorDir['ParMotor'] = value;
+				}
+			});
+		}
+		else{
+			newSensorDir = sensorDir;
+		}
+
+		let newParesValores = _.reject(paresValores, newSensorDir);
+
+		// ------------ Añadir aquí el eliminado de la relación en Firebase ------------
+
+		this.setState({
+			paresValores: newParesValores,
+		})
+	}
+
 	render(){
         const sensorDir = this.state.sensorDir;
         const selectedSensors = this.props.selectedSensors;
@@ -274,6 +294,7 @@ export class AnomaliasQueryForm extends React.Component{
 		const relType = this.state.relType;
 		const errores = this.state.errores;
 		const paresValores = this.state.paresValores;
+		const relSelected = this.state.relSelected;
 
 		const select = (selectedSensors.length > 1)
 			? (<Input s={12} l={6} type='select' defaultValue='predef' onChange={(e) => {this.handleSelectChange(e);}}>
@@ -351,16 +372,33 @@ export class AnomaliasQueryForm extends React.Component{
 				);
 			});
 			const id = "sensorRel" + iRel;
-			// const checked = (iRel === 0)
-			// 	? (true)
-			// 	: (false);
+			const buttonDisabled = (iRel === relSelected)
+				? (false)
+				: (true);
+			// const buttonClass = (iRel === relSelected)
+			// 	? ("")
+			// 	: ("red darken-3");
+			const textClass = (iRel === relSelected)
+				? ("grey-text text-darken-3 margin-left")
+				: ("grey-text margin-left");
 			return(
-				<Col s={12} key={id} className="margin-bottom">
-					<input name="predefRel" className="with-gap" type="radio" id={id} onChange={(e) => {this.handleRadioChange(e,iRel);}}/>
-					<label htmlFor={id} className="valign-wrapper">
-						{sensorRels}
-					</label>
-				</Col>
+				<Row key={id}>
+					<Col s={6} m={12} l={6} className="margin-bottom">
+						<input name="predefRel" className="with-gap" type="radio" id={id} onChange={(e) => {this.handleRadioChange(e,iRel);}}/>
+						<label htmlFor={id} className="valign-wrapper">
+							{sensorRels}
+						</label>
+					</Col>
+					<Col s={6} m={12} l={6}>
+						<Button floating className="grey darken-2" disabled={buttonDisabled}
+							onClick={() => {this.removeSelectedAnomalie();}}>
+							<Icon>remove</Icon>
+						</Button>
+						<span className={textClass}>
+							Eliminar
+						</span>
+					</Col>
+				</Row>
 			);
 		});
 
