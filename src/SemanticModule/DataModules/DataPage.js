@@ -343,7 +343,7 @@ export class ParseData extends React.Component {
 			    	<span className="card-title blue-text text-darken-3">Insertando datos... </span>
 					{loadingMessage}
 					<p> La operación puede tardar varios minutos. </p>
-					<img className='loading' alt='Cargando' src={require(imgPath + 'loading_bars.gif')}/>
+					<img className='loading' alt='Cargando' src={`${imgPath}loading_bars.gif`}/>
 				</div>
 			</div>);
 
@@ -397,7 +397,7 @@ export class ParseData extends React.Component {
 class ParsingFile extends React.Component {
 	render(){
 		return(
-			<img alt='Cargando' src={require(imgPath + 'loading_bars.gif')}/>
+			<img alt='Cargando' src={`${imgPath}loading_bars.gif`}/>
 		)
 	}
 }

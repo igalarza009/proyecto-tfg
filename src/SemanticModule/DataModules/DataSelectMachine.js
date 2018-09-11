@@ -137,8 +137,8 @@ export class DataSelectMachine extends React.Component {
 		const cargando = (state === 'cargando' && !errorLoading && !noMachineInfo)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
 				<img className='loading' alt='Cargando...'
-						src={require(imgPath + 'loading_bars.gif')}
-					/>
+					src={`${imgPath}loading_bars.gif`}
+				/>
 				</Card>)
 			: (null);
 
