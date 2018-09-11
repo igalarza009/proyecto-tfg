@@ -13,7 +13,9 @@ import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
 
+// ----------- CAMBIAR EN LA UNIÓN CON I4TSPS ---------
 const imgPath = './img/';
+// ----------------------------------------------------
 
 const querystring = require('querystring');
 const _ = require('lodash');

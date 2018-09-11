@@ -13,7 +13,9 @@ import {Card, Button, Row, Col} from 'react-materialize'
 import * as DataFunctions from '../Functions/DataFunctions.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
 
+// ----------- CAMBIAR EN LA UNIÓN CON I4TSPS ---------
 const imgPath = './img/';
+// ----------------------------------------------------
 
 const _ = require('lodash');
 

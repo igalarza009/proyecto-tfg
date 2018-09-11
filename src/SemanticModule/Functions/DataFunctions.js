@@ -74,12 +74,15 @@ export function getFormInfo(info){
 // Tratar la respuesta de Virtuoso.
 // ----------
 // Estructura Objeto JSON parámtero:
-// 	sensorResponse: ....
-// 	selectedValues: ...
-// selectedDateTime: ...
-// sensorId: ...
-// info: ...
-// infoSensores: ...
+// 	sensorResponse: Collection (respuesta de Virtuoso)
+// 	selectedValues: Array (valores SPARL seleccionados)
+//  selectedDateTime: String
+//  sensorId: String
+//  info: Collection
+// 		sensors: Array (sensores seleccionados),
+// 		type: 'infor' / 'otro' / 'anom',
+// 		parMotor: Collection
+//  infoSensores: Collection (información sobre los sensores)
 // ----------
 export function parseResponseData(sensorResponse, selectedValues, selectedDateTime, sensorId, info, infoSensores){
 
@@ -100,10 +103,13 @@ export function parseResponseData(sensorResponse, selectedValues, selectedDateTi
 // Preparar los datos para introducirlos en las gráficas de Google.
 // ----------
 // Estructura Objeto JSON parámtero:
-// 	sensorValues: ....
-// 	sensorDatetimes: ...
-// 	infoQuery: ...
-//  infoSensores: ...
+// 	sensorValues: Array
+// 	sensorDatetimes: Array
+// 	infoQuery: Collection
+// 		sensors: Array (sensores seleccionados),
+// 		type: 'infor' / 'otro' / 'anom',
+// 		parMotor: Collection
+//  infoSensores: Collection (información sobre los sensores)
 // ----------
 export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedSensors, infoQuery, infoSensores){
     let allChartData = [];
@@ -278,11 +284,13 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 // Buscar anomalías en los valores de los sensores.
 // ----------
 // Estructura Objeto JSON parámtero:
-// 	selectedSensors: ....
-// 	sensorDir: ...
-// 	sensorValues: ...
-//  sensorDatetimes: ...
-//  parMotor: ...
+// 	selectedSensors: Array (sensores seleccionados)
+// 	sensorDir: Collection
+// 		'sensor_id': 'Up'/'Down'/'On'/'Off'
+// 		[...]
+// 	sensorValues: Array
+//  sensorDatetimes: Array
+//  parMotor: Collection
 // ----------
 export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sensorDatetimes, parMotor){
 	let anomDatetimes = [];

@@ -14,7 +14,10 @@ import {Button} from 'react-materialize'
 import $ from 'jquery';
 
 const idOrg = '-L2PV1Ya30YR-SBlesmI';
+
+// ----------- CAMBIAR EN LA UNIÓN CON I4TSPS ---------
 const imgPath = './img/';
+// ----------------------------------------------------
 
 class SelectedPage extends React.Component {
 	constructor(props){

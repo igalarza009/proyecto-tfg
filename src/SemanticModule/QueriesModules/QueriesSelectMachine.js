@@ -16,11 +16,13 @@ import * as Queries from '../Functions/SPARQLQueries.js';
 
 const _ = require('lodash');
 
+// ----------- CAMBIAR EN LA UNIÓN CON I4TSPS ---------
 const imgPath = './img/';
+// ----------------------------------------------------
 
-const virtuosoURL = 'http://localhost:8890/sparql';
-const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
-const usedURL = virtuosoURL;
+const virtuosoLocalURL = 'http://localhost:8890/sparql';
+const virtuosoDebianURL = 'http://35.237.115.247:8890/sparql';
+const usedURL = virtuosoLocalURL;
 
 // const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";

@@ -15,7 +15,9 @@ import {GoogleChart} from './GoogleChart.js'
 import {PruebaTabsMat} from './SelectQueryTabs.js'
 import * as DataFunctions from '../Functions/DataFunctions.js'
 
+// ----------- CAMBIAR EN LA UNIÓN CON I4TSPS ---------
 const imgPath = './img/';
+// ----------------------------------------------------
 
 const _ = require('lodash');
 const querystring = require('querystring');
