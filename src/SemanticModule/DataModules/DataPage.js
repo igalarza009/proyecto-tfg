@@ -11,29 +11,12 @@ import Papa from 'papaparse';
 import M from 'materialize-css';
 import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
-// import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
-// import * as Virtuoso from '../Functions/VirtuosoCalls.js';
 import * as Queries from '../Functions/SPARQLQueries.js';
 
 const querystring = require('querystring');
 const _ = require('lodash');
 
-// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
-// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
-
-const virtuosoUrl =  'http://localhost:8890/sparql/';
-const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
-const usedURL = virtuosoUrl;
-
 const maxReqLength = 250000;
-
-const turtlePrefixes = "@prefix : " + graphURI + " . " +
-					"@prefix owl: <http://www.w3.org/2002/07/owl#> . " +
-					"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . " +
-					"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . " +
-					"@prefix sosa: <http://www.w3.org/ns/sosa/> . " +
-					"@base " + graphURI + " . ";
 
 export class ParseData extends React.Component {
 	constructor(props) {
@@ -143,7 +126,7 @@ export class ParseData extends React.Component {
 			insertState: 'insertingData',
 		})
 
-		let infoForParsing = Parser.getInfoToParseData(fileName, this.props.infoSensores);
+		let infoForParsing = Parser.getInfoToParseData(fileName, this.props.infoSensores, this.props.graphURI);
 
 		let dataToInsert = '';
 		let cont = 0;
@@ -161,8 +144,13 @@ export class ParseData extends React.Component {
 
 		if(index < values.length){
 			if (cont === 160){
-				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert);
-				axios.post(usedURL,
+				// -------------------- CAMBIAR PARA LA UNIÓN DE I4TSPS --------------------
+				// Comentar esto:
+				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
+				// Descomentar esto:
+				// var query = Queries.getInsertQueryDebian(prefixes, dataToInsert, this.props.graphURI);
+				// -------------------------------------------------------------------------
+				axios.post(this.props.usedURL,
 					querystring.stringify({'query': query})
 				)
 				.then((response) => {
@@ -181,8 +169,15 @@ export class ParseData extends React.Component {
 		else{
 			if (cont > 0) {
 				console.log('Ultima petición');
-				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert);
-				axios.post(usedURL,
+
+				// -------------------- CAMBIAR PARA LA UNIÓN DE I4TSPS --------------------
+				// Comentar esto:
+				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
+				// Descomentar esto:
+				// var query = Queries.getInsertQueryDebian(prefixes, dataToInsert, this.props.graphURI);
+				// -------------------------------------------------------------------------
+
+				axios.post(this.props.usedURL,
 					querystring.stringify({'query': query})
 				)
 				.then((response) => {
@@ -225,6 +220,16 @@ export class ParseData extends React.Component {
 	            window.URL.revokeObjectURL(url);
 	        }, 0);
 	    }
+	}
+
+	getTurtlePrefixes(){
+		const turtlePrefixes = "@prefix : " + this.props.graphURI + " . " +
+							"@prefix owl: <http://www.w3.org/2002/07/owl#> . " +
+							"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . " +
+							"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . " +
+							"@prefix sosa: <http://www.w3.org/ns/sosa/> . " +
+							"@base " + this.props.graphURI + " . ";
+		return turtlePrefixes;
 	}
 
 	hanldeNewFile(){

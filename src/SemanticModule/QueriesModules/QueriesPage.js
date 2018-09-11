@@ -19,11 +19,6 @@ import {Chart} from 'react-google-charts';
 const _ = require('lodash');
 const querystring = require('querystring');
 
-const virtuosoURL = 'http://localhost:8890/sparql';
-const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
-const usedURL = virtuosoURL;
-
 const lineChartName = 'Line';
 const barChartName = 'Bar';
 const scatterChartName = 'Scatter';
@@ -209,10 +204,11 @@ export class SensorsInfo extends React.Component {
 						groupBy,
 						filter,
 						filterValues,
-						orderBy
+						orderBy,
+						this.props.graphURI
 					);
 		console.log(query);
-		axios.post(usedURL,
+		axios.post(this.props.usedURL,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
@@ -305,10 +301,11 @@ export class SensorsInfo extends React.Component {
 						askedSensors[nResponses],
 						filterValues,
 						filter,
-						orderBy
+						orderBy,
+						this.props.graphURI
 					);
 		console.log(query);
-		axios.post(usedURL,
+		axios.post(this.props.usedURL,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
@@ -401,9 +398,10 @@ export class SensorsInfo extends React.Component {
 						{},
 						filter,
 						{},
-						orderBy
+						orderBy,
+						this.props.graphURI
 					);
-		axios.post(usedURL,
+		axios.post(this.props.usedURL,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {

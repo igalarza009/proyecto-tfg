@@ -3,13 +3,6 @@
 // Funciones de creación de preguntas SPARQL.
 // --------------------------------------------------------------
 
-// const graphURI = '<http://www.sensores.com/ontology/prueba04/extrusoras#>';
-// const graphURI = '<http://www.sensores.com/ontology/prueba08/extrusoras#>';
-// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-// const graphURI = '<http://www.sensores.com/ontology/pruebas_fixed/extrusoras#>';
-// const graphURI = "<http://www.sensores.com/ontology/nuevo_02/extrusoras#>";
-const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
-
 var _ = require('lodash');
 
  // ------------------- FUNCIÓN "getInformationQueryIndividual" -------------------
@@ -41,12 +34,9 @@ var _ = require('lodash');
  // 		- orderBy['orderBy']: true or false
  // 		- orderBy['order']: 'desc' or 'asc'
  // 		- orderBy['orderField']: 'value', 'dateTime', 'date', 'sensorId'
- // 	split: Collection
- // 		- split['firstSegment']: true or false
- // 		- split['lastTimestamp']: STRING (timestamp)
- // 		- split['limit']: Integer
+ // 	graphURI: URI del grafo a consultar
  // -----------
-export function getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy){
+export function getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy, graphURI){
 
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
@@ -134,8 +124,9 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 // 		- orderBy['orderBy']: true or false
 // 		- orderBy['order']: 'desc' or 'asc'
 // 		- orderBy['orderField']: 'value', 'dateTime', 'date', 'sensorId'
+// 	graphURI: URI del grafo a consultar
 // ----------
-export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filterValues, filter, orderBy){
+export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filterValues, filter, orderBy, graphURI){
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
 		'prefix sosa: <http://www.w3.org/ns/sosa/> '+
@@ -216,7 +207,7 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 // ------------------- FUNCIÓN "getInsertQueryDebian" -------------------
 // Sentencia INSERT para Virtuoso en Debian.
 // -----------
-export function getInsertQueryDebian(prefixes, dataToInsert){
+export function getInsertQueryDebian(prefixes, dataToInsert, graphURI){
 	let query = prefixes;
 	query += ' insert into graph ' + graphURI + ' { ';
 	query += dataToInsert;
@@ -228,7 +219,7 @@ export function getInsertQueryDebian(prefixes, dataToInsert){
 // ------------------- FUNCIÓN "getInsertQueryLocal" -------------------
 // Sentencia INSERT para Virtuoso en local.
 // -----------
-export function getInsertQueryLocal(prefixes, dataToInsert){
+export function getInsertQueryLocal(prefixes, dataToInsert, graphURI){
 	let query = prefixes;
 	query += ' insert data { graph ' + graphURI + ' { ';
 	query += dataToInsert;
@@ -240,7 +231,7 @@ export function getInsertQueryLocal(prefixes, dataToInsert){
 // ------------------- FUNCIÓN "getInfoSensores" -------------------
 // Consulta de la información de los sensores de la máquina Extrusora de Cuatro Zonas.
 // -----------
-export function getInfoSensoresQuery(){
+export function getInfoSensoresQuery(graphURI){
 	let query = 'prefix : ' + graphURI + ' ' +
 			'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
 			'prefix sosa: <http://www.w3.org/ns/sosa/> ' +

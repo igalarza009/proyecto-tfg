@@ -5,10 +5,6 @@
 
 const _ = require('lodash');
 
-// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
-// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
-
 // ------------------- FUNCIÓN "getInfoToParseData" -------------------
 // Obtener información previa necesaria para la transformación a RDF.
 // ----------
@@ -16,7 +12,7 @@ const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 // 	filename: Nombre del archivo
 // 	infoSensores: Collection
 // ----------
-export function getInfoToParseData(filename, infoSensores){
+export function getInfoToParseData(filename, infoSensores, graphURI){
 	const virtPrefixes = "prefix : " + graphURI + " " +
 						"prefix owl: <http://www.w3.org/2002/07/owl#> " +
 						"prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +

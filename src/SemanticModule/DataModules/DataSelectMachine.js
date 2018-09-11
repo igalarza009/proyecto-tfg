@@ -20,6 +20,10 @@ const virtuosoURL = 'http://localhost:8890/sparql';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890//sparql';
 const usedURL = virtuosoURL;
 
+// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
+
 const machineId = "1086_WWN_BGY3MW_3";
 
 export class DataSelectMachine extends React.Component {
@@ -73,7 +77,7 @@ export class DataSelectMachine extends React.Component {
 
 		if (id === machineId){
 
-	        let query = Queries.getInfoSensoresQuery();
+	        let query = Queries.getInfoSensoresQuery(graphURI);
 
 			const querystring = require('querystring');
 			axios.post(usedURL,
@@ -175,7 +179,12 @@ export class DataSelectMachine extends React.Component {
         const maq = (state === 'selecMaq') && (listaMaq);
 
         const showDatos = (state === 'showData') &&
-            (<ParseData infoSensores={infoSensores} infoMaquina={selectedMachine}/>);
+            (<ParseData
+				infoSensores={infoSensores}
+				infoMaquina={selectedMachine}
+				graphURI={graphURI}
+				usedURL={usedURL}
+			/>);
 
 		return(
 			<div className='container'>

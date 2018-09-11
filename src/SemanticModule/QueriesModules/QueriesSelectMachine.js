@@ -18,8 +18,11 @@ const _ = require('lodash');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
-const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
 const usedURL = virtuosoURL;
+
+// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
 // ------- COMENTAR AL HACER LA UNIÓN CON I4TSPS -------
 const machineId = "1086_WWN_BGY3MW_3";
@@ -71,7 +74,7 @@ export class QueriesSelectMachine extends React.Component {
 		const machineInfo = machines[id];
 
 		if (id === machineId){
-			let query = Queries.getInfoSensoresQuery();
+			let query = Queries.getInfoSensoresQuery(graphURI);
 			const querystring = require('querystring');
 			axios.post(usedURL,
 				querystring.stringify({'query': query})
@@ -170,7 +173,12 @@ export class QueriesSelectMachine extends React.Component {
         const maq = (state === 'selecMaq') && (listaMaq);
 
         const showPreguntas = (state === 'showQueries') &&
-            (<SensorsInfo infoSensores={infoSensores} infoMaquina={selectedMachine}/>);
+            (<SensorsInfo
+				infoSensores={infoSensores}
+				infoMaquina={selectedMachine}
+				graphURI={graphURI}
+				usedURL={usedURL}
+			/>);
 
 		return(
 			<div className='container'>
