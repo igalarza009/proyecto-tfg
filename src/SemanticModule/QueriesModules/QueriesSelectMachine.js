@@ -28,6 +28,8 @@ const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 const machineId = "1086_WWN_BGY3MW_3";
 // -----------------------------------------------------
 
+const imgPath = '../img/';
+
 export class QueriesSelectMachine extends React.Component {
 	constructor(props){
 		super(props);
@@ -132,7 +134,7 @@ export class QueriesSelectMachine extends React.Component {
 		const cargando = (state === 'cargando' && !errorLoading && !noMachineInfo)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
 				<img className='loading' alt='Cargando...'
-						src={require('../img/loading_bars.gif')}
+						src={require(imgPath + 'loading_bars.gif')}
 					/>
 				</Card>)
 			: (null);
@@ -163,7 +165,7 @@ export class QueriesSelectMachine extends React.Component {
             listaMaq.push(
 					<div className="col s12 m6 l4">
 						<Card className="center machine_card_consult pointer"  onClick={() => {this.loadMachineInfo(key);}}
-							header={<img width="100%" alt={altValue} src={require('../img/' + tipo + '.png')}/>}>
+							header={<img width="100%" alt={altValue} src={require(imgPath + tipo + '.png')}/>}>
 		        			La máquina <span className='bold'> {key} </span>.
 		        		</Card>
 	                </div>

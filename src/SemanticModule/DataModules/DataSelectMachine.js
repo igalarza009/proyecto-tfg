@@ -14,6 +14,8 @@ import {Card, Button, Row, Col} from 'react-materialize'
 import * as DataFunctions from '../Functions/DataFunctions.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
 
+const imgPath = '../img/';
+
 const _ = require('lodash');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
@@ -135,7 +137,7 @@ export class DataSelectMachine extends React.Component {
 		const cargando = (state === 'cargando' && !errorLoading && !noMachineInfo)
 			? (<Card s={12} l={8} offset='l2' title="Cargando datos..." className='center'>
 				<img className='loading' alt='Cargando...'
-						src={require('../img/loading_bars.gif')}
+						src={require(imgPath + 'loading_bars.gif')}
 					/>
 				</Card>)
 			: (null);
@@ -168,7 +170,7 @@ export class DataSelectMachine extends React.Component {
 	            	<Card className="center machine_card_insert pointer" onClick={() => {this.loadMachineInfo(key);}}
 						header={
 	        				<img width="100%" alt={altValue}
-	        					src={require('../img/' + tipo + '.png')}
+	        					src={require(imgPath + tipo + '.png')}
 	        				/>}>
 	        			La máquina <span className='bold'> {key} </span>.
 	        		</Card>

@@ -15,6 +15,7 @@ import {Card, Button} from 'react-materialize'
 import $ from 'jquery';
 
 const idOrg = '-L2PV1Ya30YR-SBlesmI';
+const imgPath = './img/';
 
 class SelectedPage extends React.Component {
 	constructor(props){
@@ -89,7 +90,7 @@ class SelectedPage extends React.Component {
 			<li className="blue darken-3">
 				<div className="user-view">
 					<a href="#!user" className="margin-left">
-						<img className="circle margin-top" src={require('./SemanticModule/img/user.png')} height="100%"/>
+						<img className="circle margin-top" src={require(imgPath + 'user.png')} height="100%"/>
 					</a>
 					<a href="#!email" className='margin-top'>
 						<span className="white-text email">example@example.com</span>

@@ -16,6 +16,8 @@ import {PruebaTabsMat} from './SelectQueryTabs.js'
 import * as DataFunctions from '../Functions/DataFunctions.js'
 import {Chart} from 'react-google-charts';
 
+const imgPath = '../img/';
+
 const _ = require('lodash');
 const querystring = require('querystring');
 
@@ -121,7 +123,7 @@ export class SensorsInfo extends React.Component {
 				<div key={classes} className={classes} data-position="top"
 					data-delay="10" data-tooltip={tooltipName}
 				>
-					<img alt={iconName} src={require('../img/'+iconName+'.png')}/>
+					<img alt={iconName} src={require(imgPath + iconName + '.png')}/>
 				</div>
 			);
 		});
@@ -156,7 +158,7 @@ export class SensorsInfo extends React.Component {
 			<Card header={
 				<div className='mapContainer'>
 					<img alt='Mapa de sensores'
-						src={require('../img/extrusora_editada_grande_claro.png')}
+						src={require(imgPath + 'extrusora_editada_grande_claro.png')}
 					/>
 					{iconDivs}
 					{sensorDivs}
@@ -497,7 +499,7 @@ export class SensorsInfo extends React.Component {
 
 		const newQueryButton = (showChart)
 			? (<Button className='blue darken-3' onClick={() => {this.newQuery();}}> Nueva pregunta </Button>)
-			: (<img className='loading' alt='Cargando...' src={require('../img/loading_bars.gif')}/>);
+			: (<img className='loading' alt='Cargando...' src={require(imgPath + 'loading_bars.gif')}/>);
 
 		let tipoDePregunta;
 		let resumenInfo;
@@ -704,7 +706,7 @@ export class SensorsInfo extends React.Component {
 		const loadingChartCard = (loadingQuery) &&
 		 	(<Card className='center'>
 				<img className='loading' alt='Cargando...'
-					src={require('../img/loading_bars.gif')}
+					src={require(imgPath + 'loading_bars.gif')}
 				/>
 			</Card>);
 
