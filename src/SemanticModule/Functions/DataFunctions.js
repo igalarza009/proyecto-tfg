@@ -420,16 +420,31 @@ export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sen
 			if (!(booleans.every(allTrue) || booleans.every(allFalse))) {
 				// console.log('Anomalía detectada');
 				anomValues[primSensor].push(value);
-				anomDatetimes.push(datetimes[i]);
+				// anomDatetimes.push(datetimes[i]);
 				restoSensores.forEach((sensorId) => {
 					anomValues[sensorId].push(sensorValues[sensorId][i]);
 				});
 			}
+			else{
+				anomValues[primSensor].push("NaN");
+				// anomDatetimes.push(datetimes[i]);
+				restoSensores.forEach((sensorId) => {
+					anomValues[sensorId].push("NaN");
+				});
+			}
+			anomDatetimes.push(datetimes[i]);
 		}
 		else if (!prevValues[primSensor] && !isNaN(value)){
 			prevValues[primSensor] = value;
 			restoSensores.forEach((sensorId) => {
 				prevValues[sensorId] = sensorValues[sensorId][i];
+			});
+		}
+		else{
+			anomValues[primSensor].push("NaN");
+			anomDatetimes.push(datetimes[i]);
+			restoSensores.forEach((sensorId) => {
+				anomValues[sensorId].push("NaN");
 			});
 		}
 	});

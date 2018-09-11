@@ -71,6 +71,8 @@ export class GoogleChart extends React.Component{
 				options['series'] = series;
 				options['axes'] = axes;
 
+				console.log(options);
+
 				var convertFunc = this.state.convertFunc;
 	    		var finalOptions = convertFunc ? convertFunc(options) : options;
 

@@ -7,7 +7,7 @@ const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
 var _ = require('lodash');
 
- // 	sensors: Array of selected sensors
+ // 	sensorId: id of sensor to ask
  // 	groupBy: Collection
  // 		- groupBy['groupBy']: true or false
  // 		- groupBy['groupByDate']: true or false
@@ -39,8 +39,6 @@ var _ = require('lodash');
 
 export function getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy){
 
-	console.log(filter);
-
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
 		'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
@@ -102,149 +100,6 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 
     return finalQuery;
 }
-
-export function getInformationQueryIndividualSplit(sensorId, groupBy, filter, filterValues, orderBy, split){
-
-	const prefixes = 'base ' + graphURI + ' ' +
-		'prefix : ' + graphURI + ' ' +
-		'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
-		'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ';
-
-	const select = getSelect(groupBy);
-
-	const from = 'from ' + graphURI + ' ';
-
-	let where = 'where { ';
-
-	where += '?sensorName sosa:madeObservation ?obsName . ' +
-			'?obsName sosa:hasSimpleResult ?resultValue . ' +
-			'?obsName sosa:resultTime ?resultTime . ';
-
-	if (filterValues['filter'] && filterValues['values'][sensorId]){
-			where += 'filter(?resultValue  ';
-			let sensorFilterValues = filterValues['values'][sensorId];
-			// console.log(sensorFilterValues);
-			if (typeof(sensorFilterValues[0]) === "boolean"){
-				// console.log(sensorFilterValues[0] + " is NOT a number.");
-				where += '= "' + sensorFilterValues[0] + '"^^xsd:boolean ';
-			}
-			else{
-				console.log(sensorFilterValues[0] + " is a number.");
-				where += '>= "' + sensorFilterValues[0] + '"^^xsd:double && ' +
-						'?resultValue <= "' + sensorFilterValues[1] + '"^^xsd:double ';
-			}
-			where += '&& ?sensorName = <#sensor'+ sensorId +'> ) .';
-	}
-	else{
-		where += 'filter( ?sensorName = <#sensor'+ sensorId +'> ) .';
-	}
-
-    if (groupBy['groupByDate']) {
-    	where += 'bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate) ';
-    }
-    else if(groupBy['groupByHour']){
-    	where += 'bind(xsd:time(xsd:dateTime(?resultTime)) as ?time) . ' +
-    		'bind(substr(str(?time), 1, 2) as ?hour) . ' +
-    		'bind(concat(?hour, ":00:00") as ?resultHour) . ';
-    }
-
-	if (!split['firstSegment']){
-		where += 'filter( xsd:dateTime(?resultTime) >= "' + split['lastTimestamp'] + '"^^xsd:dateTime ) ';
-	}
-
-    if (filter['filter']){
-    	where += getFilter(filter);
-    }
-
-    where += '} ';
-
-    let finalQuery = prefixes + select + from + where;
-
-    if (groupBy['groupBy']){
-    	finalQuery += getGroupBy(groupBy);
-    }
-
-    if (orderBy['orderBy'] && !groupBy['groupByAll']){
-    	finalQuery += getOrderBy(orderBy, groupBy);
-    }
-
-	finalQuery += 'limit ' + split['limit'];
-
-    return finalQuery;
-}
-
-// export function getInformationQuery(sensors, groupBy, filter, filterValues, orderBy){
-//
-// 	const prefixes = 'base ' + graphURI + ' ' +
-// 		'prefix : ' + graphURI + ' ' +
-// 		'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
-// 		'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ';
-//
-// 	const select = getSelect(groupBy);
-//
-// 	const from = 'from ' + graphURI + ' ';
-//
-// 	let where = 'where { ';
-//
-// 	sensors.forEach((value, i) => {
-// 		if (i === 0)
-// 			where += '{ ';
-// 		else
-// 			where += 'union { ';
-//
-// 		where += '?sensorName sosa:madeObservation ?obsName . ' +
-// 				'?obsName sosa:hasResult/sosa:hasSimpleResult ?resultValue . ' +
-// 			    '?obsName sosa:resultTime ?resultTime . ';
-//
-// 		if (filterValues['filter'] && filterValues['values'][value]){
-// 				where += 'filter(?resultValue  ';
-// 				let sensorFilterValues = filterValues['values'][value];
-// 				console.log(sensorFilterValues);
-// 				if (typeof(sensorFilterValues[0]) === "boolean"){
-// 					console.log(sensorFilterValues[0] + " is NOT a number.");
-// 					where += '= "' + sensorFilterValues[0] + '"^^xsd:boolean ';
-// 				}
-// 				else{
-// 					console.log(sensorFilterValues[0] + " is a number.");
-// 					where += '>= "' + sensorFilterValues[0] + '"^^xsd:double && ' +
-// 							'?resultValue <= "' + sensorFilterValues[1] + '"^^xsd:double ';
-// 				}
-// 				where += '&& ?sensorName = <#sensor'+ value +'> ) .';
-// 		}
-// 		else{
-// 			where += 'filter( ?sensorName = <#sensor'+ value +'> ) .';
-// 		}
-//
-// 		where += '} ';
-// 	});
-//
-//     if (groupBy['groupByDate']) {
-//     	where += 'bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate) ';
-//     }
-//     else if(groupBy['groupByHour']){
-//     	where += 'bind(xsd:time(xsd:dateTime(?resultTime)) as ?time) . ' +
-//     		'bind(substr(str(?time), 1, 2) as ?hour) . ' +
-//     		'bind(concat(?hour, ":00:00") as ?resultHour) . ';
-//     }
-//
-//     if (filter['filter']){
-//     	where = getFilter(where, filter);
-//     }
-//
-//     where += '} ';
-//
-//     let finalQuery = prefixes + select + from + where;
-//
-//     if (groupBy['groupBy']){
-//     	finalQuery += getGroupBy(groupBy);
-//     }
-//
-//     if (orderBy['orderBy'] && !groupBy['groupByAll']){
-//     	finalQuery += getOrderBy(orderBy, groupBy);
-//     }
-//
-//     return finalQuery;
-// }
 
 // 	knownSensors: Collection
 // 		{'sensorName':sensorValue, ...}

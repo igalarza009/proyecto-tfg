@@ -105,6 +105,7 @@ export class ParseData extends React.Component {
 	}
 
 	parsingCompleted(fileName, parsedValues, parsedTimestamps, fixedValues, fixedTimestamps){
+
 		const firstValues = parsedValues.splice(0, maxReqLength);
 		const firstTimestamps = parsedTimestamps.splice(0, maxReqLength);
 		axios.post("http://35.224.159.30/api/fix/",
@@ -140,7 +141,7 @@ export class ParseData extends React.Component {
 			insertState: 'insertingData',
 		})
 
-		let infoForParsing = Parser.getInfoToParseData(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
+		let infoForParsing = Parser.getInfoToParseData(fileName, this.props.infoSensores);
 
 		let dataToInsert = '';
 		let cont = 0;

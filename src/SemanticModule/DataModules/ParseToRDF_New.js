@@ -11,7 +11,7 @@ const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 // const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
 // const usedURL = virtuosoUrl;
 
-export function getInfoToParseData(filename, values, timestamps, infoSensores){
+export function getInfoToParseData(filename, infoSensores){
 	const virtPrefixes = "prefix : " + graphURI + " " +
 						"prefix owl: <http://www.w3.org/2002/07/owl#> " +
 						"prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +

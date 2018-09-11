@@ -220,12 +220,13 @@ export class SensorsInfo extends React.Component {
 						filterValues,
 						orderBy
 					);
-		// console.log(query);
+		console.log(query);
 		axios.post(usedURL,
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
 			console.log(response);
+			console.log(response.data["results"]["bindings"]);
 			const sensorId = selectedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 0){
 				// sensorsResponse[sensorId] = response.data["results"]["bindings"];

@@ -63,7 +63,7 @@ export class QueriesSelectMachine extends React.Component {
 
 		if (id === machineId){
 			let query = Queries.getInfoSensoresQuery();
-
+			// console.log(query);
 			const querystring = require('querystring');
 			console.log('Realizamos la consulta de información a Virtuoso');
 			axios.post(usedURL,
@@ -74,6 +74,7 @@ export class QueriesSelectMachine extends React.Component {
 				let results = response.data["results"]["bindings"];
 				if (results.length > 0) {
 					let infoSensores = DataFunctions.getInfoSensores(results);
+					// console.log(infoSensores);
 					this.setState({
 						infoSensores: infoSensores,
 						state: 'showQueries',
