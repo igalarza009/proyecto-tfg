@@ -13,7 +13,7 @@ import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
 
-const imgPath = '../img/';
+const imgPath = './img/';
 
 const querystring = require('querystring');
 const _ = require('lodash');

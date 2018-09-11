@@ -16,6 +16,8 @@ import * as Queries from '../Functions/SPARQLQueries.js';
 
 const _ = require('lodash');
 
+const imgPath = './img/';
+
 const virtuosoURL = 'http://localhost:8890/sparql';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
 const usedURL = virtuosoURL;
@@ -27,8 +29,6 @@ const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 // ------- COMENTAR AL HACER LA UNIÓN CON I4TSPS -------
 const machineId = "1086_WWN_BGY3MW_3";
 // -----------------------------------------------------
-
-const imgPath = '../img/';
 
 export class QueriesSelectMachine extends React.Component {
 	constructor(props){

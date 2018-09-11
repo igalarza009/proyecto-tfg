@@ -13,7 +13,7 @@ import {Card, Button, Row, Col} from 'react-materialize'
 import * as DataFunctions from '../Functions/DataFunctions.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
 
-const imgPath = '../img/';
+const imgPath = './img/';
 
 const _ = require('lodash');
 
