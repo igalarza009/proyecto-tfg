@@ -464,9 +464,6 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 	}
 
 	sensorResponse.forEach((result, i) => {
-		var sensorNameValue = result["sensorName"]["value"];
-		var indexName = sensorNameValue.indexOf('#');
-		var sensorId = sensorNameValue.substring(indexName+7);
 		if (selectDateTime !== ''){
 			var resultDateTimeValue = result[selectDateTime]["value"];
 			var datetime;

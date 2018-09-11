@@ -7,10 +7,10 @@
 
 import React from 'react';
 import '../../index.css';
-import M from 'materialize-css';
+// import M from 'materialize-css';
 import {SensorsInfo} from './QueriesPage.js'
 import axios from 'axios';
-import {Card, Button, Row, Col} from 'react-materialize'
+import {Card, Button} from 'react-materialize'
 import * as DataFunctions from '../Functions/DataFunctions.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
 

@@ -8,7 +8,6 @@
 import React from 'react';
 import '../../index.css';
 import {ParseData} from './DataPage.js'
-import M from 'materialize-css';
 import axios from 'axios';
 import {Card, Button, Row, Col} from 'react-materialize'
 import * as DataFunctions from '../Functions/DataFunctions.js'
@@ -170,7 +169,7 @@ export class DataSelectMachine extends React.Component {
 	            	<Card className="center machine_card_insert pointer" onClick={() => {this.loadMachineInfo(key);}}
 						header={
 	        				<img width="100%" alt={altValue}
-	        					src={require(imgPath + tipo + '.png')}
+								src={`${imgPath}${tipo}.png`}
 	        				/>}>
 	        			La máquina <span className='bold'> {key} </span>.
 	        		</Card>

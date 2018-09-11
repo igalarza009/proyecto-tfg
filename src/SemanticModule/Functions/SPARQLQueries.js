@@ -132,7 +132,7 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 		'prefix sosa: <http://www.w3.org/ns/sosa/> '+
 		'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ';;
 
-	let select = 'select ?sensorName ?resultValue ?resultTime ';
+	let select = 'select ?resultValue ?resultTime ';
 
 	const from = 'from ' + graphURI + ' ';
 
@@ -186,8 +186,7 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 
 	where += '<#sensor' + askedSensorId +'> sosa:madeObservation ?askedObs . ' +
 			'?askedObs sosa:hasSimpleResult ?resultValue . ' +
-			'?askedObs sosa:resultTime ?resultTime . ' +
-			'bind(<#sensor' + askedSensorId +'> as ?sensorName) ';
+			'?askedObs sosa:resultTime ?resultTime . ';
 
 	if (filter['filter']){
 		  where += getFilter(filter);
@@ -283,7 +282,7 @@ export function getInfoSensoresQuery(graphURI){
 
 // Función para el SELECT de las sentencias.
 function getSelect(groupBy){
-	let select = 'select ?sensorName ';
+	let select = 'select ';
 	if (groupBy['groupBy']){
 		if (groupBy['groupByDate']) {
 	    	select += '?resultDate ';
@@ -332,7 +331,7 @@ function getFilter(filter){
 
 // Función para el GROUP BY de las sentencias.
 function getGroupBy(groupBy){
-	let groupByQuery = 'group by ?sensorName ';
+	let groupByQuery = 'group by ';
     if (groupBy['groupByDate']) {
     	groupByQuery += '?resultDate ';
     }
@@ -363,7 +362,7 @@ function getOrderBy(orderBy, groupBy){
     		orderByQuery += '?resultTime';
     	}
     }
-    orderByQuery += ') desc(?sensorName) ';
+    orderByQuery += ') ';
 
     return orderByQuery;
 }

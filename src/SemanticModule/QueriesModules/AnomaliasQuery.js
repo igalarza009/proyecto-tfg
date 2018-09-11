@@ -7,8 +7,6 @@
 import React from 'react';
 import '../../index.css';
 import {Button, Icon, Row, Col, Card, Input} from 'react-materialize'
-import M from 'materialize-css';
-import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');

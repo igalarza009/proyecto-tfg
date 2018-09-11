@@ -8,10 +8,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import {DataSelectMachine} from './SemanticModule/DataModules/DataSelectMachine.js'
-import M from 'materialize-css';
+// import M from 'materialize-css';
 import {QueriesSelectMachine} from './SemanticModule/QueriesModules/QueriesSelectMachine.js'
-import axios from 'axios';
-import {Card, Button} from 'react-materialize'
+import {Button} from 'react-materialize'
 import $ from 'jquery';
 
 const idOrg = '-L2PV1Ya30YR-SBlesmI';

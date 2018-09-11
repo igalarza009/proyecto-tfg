@@ -9,12 +9,11 @@ import React from 'react';
 import '../../index.css';
 import * as Queries from '../Functions/SPARQLQueries.js';
 import {Button, Row, Col, Card, Icon} from 'react-materialize'
-import M from 'materialize-css';
+// import M from 'materialize-css';
 import axios from 'axios';
 import {GoogleChart} from './GoogleChart.js'
 import {PruebaTabsMat} from './SelectQueryTabs.js'
 import * as DataFunctions from '../Functions/DataFunctions.js'
-import {Chart} from 'react-google-charts';
 
 const imgPath = '../img/';
 
@@ -214,8 +213,6 @@ export class SensorsInfo extends React.Component {
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
-			console.log(response);
-			console.log(response.data["results"]["bindings"]);
 			const sensorId = selectedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 0){
 				// Sustituir y tratar aquí los datos, ponerlos en el formato adecuado y reducirlos
@@ -227,7 +224,6 @@ export class SensorsInfo extends React.Component {
 					{'sensors': selectedSensors, 'type': 'infor', 'parMotor':{}},
 					this.props.infoSensores
 				);
-				console.log(result);
 				sensorValues[sensorId] = result['values'];
 				sensorDatetimes[sensorId] = result['datetimes'];
 				sensorsWithData.push(sensorId);
@@ -253,7 +249,6 @@ export class SensorsInfo extends React.Component {
 										this.props.infoSensores
 									);
 				}
-				console.log(allChartData);
 				this.setState({
 					showChart: true,
 					loadingQuery: false,
@@ -287,7 +282,6 @@ export class SensorsInfo extends React.Component {
 			longDateFormat: true,
 		});
 
-		const querystring = require('querystring');
 		let numberOfResponses = 0;
 		let sensorValues = {};
 		let sensorDatetimes = {};
@@ -311,9 +305,8 @@ export class SensorsInfo extends React.Component {
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
-			console.log(response);
 			const sensorId = askedSensors[nResponses];
-			if (response.data["results"]["bindings"].length > 1){
+			if (response.data["results"]["bindings"].length > 0){
 				var result = DataFunctions.parseResponseData(
 								response.data["results"]["bindings"],
 								selectedValues,
@@ -322,7 +315,6 @@ export class SensorsInfo extends React.Component {
 								{'sensors': askedSensors, 'type': 'otro', 'parMotor':{}},
 								this.props.infoSensores
 							);
-				console.log(result);
 				sensorValues[sensorId] = result['values'];
 				sensorDatetimes[sensorId] = result['datetimes'];
 				sensorsWithData.push(sensorId);
@@ -347,7 +339,6 @@ export class SensorsInfo extends React.Component {
 										this.props.infoSensores
 									);
 				}
-				console.log(allChartData);
 				this.setState({
 					showChart: true,
 					allChartData: allChartData,
@@ -407,7 +398,6 @@ export class SensorsInfo extends React.Component {
 			querystring.stringify({'query': query})
 		)
 		.then((response) => {
-			console.log(response);
 			const sensorId = selectedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 1){
 				var result = DataFunctions.parseResponseData(
@@ -418,7 +408,6 @@ export class SensorsInfo extends React.Component {
 								{'sensors': selectedSensors, 'type': 'anom', 'parMotor':parMotor},
 								this.props.infoSensores
 							);
-				console.log(result);
 				sensorValues[sensorId] = result['values'];
 				sensorDatetimes[sensorId] = result['datetimes'];
 				sensorsWithData.push(sensorId);
@@ -450,7 +439,6 @@ export class SensorsInfo extends React.Component {
 										this.props.infoSensores
 									);
 				}
-				console.log(allChartData);
 				if (allChartData.length > 0){
 					this.setState({
 						showChart: true,
@@ -480,7 +468,6 @@ export class SensorsInfo extends React.Component {
 	}
 
 	newQuery(){
-		const selectedSensors = this.state.selectedSensors.slice();
 		this.setState({
 			showQueries: true,
 			loadingQuery: false,
