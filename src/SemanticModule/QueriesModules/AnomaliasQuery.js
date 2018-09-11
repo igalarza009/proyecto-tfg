@@ -1,3 +1,9 @@
+// InformationQuery.js
+// --------------------------------------------------------------
+// Consultas de búsqueda de anomalías en los valores de sensores.
+// CONTIENE CAMBIOS NECESARIOS PARA LA UNIÓN CON I4TSPS.
+// --------------------------------------------------------------
+
 import React from 'react';
 import '../../index.css';
 import {Button, Icon, Row, Col, Card, Input} from 'react-materialize'
@@ -6,8 +12,6 @@ import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
-// const infoSensores = require('../../infoSensores.json');
-// const paresValores = require('../../paresValores.json');
 
 const parMotorId = '79PWN7';
 
@@ -29,14 +33,6 @@ export class AnomaliasQueryForm extends React.Component{
 			relSelected: -1,
 		};
 	}
-
-	// componentDidMount(){
-	// 	console.log(this.props.infoMaquina);
-	// 	// const paresValores = require('../../paresValores.json');
-	// 	this.setState({
-	// 		paresValores: this.props.infoMaquina,
-	// 	})
-	// }
 
     static getDerivedStateFromProps(props, state){
 		if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
@@ -131,9 +127,7 @@ export class AnomaliasQueryForm extends React.Component{
 	}
 
 	handleRadioChange(event, i){
-		// const value = event.target.value;
 		const paresValores = this.state.paresValores;
-		// alert("selected radio " + i);
 		const selectedRel = paresValores[i];
 		let sensorDir = {};
 		let calParMotor = false;
@@ -251,11 +245,15 @@ export class AnomaliasQueryForm extends React.Component{
 
 		newParesValores.push(sensorDir);
 
-		// ------------ Añadir aquí el guardado de la relación en Firebase ------------
+		// ------------------- CAMBIAR PARA LA UNIÓN CON I4TSPS -------------------
 
+		// --- Comentar esto:
 		this.setState({
 			paresValores: newParesValores,
 		})
+		// --- Añadir en su lugar el guardado en Firebase de las nuevas anomalías.
+
+		// ------------------------------------------------------------------------
 	}
 
 	removeSelectedAnomalie(){
@@ -280,17 +278,20 @@ export class AnomaliasQueryForm extends React.Component{
 
 		let newParesValores = _.reject(paresValores, newSensorDir);
 
-		// ------------ Añadir aquí el eliminado de la relación en Firebase ------------
+		// ------------------- CAMBIAR PARA LA UNIÓN CON I4TSPS -------------------
 
+		// --- Comentar esto:
 		this.setState({
 			paresValores: newParesValores,
 		})
+		// --- Añadir en su lugar el guardado en Firebase de las nuevas anomalías.
+
+		// ------------------------------------------------------------------------
 	}
 
 	render(){
         const sensorDir = this.state.sensorDir;
         const selectedSensors = this.props.selectedSensors;
-		// const parMotorId = this.state.parMotorId;
 		const relType = this.state.relType;
 		const errores = this.state.errores;
 		const paresValores = this.state.paresValores;
@@ -375,9 +376,6 @@ export class AnomaliasQueryForm extends React.Component{
 			const buttonDisabled = (iRel === relSelected)
 				? (false)
 				: (true);
-			// const buttonClass = (iRel === relSelected)
-			// 	? ("")
-			// 	: ("red darken-3");
 			const textClass = (iRel === relSelected)
 				? ("grey-text text-darken-3 margin-left")
 				: ("grey-text margin-left");

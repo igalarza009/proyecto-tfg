@@ -1,3 +1,8 @@
+// OtroSensorQuery.js
+// --------------------------------------------------------------
+// Consultas de relación entre los valores de los sensores.
+// --------------------------------------------------------------
+
 import React from 'react';
 import '../../index.css';
 import {Button, Icon, Row, Col, Card, Input} from 'react-materialize'
@@ -7,7 +12,6 @@ import Slider, { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 var _ = require('lodash');
-// const infoSensores = require('../../infoSensores.json');
 
 export class OtroSensorQueryForm extends React.Component{
 	constructor(props){
@@ -27,28 +31,6 @@ export class OtroSensorQueryForm extends React.Component{
 			},
 		};
 	}
-
-	// componentDidMount(){
-	// 	// const askedSensors = this.state.askedSensors;
-	// 	// const selectedSensors = this.state.selectedSensors;
-	// 	// const knownSensors = this.state.knownSensors;
-	// 	// // let newKnownSensors = {};
-	// 	// // selectedSensors.forEach((value,i) => {
-	// 	// // 	if (askedSensors.indexOf(value) === -1){
-	// 	// // 		newKnownSensors[value] = null;
-	// 	// // 	}
-	// 	// // });
-	// 	// //
-	// 	// // this.setState({
-	// 	// // 	knownSensors: newKnownSensors,
-	// 	// // });
-	// 	// console.log(askedSensors);
-	// 	// console.log(knownSensors);
-	// 	this.setState({
-	// 		selectedSensors: this.props.selectedSensors,
-	// 		askedSensors: [this.props.selectedSensors[0]],
-	// 	})
-	// }
 
 	static getDerivedStateFromProps(props, state){
         if (!_.isEqual(props.selectedSensors, state.selectedSensors)){
@@ -160,7 +142,6 @@ export class OtroSensorQueryForm extends React.Component{
 		this.setState({
 			values: values,
 		});
-		// console.log(values);
 
 	}
 
@@ -253,7 +234,6 @@ export class OtroSensorQueryForm extends React.Component{
 		const stateFilterValues = this.state.filterValues;
 		const fechaInicio = this.state.fechaInicio;
 		const fechaFin = this.state.fechaFin;
-		// const quitarAnomalias = this.state.quitarAnomalias;
 
 		let filterValues = {'filter': false, 'values': {}};
 		let filter = {'filter':false, 'filterDate':false, 'startDate':'', 'endDate':'', 'filterTime':false, 'startTime':'', 'endTime':''};
@@ -272,7 +252,6 @@ export class OtroSensorQueryForm extends React.Component{
 			filter['endDate'] = fechaFin;
 		}
 
-		// this.resetValues();
 		this.props.getOtherSensorQuery(knownSensors, askedSensors, filterValues, filter);
 	}
 

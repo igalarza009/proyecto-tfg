@@ -1,100 +1,26 @@
 // index.js
-
-// <div>Icons made by <a href="https://www.flaticon.com/authors/epiccoders" title="EpicCoders">EpicCoders</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+// ----------------------------------------------
+// Esta página no entra dentro de la unión.
+// Será sustituída por el index.js de I4TSPS.
+// ----------------------------------------------
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-// import {ParseData} from './SemanticModule/DataModules/DataPage_New.js'
 import {DataSelectMachine} from './SemanticModule/DataModules/DataSelectMachine.js'
 import M from 'materialize-css';
-// import {SensorsInfo} from './SemanticModule/QueriesModules/QueriesPage.js'
 import {QueriesSelectMachine} from './SemanticModule/QueriesModules/QueriesSelectMachine.js'
 import axios from 'axios';
 import {Card, Button} from 'react-materialize'
 import $ from 'jquery';
-// import {MainPage} from './main.js';
-
-// const machinesQueries = ['maquina1', 'maquina2', 'maquina3', 'maquina4'];
-// const machinesData = ['maquina1', 'maquina2'];
 
 const idOrg = '-L2PV1Ya30YR-SBlesmI';
-
-// class Welcome1 extends React.Component{
-//     render(){
-//         return <h1>Hello {this.props.name}!</h1>
-//     }
-// }
-//
-// class Welcome2 extends React.Component{
-//     constructor(props){
-// 		super(props)
-// 		this.state = {
-// 			helloGreeting: true,
-// 		}
-// 	}
-//
-//     changeGreeting(){
-//         let helloGreeting = this.state.helloGreeting;
-//         this.setState({
-//             helloGreeting: !helloGreeting,
-//         })
-//     }
-//
-//     render(){
-//         const helloGreeting = this.state.helloGreeting
-//         const greeting = (helloGreeting) ? 'Hello' : 'Goodbye'
-//
-//         return (
-//             <div className='greetings'>
-//                 <h1>{greeting} {this.props.name}!</h1>
-//                 <button onClick={() => {this.changeGreeting();}}>
-//                     Change greeting
-//                 </button>
-//             </div>
-//         )
-//     }
-// }
-
-
-// class Form extends React.Component {
-// 	constructor(props) {
-//     	super(props);
-//     	this.state = {
-//         	nameValue: '',
-//     	};
-//   	}
-//
-//   	handleNameChange(event) {
-//     	this.setState({
-//         	nameValue: event.target.value
-//     	});
-//   	}
-//
-//   	handleSubmit(event) {
-// 		alert('The form was submitted!! Name: ' + this.state.nameValue);
-// 		event.preventDefault();
-//   	}
-//
-//   	render() {
-// 		return (
-// 			<form onSubmit={(e) => {this.handleSubmit(e);}} className="container margin-top">
-// 				Name:
-// 				<input type="text"
-// 					onChange={(e) => {this.handleNameChange(e);}} />
-//
-// 			  	<input type="submit" value="Submit" />
-// 			</form>
-//     	);
-//   	}
-// }
 
 class SelectedPage extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
 			preguntasSelected: true,
-			// infoSensores: [],
 			selectedPage: 'preguntas',
 			errorLoading: false,
 		};
@@ -128,11 +54,9 @@ class SelectedPage extends React.Component {
 		const selectedPage = this.state.selectedPage;
 
 		const queries = (selectedPage === 'preguntas') &&
-			// (<SensorsInfo infoSensores={infoSensores}/>);
 			(<QueriesSelectMachine idOrganization={idOrg}/>);
 
 		const datos = (selectedPage === 'datos') &&
-			// (<ParseData infoSensores={infoSensores}/>);
 			(<DataSelectMachine idOrganization={idOrg}/>);
 
 		let preguntasClass = '';
@@ -149,11 +73,6 @@ class SelectedPage extends React.Component {
 		const navBarTitle = (preguntasSelected) ? "Consultar de datos de sensores" : "Insertar datos de sensores";
 
 		const navBar =
-		// (selectedPage === 'cargando')
-			// ? (
-			// 		<div className="nav-wrapper">
-			// 			<a href="#" className="brand-logo center">Análisis de datos de sensores</a>
-			// 		</div>)
 			(
 					<div className="nav-wrapper">
 						<a href="#" className="brand-logo center">{navBarTitle}</a>
@@ -162,9 +81,6 @@ class SelectedPage extends React.Component {
 								<Button data-activates="slide-out" className="button-collapse show-on-medium-and-up btn-flat white-text">
 									<i className="material-icons">menu</i>
 								</Button>
-								{/* <a href="#" data-activates="slide-out" className="button-collapse show-on-medium-and-up">
-									<i className="material-icons">menu</i>
-								</a> */}
 							</li>
 						</ul>
 					</div>);
@@ -204,10 +120,8 @@ class SelectedPage extends React.Component {
 						{sideNav}
 					</nav>
 				</div>
-				{/* <div className='container'> */}
-					{queries}
-					{datos}
-				{/* </div> */}
+				{queries}
+				{datos}
 			</div>
 		)
 	}

@@ -1,48 +1,52 @@
+// DataPage.js
+// --------------------------------------------------------------
+// Página principal de inserción de datos en la máquina seleccionada.
+// --------------------------------------------------------------
+
 import React from 'react';
 import '../../index.css';
-import * as Parser from './ParseToRDF.js';
+import * as Parser from '../Functions/ParseToRDF.js';
 import {Row, Col, Card, Icon, Button} from 'react-materialize'
 import Papa from 'papaparse';
 import M from 'materialize-css';
 import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
-import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
+// import {HTTPPrueba} from '../Pruebas/HTTPPrueba.js'
+// import * as Virtuoso from '../Functions/VirtuosoCalls.js';
+import * as Queries from '../Functions/SPARQLQueries.js';
 
+const querystring = require('querystring');
 const _ = require('lodash');
 
-const virtuosoURL = 'http://localhost:8890/sparql';
-const RESTfulURLInsert = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/insertfile';
+// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
+const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
+
+const virtuosoUrl =  'http://localhost:8890/sparql/';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
+const usedURL = virtuosoUrl;
 
 const maxReqLength = 250000;
 
-// const coloresLeyenda = {
-// 		TemperatureSensor: 'red-text text-darken-2',
-// 		ResistanceSensor: 'orange-text text-darken-1',
-// 		VentilationSensor: 'yellow-text text-accent-4',
-// 		EngineRPMSensor: 'green-text',
-// 		EngineConsumptionSensor: 'blue-text',
-// 		PressureSensor: 'purple-text',
-// 		MeltingTemperatureSensor: 'pink-text text-lighten-2'
-// };
-
-// const querystring = require('querystring');
+const turtlePrefixes = "@prefix : " + graphURI + " . " +
+					"@prefix owl: <http://www.w3.org/2002/07/owl#> . " +
+					"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . " +
+					"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . " +
+					"@prefix sosa: <http://www.w3.org/ns/sosa/> . " +
+					"@base " + graphURI + " . ";
 
 export class ParseData extends React.Component {
 	constructor(props) {
 	    super(props);
-	    // this.handleSubmit = this.handleSubmit.bind(this);
 	    this.state = {
 			selectFile: true,
-	    	parsingFile: false,
-			parsingEnded: false,
+	    	insertingData: false,
+			dataInserted: false,
+			insertState: "",
 			file: null,
 			fileName: null,
-			fileUploaded: false,
-			uploadingFile: false,
 			error: "",
 			showLeyenda: false,
-			// showInformation: false,
 	    }
  	}
 
@@ -53,12 +57,10 @@ export class ParseData extends React.Component {
 		})
 	}
 
-	handleParseFile(){
-		// let error = this.state.error;
+	handleInsertData(){
 		if (this.fileInput.files.length > 0){
 			const selectedFile = this.fileInput.files;
 			const fileName = selectedFile[0].name;
-			// let parsedData = [];
 			let parsedValues = [];
 			let parsedTimestamps = [];
 
@@ -73,86 +75,130 @@ export class ParseData extends React.Component {
 			}
 			else{
 				this.setState({
-					error: '',
-					parsingFile: true,
-					// showLeyenda:false,
+					error: "",
+					insertingData: true,
+					insertState: 'readingFile',
 					selectFile: false,
 					fileName: fileName,
 				});
 
 				Papa.parse(selectedFile[0], {
 					step: function(row, i) {
-						// parsedData.push(row.data[0]);
 						if (row.data[0][0] !== "" && !isNaN(row.data[0][1])){
 							parsedTimestamps.push(row.data[0][0]);
 							parsedValues.push(parseFloat(row.data[0][1]));
 						}
 					},
 					complete: (results) => {
+						console.log("CSV file parsed to JSON");
 						parsedTimestamps.reverse();
 						parsedValues.reverse();
+						this.setState({
+							insertState: 'fixingData',
+						})
 						this.parsingCompleted(fileName, parsedValues, parsedTimestamps, [], []);
 					},
 				});
 			}
 		}
 		else{
-			// errors['noFile'] = true;
 			this.setState({
 				error: 'noFile',
 			});
 		}
-
 	}
 
 	parsingCompleted(fileName, parsedValues, parsedTimestamps, fixedValues, fixedTimestamps){
-		console.log("CSV file parsed to JSON");
+
 		const firstValues = parsedValues.splice(0, maxReqLength);
 		const firstTimestamps = parsedTimestamps.splice(0, maxReqLength);
-		// console.log(firstValues);
-		// console.log(firstTimestamps);
-		// console.log(parsedValues);
-		// console.log(parsedTimestamps);
 		axios.post("http://35.224.159.30/api/fix/",
 			{timestamps: firstTimestamps, values:firstValues}
 		)
 		.then((response) => {
-			console.log(response);
 			let newFixedValues = fixedValues.concat(response['data']['values']);
 			let newFixedTimestamps = fixedTimestamps.concat(response['data']['timestamps']);
-			// console.log(newFixedValues);
-			// console.log(newFixedTimestamps);
 			if (parsedValues.length > 0){
 				this.parsingCompleted(fileName, parsedValues, parsedTimestamps, newFixedValues, newFixedTimestamps);
 			}
 			else{
-				console.log("No hay más datos");
-				// console.log(newFixedValues);
-				// console.log(newFixedTimestamps);
+				console.log("Data fixed.");
 				let fixedTimestampsISOFormat = [];
 				newFixedTimestamps.forEach((value) => {
 					let date = new Date(value+'Z');
 					fixedTimestampsISOFormat.push(date.toISOString());
-					// if (i < 100){
-					// 	console.log(value);
-					// 	console.log(date);
-					// 	console.log(date.toISOString());
-					// }
 				});
-				// console.log(fixedTimestampsISOFormat);
-				var file = Parser.parseDataToRDF(fileName, newFixedValues, fixedTimestampsISOFormat, this.props.infoSensores);
-				// var file = Parser.parseDataToRDF(fileName, parsedValues, parsedTimestamps, this.props.infoSensores);
-				console.log("TTL file created");
-				this.setState({
-					file: file,
-					parsingEnded: true,
-					parsingFile: false,
-				});
+				console.log("Data converted to ISO");
+				this.fixingCompleted(fileName, newFixedValues, fixedTimestampsISOFormat)
 			}
 		})
 		.catch((error) => {
+			alert("Ha ocurrido un error. Mirar en la consola para más información.");
 			console.log(error);
 		});
+	}
+
+	fixingCompleted(fileName, parsedValues, parsedTimestamps){
+		this.setState({
+			insertState: 'insertingData',
+		})
+
+		let infoForParsing = Parser.getInfoToParseData(fileName, this.props.infoSensores);
+
+		let dataToInsert = '';
+		let cont = 0;
+		let i = 0;
+
+		console.log("Tiempo inicio " + Date.now());
+		this.insertDataRecursive(i, cont, parsedValues, parsedTimestamps, infoForParsing['virtPrefixes'], infoForParsing['sensorName'], infoForParsing['observationType'], infoForParsing['valueType'], dataToInsert);
+	}
+
+	insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert){
+		dataToInsert += Parser.parseDataRecursive(index, values, timestamps, prefixes, sensorName, observationType, valueType);
+
+		index++;
+		cont++;
+
+		if(index < values.length){
+			if (cont === 160){
+				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert);
+				axios.post(usedURL,
+					querystring.stringify({'query': query})
+				)
+				.then((response) => {
+					dataToInsert = '';
+					cont = 0;
+					this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+			}
+			else{
+				this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+			}
+		}
+		else{
+			if (cont > 0) {
+				console.log('Ultima petición');
+				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert);
+				axios.post(usedURL,
+					querystring.stringify({'query': query})
+				)
+				.then((response) => {
+					console.log(response);
+					console.log("Tiempo Final " + Date.now());
+					this.setState({
+						dataInserted: true,
+				        insertingData: false,
+						insertState: "",
+					})
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+			}
+		}
 	}
 
 	handleDownload(){
@@ -181,58 +227,27 @@ export class ParseData extends React.Component {
 	    }
 	}
 
-	handleUpload(){
-		const file = this.state.file;
-		this.setState({
-			uploadingFile: true,
-			parsingEnded: false,
-		})
-
-		var formData = new FormData();
-		formData.append("file", file);
-		axios.post(RESTfulURLInsert, formData, {
-			headers: {
-				 'Content-Type': 'multipart/form-data'
-			}
-		})
-		.then((response) => {
-			console.log(response);
-			this.setState({
-				uploadingFile: false,
-				fileUploaded: true,
-				// parsingEnded: false,
-			})
-		})
-		.catch((error) => {
-			console.log(error);
-		});
-		// alert("Se subiría el archivo a Virtuoso.");
-	}
-
 	hanldeNewFile(){
 		this.setState({
 			selectFile: true,
-	    	parsingFile: false,
-			parsingEnded: false,
+	    	insertingData: false,
+			insertState: "",
+			dataInserted: false,
 			file: null,
 			fileName: null,
-			fileUploaded: false,
-			uploadingFile: false,
 			error: "",
 		});
 	}
 
 	render(){
-		const parsingFile = this.state.parsingFile;
-		// const noSensor = this.state.noSensor;
-		const uploadingFile = this.state.uploadingFile;
-		const fileUploaded = this.state.fileUploaded;
 		const selectFile = this.state.selectFile;
-		const parsingEnded = this.state.parsingEnded;
+		const insertingData = this.state.insertingData;
+		const dataInserted = this.state.dataInserted;
 		const fileName = this.state.fileName;
 		const error = this.state.error;
 		const infoSensores = this.props.infoSensores;
 		const showLeyenda = this.state.showLeyenda;
+		const insertState = this.state.insertState;
 
 		const listaSensores = infoSensores.map((sensor, i) => {
 			const sensorId = sensor['indicatorId'];
@@ -243,7 +258,6 @@ export class ParseData extends React.Component {
 			);
 		});
 
-		console.log(showLeyenda);
 		const leyendaSensores = (selectFile && showLeyenda) &&
 			(<div className="card">
 	            <div className="card-content">
@@ -296,113 +310,59 @@ export class ParseData extends React.Component {
 			  </form>
 			  {errorCard}
 			  <Row>
-				  <a href='#' className="margin-left-data blue-text text-darken-3 valign-wrapper" onClick={() => this.handleParseFile()}>
+				  <a href='#' className="margin-left-data blue-text text-darken-3 valign-wrapper"
+					  onClick={() => this.handleInsertData()}>
 					  <Icon className='blue-text text-darken-3'>play_circle_filled</Icon>
-					  Empezar anotación de datos.
+					  <span className="margin-left"> Comenzar con la inserción de datos. </span>
 				  </a>
 			  </Row>
             </div>
           </div>);
 
-		// const uploadDataButton = (fileUploaded)
-		// 	? (<Button className="blue darken-3 valign-wrapper" disabled>
-		// 			Datos insertados
-		// 			<Icon left>done</Icon>
-		// 		</Button>)
-		// 	: (<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
-		// 			Insertar datos
-		// 			<Icon left>publish</Icon>
-		// 		</Button>);
+		let loadingMessage = "";
+		if (insertingData && insertState === 'readingFile'){
+			loadingMessage = (<p> Leyendo los datos del fichero <span className="bold">{fileName}</span> </p>)
+		}
+		else if (insertingData && insertState === 'fixingData'){
+			loadingMessage = (<p> Preprocesando los datos del fichero <span className="bold">{fileName}</span> para corregir ciertos errores antes de ser insertados.</p>)
+		}
+		else{
+			loadingMessage = (<p> Insertando los datos corregidos del fichero <span className="bold">{fileName}</span> en el respositorio de datos. </p>)
+		}
 
-		const loadingParseFile = (parsingFile)
-			? (<div className="card">
-		            <div className="card-content center">
-		              	<span className="card-title blue-text text-darken-3">Anotando datos... </span>
-						<p> Anotación de datos del fichero <span className="bold">{fileName}</span> en curso. </p>
-						<p> Este proceso puede tardar varios minutos. </p>
-						<img className='loading' alt='Cargando' src={require('../img/loading_bars.gif')}/>
-					</div>
-				</div>)
-			: (null);
-
-		const fileParsedOptions = (parsingEnded) &&
-			(<div className="card">
-			 	<div className="card-content center">
-			    	<span className="card-title blue-text text-darken-3">Datos listos para insertar. </span>
-					<Row>
-						<p className="margin-left">El fichero <span className="bold">{fileName}</span> ha sido correctamente anotado en formato RDF.</p>
-						<p className="margin-left">Los datos están ahora listos para ser insertados.</p>
-					</Row>
-					<Row className="center">
-						<Button className="blue darken-3 valign-wrapper" onClick={() => this.handleUpload()}>
-							Insertar datos
-							<Icon left>publish</Icon>
-						</Button>
-					</Row>
-					<Row>
-						<Col l={6} s={12}>
-							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => {this.hanldeNewFile();}}>
-								<Icon>insert_drive_file</Icon>
-								Insertar datos de otro fichero.
-							</a>
-						</Col>
-						<Col l={6} s={12}>
-							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
-								<Icon>file_download</Icon>
-								Descargar fichero en formato RDF.
-							</a>
-						</Col>
-					</Row>
-				</div>
-			</div>);
-
-		const explicacionAnotacion = (parsingEnded) &&
-			(<Card>
-				<p className="bold">Datos contenidos en el CSV:</p>
-				<li className="margin-left-big">Timestamp</li>
-				<li className="margin-left-big">Valor</li>
-				<br/>
-				<p className="bold">Datos anotados en RDF:</p>
-				<li className="margin-left-big">Sensor al que peretencen los datos</li>
-				<li className="margin-left-big">Tipo de datos de los valores: booleanos o numéricos.</li>
-				<li className="margin-left-big">Propiedad observada.</li>
-				<li className="margin-left-big">En datos numéricos, unidades de medida utilizadas</li>
-				<li className="margin-left-big">Outlier superior y outlier inferior del sensor</li>
-			</Card>);
-
-		const loadingInsertData = (uploadingFile) &&
+		const loadingInsertData = (insertingData) &&
 			(<div className="card">
 			 	<div className="card-content center">
 			    	<span className="card-title blue-text text-darken-3">Insertando datos... </span>
-					<p> Insertando los datos del fichero <span className="bold">{fileName}</span> en el respositorio de datos. </p>
+					{loadingMessage}
 					<p> La operación puede tardar varios minutos. </p>
 					<img className='loading' alt='Cargando' src={require('../img/loading_bars.gif')}/>
 				</div>
 			</div>);
 
-		const dataInserted = (fileUploaded) &&
-			(<div className="card">
-				<div className="card-content center">
-					<span className="card-title green-text green-darken-3"><Icon>done</Icon> Datos correctamente insertados.</span>
-					<Row>
-						<p className="margin-left">Los datos contenidos en el fichero <span className="bold">{fileName}</span> han sido correctamente insertados en el repositorio de datos.</p>
-					</Row>
-					<Row>
-						<Col l={6} s={12}>
-							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => {this.hanldeNewFile();}}>
-								<Icon>insert_drive_file</Icon>
-								Insertar datos de otro fichero.
-							</a>
-						</Col>
-						<Col l={6} s={12}>
-							<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
-								<Icon>file_download</Icon>
-								Descargar fichero en formato RDF.
-							</a>
-						</Col>
-					</Row>
-				</div>
-			</div>);
+			const dataInsertedCard = (dataInserted) &&
+				(<div className="card">
+					<div className="card-content center">
+						<span className="card-title green-text green-darken-3"><Icon>done</Icon> Datos correctamente insertados.</span>
+						<Row>
+							<p className="margin-left">Los datos contenidos en el fichero <span className="bold">{fileName}</span> han sido correctamente insertados en el repositorio de datos.</p>
+						</Row>
+						<Row>
+							<Col l={6} s={12}>
+								<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => {this.hanldeNewFile();}}>
+									<Icon>insert_drive_file</Icon>
+									Insertar datos de otro fichero.
+								</a>
+							</Col>
+							<Col l={6} s={12}>
+								<a href="#" className="blue-text text-darken-3 valign-wrapper" onClick={() => this.handleDownload()}>
+									<Icon>file_download</Icon>
+									Descargar fichero en formato RDF.
+								</a>
+							</Col>
+						</Row>
+					</div>
+				</div>);
 
 		const offsetMainCard = (showLeyenda && selectFile)
 			? "m1"
@@ -414,22 +374,14 @@ export class ParseData extends React.Component {
 					<Col s={12} m={10} l={8} offset={offsetMainCard}>
 						<Row>
 							{selectFileOption}
-							{loadingParseFile}
-							{fileParsedOptions}
 							{loadingInsertData}
-							{dataInserted}
-						</Row>
-						<Row>
-							{explicacionAnotacion}
+							{dataInsertedCard}
 						</Row>
 					</Col>
 					<Col s={12} m={10} l={4} offset="m1">
 						{leyendaSensores}
 					</Col>
 				</Row>
-				{/* <Row>
-					<HTTPPrueba />
-				</Row> */}
 			</div>
 		)
 	}

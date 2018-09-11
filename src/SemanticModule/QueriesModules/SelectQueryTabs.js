@@ -1,3 +1,8 @@
+// SelectQueryTabs.js
+// --------------------------------------------------------------
+// Pestañas de selección de los diferentes formularios.
+// --------------------------------------------------------------
+
 import React from 'react';
 import '../../index.css';
 import M from 'materialize-css';
@@ -71,9 +76,6 @@ export class PruebaTabsMat extends React.Component {
 			             getInformationQuery={(s,g,f,fv) => {this.props.getInformationQuery(s,g,f,fv);}}
 						 infoSensores={this.props.infoSensores}
 			         />
-					 {/* <Card className="center">
-						 Formulario información general.
-					 </Card> */}
 				 </div>
 				 <div id="otro" className="col s12">
 					 <OtroSensorQueryForm
@@ -81,9 +83,6 @@ export class PruebaTabsMat extends React.Component {
 			             getOtherSensorQuery={(k,a,v,f) => {this.props.getOtherSensorQuery(k,a,v,f);}}
 						 infoSensores={this.props.infoSensores}
 			         />
-					 {/* <Card className="center">
-						 Formulario relación entre sensores.
-					 </Card> */}
 				 </div>
 				 <div id="anom" className="col s12">
 					 <AnomaliasQueryForm
@@ -92,17 +91,6 @@ export class PruebaTabsMat extends React.Component {
 						 infoSensores={this.props.infoSensores}
 						 infoMaquina={this.props.infoMaquina}
 			         />
-					 {/* <Card >
-						 <Row>
-							 <Input s={12} l={6} type='select' defaultValue='predef'>
-								   <option value='predef'>Relación predefinida</option>
-								   <option value='custom'>Relación personalizada</option>
-							</Input>
-						 </Row>
-						<Row className="center">
-							 Formulario anomalías predefinidas.
-						</Row>
-					 </Card> */}
 				 </div>
 			 </div>
 		 </div>

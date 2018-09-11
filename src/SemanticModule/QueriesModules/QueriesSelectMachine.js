@@ -1,57 +1,66 @@
-// index.js
-
-// <div>Icons made by <a href="https://www.flaticon.com/authors/epiccoders" title="EpicCoders">EpicCoders</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+// QueriesSelectMachine.js
+// --------------------------------------------------------------
+// Página principal de la funcionalidad de consulta de Datos.
+// Selección de la máquina a consultar.
+// CONTIENE CAMBIOS NECESARIOS PARA LA UNIÓN CON I4TSPS.
+// --------------------------------------------------------------
 
 import React from 'react';
-// import ReactDOM from 'react-dom';
 import '../../index.css';
-// import {ParseData} from './js/DataModules/DataPage.js'
 import M from 'materialize-css';
 import {SensorsInfo} from './QueriesPage.js'
 import axios from 'axios';
 import {Card, Button, Row, Col} from 'react-materialize'
 import * as DataFunctions from '../Functions/DataFunctions.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
-// import $ from 'jquery';
-// import {MainPage} from './main.js';
 
 const _ = require('lodash');
 
 const virtuosoURL = 'http://localhost:8890/sparql';
 const virtuosoDebianUrl = 'http://35.237.115.247:8890/sparql';
 const RESTfulURLQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/query';
-// const RESTfulURLGetQuery = 'http://localhost:8080/VirtuosoPruebaWeb2/rest/service/queryGet?query=';
 const usedURL = virtuosoURL;
 
+// ------- COMENTAR AL HACER LA UNIÓN CON I4TSPS -------
 const machineId = "1086_WWN_BGY3MW_3";
+// -----------------------------------------------------
 
 export class QueriesSelectMachine extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			// preguntasSelected: {},
 			infoSensores: [],
 			state: 'selecMaq',
 			errorLoading: false,
 			noMachineInfo: false,
 			machines: {},
 			selectedMachine: null,
-			// infoOrganizacion: {}
 		};
 	}
 
 	componentDidMount(){
 		const idOrg = this.props.idOrganization;
 
-		// ------------------Cambiar esta parte al hacer la unión con I4TSPS ------------------
+		// ------------------ CAMBIAR PARA LA UNIÓN CON I4TSPS ------------------
+
+		// --- Comentar esto: ---
 		const infoGeneral = require('../../semanticModule.json');
 		const maquinas = infoGeneral['SemanticModule']['Organizations'][idOrg];
-		// ------------------------------------------------------------------------------------
-
 		this.setState({
-			// infoOrganizacion: orgActual,
 			machines: maquinas,
 		});
+
+		// --- Descomentar esto: ---
+		// ref.child(`Modules/SemanticModule/Organizations/${idOrg}`).once('value')
+	    //     .then(snap =>{
+		// 		var infoGeneral = snap.val()
+		// 		console.log(infoGeneral);
+		// 		this.setState({
+		// 			machines: infoGeneral,
+		// 		});
+	 	// 	})
+
+		// ------------------------------------------------------------------------------------
 	}
 
 	loadMachineInfo(id){
@@ -63,9 +72,7 @@ export class QueriesSelectMachine extends React.Component {
 
 		if (id === machineId){
 			let query = Queries.getInfoSensoresQuery();
-			// console.log(query);
 			const querystring = require('querystring');
-			console.log('Realizamos la consulta de información a Virtuoso');
 			axios.post(usedURL,
 				querystring.stringify({'query': query})
 			)
@@ -74,7 +81,6 @@ export class QueriesSelectMachine extends React.Component {
 				let results = response.data["results"]["bindings"];
 				if (results.length > 0) {
 					let infoSensores = DataFunctions.getInfoSensores(results);
-					// console.log(infoSensores);
 					this.setState({
 						infoSensores: infoSensores,
 						state: 'showQueries',
@@ -149,7 +155,6 @@ export class QueriesSelectMachine extends React.Component {
 		let listaMaq = [];
 
         _.forEach(machines, (value, key) => {
-			// const id = value['id'];
 			const tipo = value['type'];
             const altValue = 'Imagen de la máquina ' + key;
             listaMaq.push(

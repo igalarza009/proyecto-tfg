@@ -1,3 +1,8 @@
+// InformationQuery.js
+// --------------------------------------------------------------
+// Consultas de información general.
+// --------------------------------------------------------------
+
 import React from 'react';
 import '../../index.css';
 import {Button, Icon, Row, Col, Card, Input} from 'react-materialize'
@@ -7,7 +12,6 @@ import 'rc-slider/assets/index.css';
 import $ from 'jquery';
 
 var _ = require('lodash');
-// const infoSensores = require('../../infoSensores.json');
 
 export class InformationQueryForm extends React.Component{
 	constructor(props){
@@ -44,7 +48,6 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			openedTabs: openedTabs,
 		});
-		// console.log(openedTabs);
 	}
 
 	removeFromTabs(id){
@@ -54,7 +57,6 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			openedTabs: openedTabs,
 		});
-		// console.log(openedTabs);
 	}
 
 	handleOpenForm(index){
@@ -126,7 +128,6 @@ export class InformationQueryForm extends React.Component{
 			fechaFin: value,
 			errores: errores,
 		});
-		// console.log(errores);
 	}
 
 	handleTimeChange(event,  timeName, timeType){
@@ -173,7 +174,6 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			errores: errores,
 		});
-		// console.log(errores);
 	}
 
 	handleSwitch(event, sensorId){
@@ -187,7 +187,6 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			values: values,
 		});
-		// console.log(values);
 	}
 
 	handleRange(range, sensorId){
@@ -196,7 +195,6 @@ export class InformationQueryForm extends React.Component{
 		this.setState({
 			values: values,
 		});
-		// console.log(values);
 
 	}
 
@@ -548,7 +546,6 @@ export class InformationQueryForm extends React.Component{
 										<Input s={12} type='select' defaultValue='day' onChange={(e) => {this.handleGroupBy(e);}} disabled={groupByDisabled}>
 											<option value='day'>Cada día</option>
 											<option value='hour'>Cada hora</option>
-											{/* <option value='all'>Valor absoluto en todo el intervalo</option> */}
 										</Input>
 									</Col>
 								</Row>

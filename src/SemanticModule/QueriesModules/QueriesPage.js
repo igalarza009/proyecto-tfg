@@ -1,5 +1,9 @@
-// GRANT EXECUTE ON DB.DBA.L_O_LOOK TO "SPARQL";
-// grant execute on "DB.DBA.SPARQL_INSERT_DICT_CONTENT" to "SPARQL";
+// QueriesPage.js
+// --------------------------------------------------------------
+// Página principal de consulta de la máquina seleccionada.
+// Interfaz que une el mapa de sensores, con los formularios y
+// con los resultados.
+// --------------------------------------------------------------
 
 import React from 'react';
 import '../../index.css';
@@ -24,11 +28,8 @@ const lineChartName = 'Line';
 const barChartName = 'Bar';
 const scatterChartName = 'Scatter';
 
-// const maxChartPoints = 4500;
-
 const orderBy = {'orderBy':true, 'order':'asc', 'orderField':'dateTime'};
 
-// const infoSensores = require('../../infoSensores.json');
 const sensorIconNames = ['tempIcon', 'resistIcon', 'ventIcon', 'rpmIcon', 'consumoIcon', 'presionIcon', 'tempFundidoIcon'];
 const sensorIconTooltips = {
 	'tempIcon':'Temperatura',
@@ -80,11 +81,6 @@ export class SensorsInfo extends React.Component {
 				showQueries: true,
 			});
 		}
-		// else if (selectedSensors.length === 0){
-		// 	this.setState({
-		// 		showQueries: false,
-		// 	});
-		// }
 
 		if (selectedSensors.length > 1 && !moreThanOneSensor){
 			this.setState({
@@ -185,9 +181,6 @@ export class SensorsInfo extends React.Component {
 			chartType = barChartName;
 			longDateFormat = false;
 		}
-		// else if (filter['filter'] && filter['filterTime']){
-		// 	chartType = scatterChartName;
-		// }
 		else if (filterValues['filter']) {
 			chartType = scatterChartName;
 		}
@@ -206,8 +199,6 @@ export class SensorsInfo extends React.Component {
 		let sensorDatetimes = {};
 		let formInfo = DataFunctions.getFormInfo({'groupBy': groupBy, 'type': 'infor'});
 		let sensorsWithData = [];
-
-		// let split = {firstSegment: false, lastTimestamp: '2018-03-18T02:46:40.039Z', limit:10000};
 
 		this.recursiveInforCall_New(sensors, groupBy, filter, filterValues, numberOfResponses, sensorValues, sensorDatetimes, formInfo['selectedValues'], formInfo['selectedDateTime'], sensorsWithData);
 	}
@@ -229,7 +220,6 @@ export class SensorsInfo extends React.Component {
 			console.log(response.data["results"]["bindings"]);
 			const sensorId = selectedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 0){
-				// sensorsResponse[sensorId] = response.data["results"]["bindings"];
 				// Sustituir y tratar aquí los datos, ponerlos en el formato adecuado y reducirlos
 				var result = DataFunctions.parseResponseData(
 					response.data["results"]["bindings"],
@@ -256,7 +246,6 @@ export class SensorsInfo extends React.Component {
 				console.log("finalizado!, podemos continuar");
 				let allChartData = [];
 				if (_.size(sensorValues) > 0){
-					// allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': selectedSensors, 'groupBy': groupBy, 'filter': filter, 'orderBy': orderBy, 'type': 'infor'}, this.props.infoSensores);
 					// Preparar los datos de la gráfica de Google con los datos ya reducidos.
 					allChartData = DataFunctions.prepareGoogleChartsData(
 										sensorValues,
@@ -275,7 +264,6 @@ export class SensorsInfo extends React.Component {
 				console.log("Tiempo fin " + Date.now());
 			}
 			else{
-				// console.log("New axios call with nResponse: " + nResponses);
 				this.recursiveInforCall_New(selectedSensors, groupBy, filter, filterValues, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData);
 			}
 		})
@@ -327,7 +315,6 @@ export class SensorsInfo extends React.Component {
 			console.log(response);
 			const sensorId = askedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 1){
-				// sensorsResponse[sensorId] = response.data["results"]["bindings"];
 				var result = DataFunctions.parseResponseData(
 								response.data["results"]["bindings"],
 								selectedValues,
@@ -353,7 +340,6 @@ export class SensorsInfo extends React.Component {
 				console.log("finalizado!, podemos continuar");
 				let allChartData = [];
 				if (_.size(sensorValues) > 0){
-					// allChartData = DataFunctions.prepareResponseData(sensorsResponse, {'sensors': askedSensors, 'type': 'otro'}, this.props.infoSensores);
 					allChartData = DataFunctions.prepareGoogleChartsData(
 										sensorValues,
 										sensorDatetimes,
@@ -382,7 +368,6 @@ export class SensorsInfo extends React.Component {
 	}
 
 	getAnomaliasQuery(sensorsDir, parMotor, filter){
-		// const selectedSensors = this.state.selectedSensors.slice();
 		let selectedSensors = [];
 		_.forEach(sensorsDir, (value, key) => {
 			selectedSensors.push(key);
@@ -402,13 +387,11 @@ export class SensorsInfo extends React.Component {
 		});
 
 		let numberOfResponses = 0;
-		// let sensorsResponse = {};
 		let sensorValues = {};
 		let sensorDatetimes = {};
 		let formInfo = DataFunctions.getFormInfo({'groupBy': {}, 'type': 'anom'});
 		let sensorsWithData = [];
 
-		// console.log("First axios call with nResponses: " + numberOfResponses);
 		this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, numberOfResponses, sensorValues, sensorDatetimes, formInfo['selectedValues'], formInfo['selectedDateTime'], sensorsWithData);
 	}
 
@@ -427,7 +410,6 @@ export class SensorsInfo extends React.Component {
 			console.log(response);
 			const sensorId = selectedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 1){
-				// sensorsResponse[sensorId] = response.data["results"]["bindings"];
 				var result = DataFunctions.parseResponseData(
 								response.data["results"]["bindings"],
 								selectedValues,
@@ -453,7 +435,6 @@ export class SensorsInfo extends React.Component {
 				console.log("finalizado!, podemos continuar");
 				let allChartData = [];
 				if (_.size(sensorValues) > 0){
-					// allChartData = DataFunctions.prepareResponseDataAnomalias(sensorsResponse, selectedSensors, sensorsDir, parMotor, this.props.infoSensores);
 					let anomResults = DataFunctions.getAnomaliasValues(
 										sensorsWithData,
 										sensorsDir,
@@ -488,7 +469,6 @@ export class SensorsInfo extends React.Component {
 				}
 			}
 			else{
-				// console.log("New axios call with nResponse: " + nResponses);
 				this.recursiveAnomCall_New(selectedSensors, sensorsDir, parMotor, filter, nResponses, sensorValues, sensorDatetimes, selectedValues, selectedDateTime, sensorsWithData);
 			}
 		})
@@ -501,15 +481,10 @@ export class SensorsInfo extends React.Component {
 
 	newQuery(){
 		const selectedSensors = this.state.selectedSensors.slice();
-		// let showQueries = false;
-		// if (selectedSensors.length > 0){
-		// 	showQueries = true;
-		// }
 		this.setState({
 			showQueries: true,
 			loadingQuery: false,
 			showChart: false,
-			// noData: false,
 			noAnom: false,
 			noDataCharts: [],
 			queryType: '',
@@ -521,7 +496,6 @@ export class SensorsInfo extends React.Component {
 		const type = this.state.queryType;
 		const info = this.state.queryInfor;
 		const showChart = this.state.showChart;
-		// const noData = this.state.noData;
 
 		const newQueryButton = (showChart)
 			? (<Button className='blue darken-3' onClick={() => {this.newQuery();}}> Nueva pregunta </Button>)
@@ -656,7 +630,7 @@ export class SensorsInfo extends React.Component {
 								 </div>
 							</div>);
 		}
-		else { // 'sensorsDir':sensorsDir, 'parMotor':parMotor}
+		else {
 			tipoDePregunta = 'Mostrar los valores de los sensores cuando no siguen esta relación: ';
 			resumenInfo = null;
 			sensores = _.map(info['sensorsDir'], (value, sensorId) => {
@@ -675,7 +649,6 @@ export class SensorsInfo extends React.Component {
 				else if (value === 'off'){
 					icon = 'FALSE';
 				}
-				// const icon = (<Icon>{iconName}</Icon>);
 				return(
 					<li key={sensorId}>
 						<span className="bold">{sensorName}</span> ({sensorId}) {icon}
@@ -712,9 +685,7 @@ export class SensorsInfo extends React.Component {
 		const allChartData = this.state.allChartData;
 		const chartType = this.state.chartType;
 		const longDateFormat = this.state.longDateFormat;
-		// const noData = this.state.noData;
 		const noDataCharts = this.state.noDataCharts;
-		// const queryType = this.state.queryType;
 		const noAnom = this.state.noAnom;
 
 		const queriesCardMat = (showQueries)
@@ -732,7 +703,6 @@ export class SensorsInfo extends React.Component {
 		const loadingQueryCard = (loadingQuery || showChart)
 			&& (this.makeQueryResume());
 
-		// let chartCard = null;
 		const loadingChartCard = (loadingQuery) &&
 		 	(<Card className='center'>
 				<img className='loading' alt='Cargando...'
@@ -767,13 +737,6 @@ export class SensorsInfo extends React.Component {
 				longDateFormat={longDateFormat}
 			/>);
 
-		// const chartCard =
-		// 	(<GoogleChart
-		// 		allChartData={allChartData}
-		// 		chartType={chartType}
-		// 		longDateFormat={longDateFormat}
-		// 	/>);
-
 		return(
 			<div className='sensorsInfo'>
 				<Row>
@@ -790,13 +753,6 @@ export class SensorsInfo extends React.Component {
 				<Row s={12}>
 					{loadingChartCard}
 					{noAnomCard}
-					{/* <div className={chartClass}>
-						<GoogleChart
-							allChartData={allChartData}
-							chartType={chartType}
-							longDateFormat={longDateFormat}
-						/>
-					</div> */}
 					{chartCard}
 					{noDataCard}
 				</Row>

@@ -1,3 +1,8 @@
+// SPARQLQueries.js
+// --------------------------------------------------------------
+// Funciones de creación de preguntas SPARQL.
+// --------------------------------------------------------------
+
 // const graphURI = '<http://www.sensores.com/ontology/prueba04/extrusoras#>';
 // const graphURI = '<http://www.sensores.com/ontology/prueba08/extrusoras#>';
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
@@ -7,6 +12,10 @@ const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 
 var _ = require('lodash');
 
+ // ------------------- FUNCIÓN "getInformationQueryIndividual" -------------------
+ // Consultas de información general de un sensor.
+ // -----------
+ // Estructura Objeto JSON parámtero:
  // 	sensorId: id of sensor to ask
  // 	groupBy: Collection
  // 		- groupBy['groupBy']: true or false
@@ -35,8 +44,8 @@ var _ = require('lodash');
  // 	split: Collection
  // 		- split['firstSegment']: true or false
  // 		- split['lastTimestamp']: STRING (timestamp)
-  // 		- split['limit']: Integer
-
+ // 		- split['limit']: Integer
+ // -----------
 export function getInformationQueryIndividual(sensorId, groupBy, filter, filterValues, orderBy){
 
 	const prefixes = 'base ' + graphURI + ' ' +
@@ -57,9 +66,7 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 	if (filterValues['filter'] && filterValues['values'][sensorId]){
 			where += 'filter(?resultValue  ';
 			let sensorFilterValues = filterValues['values'][sensorId];
-			// console.log(sensorFilterValues);
 			if (typeof(sensorFilterValues[0]) === "boolean"){
-				// console.log(sensorFilterValues[0] + " is NOT a number.");
 				where += '= "' + sensorFilterValues[0] + '"^^xsd:boolean ';
 			}
 			else{
@@ -101,6 +108,11 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
     return finalQuery;
 }
 
+// ------------------- FUNCIÓN "getOtherSensorQueryIndividual" -------------------
+// Consultas de relación de valor entre dos o más sensores.
+// Devuelve los resultados de un sensor cuando el resto cumplen las condiciones impuestas.
+// -----------
+// Estructura Objeto JSON parámtero:
 // 	knownSensors: Collection
 // 		{'sensorName':sensorValue, ...}
 // 			or
@@ -122,6 +134,7 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 // 		- orderBy['orderBy']: true or false
 // 		- orderBy['order']: 'desc' or 'asc'
 // 		- orderBy['orderField']: 'value', 'dateTime', 'date', 'sensorId'
+// ----------
 export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filterValues, filter, orderBy){
 	const prefixes = 'base ' + graphURI + ' ' +
 		'prefix : ' + graphURI + ' ' +
@@ -200,6 +213,9 @@ export function getOtherSensorQueryIndividual(knownSensors, askedSensorId, filte
 	return finalQuery;
 }
 
+// ------------------- FUNCIÓN "getInsertQueryDebian" -------------------
+// Sentencia INSERT para Virtuoso en Debian.
+// -----------
 export function getInsertQueryDebian(prefixes, dataToInsert){
 	let query = prefixes;
 	query += ' insert into graph ' + graphURI + ' { ';
@@ -209,6 +225,9 @@ export function getInsertQueryDebian(prefixes, dataToInsert){
 	return query;
 }
 
+// ------------------- FUNCIÓN "getInsertQueryLocal" -------------------
+// Sentencia INSERT para Virtuoso en local.
+// -----------
 export function getInsertQueryLocal(prefixes, dataToInsert){
 	let query = prefixes;
 	query += ' insert data { graph ' + graphURI + ' { ';
@@ -218,85 +237,9 @@ export function getInsertQueryLocal(prefixes, dataToInsert){
 	return query;
 }
 
-// export function getOtherSensorQuery(knownSensors, askedSensors, quitarAnomalias, orderBy){
-// 	const prefixes = 'base ' + graphURI + ' ' +
-// 		'prefix : ' + graphURI + ' ' +
-// 		'prefix sosa: <http://www.w3.org/ns/sosa/> '+
-// 		'prefix xsd: <http://www.w3.org/2001/XMLSchema#> ';;
-//
-// 	let select = 'select ?sensorName ?resultValue ?resultTime ';
-//
-// 	const from = 'from ' + graphURI + ' ';
-//
-// 	let where = 'where { ';
-// 	let i = 1;
-//
-// 	_.forEach(knownSensors, (value,sensorName) => {
-// 		var obsName = 'knownObs' + i;
-//
-// 		if (isNaN(value)){
-// 			var calObsName = 'calObs' + i;
-// 			var calValName = 'calculatedValue' + i;
-//
-// 			where += '{ '
-// 			if (value === 'min'){
-// 				where += 'select (MIN(?calResultValue) as ?' + calValName + ') ';
-// 			}
-// 			else {
-// 				where += 'select (MAX(?calResultValue) as ?' + calValName + ') ';
-// 			}
-// 			where += 'where { ' +
-// 				'<#sensor' + sensorName + '> sosa:madeObservation ?' + calObsName + ' . ' +
-// 				'?' + calObsName + ' sosa:hasResult/sosa:hasSimpleResult ?calResultValue . ';
-//
-// 			if (quitarAnomalias){
-// 				where += 'filter(?calResultValue < 3000 && ?calResultValue > 0) . ';
-// 			}
-//
-// 			where += ' } } ' ;
-//
-// 			where += '<#sensor' + sensorName + '> sosa:madeObservation ?' + obsName + ' . ' +
-// 				'?' + obsName + ' sosa:hasResult/sosa:hasSimpleResult ?' + calValName + ' . ' +
-// 				'?' + obsName + ' sosa:resultTime ?resultTime . ';
-// 		}
-// 		else {
-// 			where += '<#sensor' + sensorName + '> sosa:madeObservation ?' + obsName + ' . ' +
-// 				'?' + obsName + ' sosa:hasResult/sosa:hasSimpleResult "' + value + '"^^xsd:double . ' +
-// 				'?' + obsName + ' sosa:resultTime ?resultTime . ';
-// 		}
-// 		i++;
-// 	});
-//
-// 	askedSensors.forEach((value,i) => {
-// 		if (i === 0){
-// 			where += '{ ' +
-// 				'<#sensor' + value +'> sosa:madeObservation ?askedObs . ' +
-// 				'?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue . ' +
-// 				'?askedObs sosa:resultTime ?resultTime . ' +
-// 				'bind(<#sensor' + value +'> as ?sensorName) ' +
-// 				'} ';
-// 		}
-// 		else{
-// 			where += 'union { ' +
-// 				'<#sensor' + value +'> sosa:madeObservation ?askedObs . ' +
-// 				'?askedObs sosa:hasResult/sosa:hasSimpleResult ?resultValue . ' +
-// 				'?askedObs sosa:resultTime ?resultTime . ' +
-// 				'bind(<#sensor' + value +'> as ?sensorName) ' +
-// 				'} ';
-// 		}
-// 	});
-//
-// 	where += '} ';
-//
-// 	let finalQuery = prefixes + select + from + where;
-//
-// 	if (orderBy['orderBy']){
-//     	finalQuery += getOrderBy(orderBy, {});
-//     }
-//
-// 	return finalQuery;
-// }
-
+// ------------------- FUNCIÓN "getInfoSensores" -------------------
+// Consulta de la información de los sensores de la máquina Extrusora de Cuatro Zonas.
+// -----------
 export function getInfoSensoresQuery(){
 	let query = 'prefix : ' + graphURI + ' ' +
 			'prefix owl: <http://www.w3.org/2002/07/owl#> ' +
@@ -345,6 +288,9 @@ export function getInfoSensoresQuery(){
 	return query;
 }
 
+// ------------------- FUNCIONES AUXILIARES  -------------------
+
+// Función para el SELECT de las sentencias.
 function getSelect(groupBy){
 	let select = 'select ?sensorName ';
 	if (groupBy['groupBy']){
@@ -371,21 +317,16 @@ function getSelect(groupBy){
 	return select;
 }
 
+// Función para los filtros de las sentencias.
 function getFilter(filter){
 	let where = 'filter( ';
     	if (filter['filterTime'] && filter['filterDate']){
-			// let endDate = new Date(filter['endDate']);
-			// endDate.setDate(endDate.getDate() + 1);
-			// let endDateISO = endDate.toISOString();
    			where += ' (xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime) && ' +
             	'(xsd:dateTime(?resultTime) < "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime) && ' +
     			'(xsd:time(xsd:dateTime(?resultTime)) >= "' + filter['startTime'] + '.000Z"^^xsd:time) && ' +
             	'(xsd:time(xsd:dateTime(?resultTime)) <= "' + filter['endTime'] + '.000Z"^^xsd:time) ';
     	}
     	else if (filter['filterDate']){
-			// let endDate = new Date(filter['endDate']);
-			// endDate.setDate(endDate.getDate() + 1);
-			// let endDateISO = endDate.toISOString();
     		where += ' (xsd:dateTime(?resultTime) >= "' + filter['startDate'] + 'T00:00:00.000Z"^^xsd:dateTime) && ' +
             	'(xsd:dateTime(?resultTime) <= "' + filter['endDate'] + 'T23:59:59.999Z"^^xsd:dateTime) ';
     	}
@@ -398,6 +339,7 @@ function getFilter(filter){
     return where;
 }
 
+// Función para el GROUP BY de las sentencias.
 function getGroupBy(groupBy){
 	let groupByQuery = 'group by ?sensorName ';
     if (groupBy['groupByDate']) {
@@ -410,6 +352,7 @@ function getGroupBy(groupBy){
     return groupByQuery;
 }
 
+// Función para el ORDER BY de las sentencias.
 function getOrderBy(orderBy, groupBy){
 	let orderByQuery = 'order by ' + orderBy['order'] + '(';
     if (orderBy['orderField'] === 'value'){
