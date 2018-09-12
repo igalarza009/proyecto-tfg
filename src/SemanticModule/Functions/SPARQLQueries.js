@@ -236,12 +236,12 @@ export function getInfoSensoresQuery(graphURI){
 			'prefix sosa: <http://www.w3.org/ns/sosa/> ' +
 			'prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
 			'prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
-			'prefix qu: <http://purl.oclc.org/NET/ssnx/qu/qu#> ' +
-			'select ?sensorId ?name ?class ?sensorType ?observationType ?valueType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
+			'prefix qumodule: <http://bdi.si.ehu.es/bdi/ontologies/extrusion/quantities#> ' +
+			'select ?sensorId ?name ?sensorType ?observationType ?valueType ?zone ?observedProperty ?measureUnit ?minValue ?maxValue ' +
 			'from ' + graphURI + ' ' +
 			'where { ' +
 				'?metaSensorType rdf:type owl:Class ; ' +
-				 'rdfs:subClassOf sosa:Sensor . ' +
+				 				'rdfs:subClassOf :Sensor . ' +
 				'?sensorType rdfs:subClassOf ?metaSensorType .  ' +
 				'?metaSensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
 												'owl:onProperty sosa:madeObservation ; ' +
@@ -256,9 +256,6 @@ export function getInfoSensoresQuery(graphURI){
 												'owl:hasValue ?observedProperty ' +
 											'] . ' +
 				'optional { ' +
-					'?observedProperty qu:unit ?measureUnit . ' +
-				'} ' +
-				'optional { ' +
 					'?sensorType rdfs:subClassOf [ rdf:type owl:Restriction ; ' +
 													'owl:onProperty :maxValue ; ' +
 													'owl:hasValue ?maxValue ' +
@@ -266,7 +263,10 @@ export function getInfoSensoresQuery(graphURI){
 												'[ rdf:type owl:Restriction ; ' +
 													'owl:onProperty :minValue ; ' +
 													'owl:hasValue ?minValue ' +
-												'] . ' +
+												'] , ' +
+												'[ rdf:type owl:Restriction ; ' +
+			                                    'owl:onProperty :unit ; ' +
+			                                    'owl:hasValue ?measureUnit ] . ' +
 				'} ' +
 				'?sensorName rdf:type ?sensorType ; ' +
 							'rdf:type owl:NamedIndividual ; ' +

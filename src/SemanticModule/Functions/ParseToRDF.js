@@ -54,14 +54,15 @@ export function parseDataRecursive(index, values, timestamps, prefixes, sensorNa
 
 	let fixedValue = value;
 	if (value === 'NA'){
-		fixedValue = 'NaN';
+		// fixedValue = 'NaN';
+		fixedValue = -50;
 	}
 
-	let dataToInsert = ':' + observationName + ' rdf:type owl:NamedIndividual , \n' +
-		':' + observationType + ' . \n' +
-		':' + observationName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . \n' +
-		':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . \n' +
-		':' + sensorName + ' sosa:madeObservation :' + observationName + ' . \n';
+	let dataToInsert = ':' + observationName + ' rdf:type owl:NamedIndividual , ' +
+		':' + observationType + ' . ' +
+		':' + observationName + ' sosa:hasSimpleResult "' + fixedValue + '"^^' + valueType + ' . ' +
+		':' + observationName + ' sosa:resultTime "' + dateTime + '"^^xsd:dateTime . ' +
+		':' + sensorName + ' sosa:madeObservation :' + observationName + ' . ';
 
 	return dataToInsert;
 }

@@ -16,9 +16,9 @@ const propertyNames = {
 
 const unitSymbols = {
 	degreeCelsius: '℃',
-	ampere: 'A',
-	revolutionsPerMinute: 'RPM',
-	barUnitOfPressure: 'bar'
+	Ampere: 'A',
+	RevolutionPerMinute: 'RPM',
+	Bar: 'bar'
 }
 
 // ------------------- FUNCIÓN "getFormInfo" -------------------
@@ -497,12 +497,24 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 			}
 			else{
 				var aux = parseFloat(result[selectValues[0]]["value"]);
-				sensorValues.push(aux);
+				if (aux === -50){
+					sensorValues.push(NaN);
+				}
+				else{
+					sensorValues.push(aux);
+				}
 			}
 		}
 		else{
 			selectValues.forEach((selectValue) => {
-			 	sensorValues[selectValue].push(parseFloat(result[selectValue]["value"]));
+				var aux = parseFloat(result[selectValue]["value"]);
+				if (aux === -50){
+					sensorValues[selectValue].push(NaN);
+				}
+				else{
+					sensorValues[selectValue].push(aux);
+				}
+
 			});
 		 }
 	});

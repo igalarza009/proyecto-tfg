@@ -147,10 +147,11 @@ export class ParseData extends React.Component {
 		cont++;
 
 		if(index < values.length){
-			if (cont === 160){
+			if (cont === 21){
 				// -------------------- CAMBIAR PARA LA UNIÓN DE I4TSPS --------------------
 				// Comentar esto:
 				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
+				// console.log(query);
 				// Descomentar esto:
 				// var query = Queries.getInsertQueryDebian(prefixes, dataToInsert, this.props.graphURI);
 				// -------------------------------------------------------------------------
@@ -164,6 +165,8 @@ export class ParseData extends React.Component {
 				})
 				.catch((error) => {
 					console.log(error);
+					console.log(index);
+					console.log(query);
 				});
 			}
 			else{

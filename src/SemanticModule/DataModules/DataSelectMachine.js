@@ -25,7 +25,8 @@ const usedURL = virtuosoURL;
 
 // const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
 // const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
+// const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
+const graphURI = "<http://bdi.si.ehu.es/bdi/ontologies/extrusion/sensors#>";
 
 const machineId = "1086_WWN_BGY3MW_3";
 
