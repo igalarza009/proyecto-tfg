@@ -13,6 +13,8 @@ import axios from 'axios';
 import {PruebaInsert} from '../Pruebas/PruebasInsert.js'
 import * as Queries from '../Functions/SPARQLQueries.js';
 
+// const graphURI_Demo = "<http://www.demo.es/bdi/ontologies/extrusion/demo/sensors#>";
+
 // ----------- CAMBIAR EN LA UNIÓN CON I4TSPS ---------
 const imgPath = './img/';
 // ----------------------------------------------------
@@ -30,7 +32,7 @@ export class ParseData extends React.Component {
 	    	insertingData: false,
 			dataInserted: false,
 			insertState: "",
-			file: null,
+			fileContent: null,
 			fileName: null,
 			error: "",
 			showLeyenda: false,
@@ -135,12 +137,13 @@ export class ParseData extends React.Component {
 		let dataToInsert = '';
 		let cont = 0;
 		let i = 0;
+		let wholeData = '';
 
 		console.log("Tiempo inicio " + Date.now());
-		this.insertDataRecursive(i, cont, parsedValues, parsedTimestamps, infoForParsing['virtPrefixes'], infoForParsing['sensorName'], infoForParsing['observationType'], infoForParsing['valueType'], dataToInsert);
+		this.insertDataRecursive(i, cont, parsedValues, parsedTimestamps, infoForParsing['virtPrefixes'], infoForParsing['sensorName'], infoForParsing['observationType'], infoForParsing['valueType'], dataToInsert, wholeData);
 	}
 
-	insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert){
+	insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData){
 		dataToInsert += Parser.parseDataRecursive(index, values, timestamps, prefixes, sensorName, observationType, valueType);
 
 		index++;
@@ -159,9 +162,10 @@ export class ParseData extends React.Component {
 					querystring.stringify({'query': query})
 				)
 				.then((response) => {
+					wholeData += dataToInsert;
 					dataToInsert = '';
 					cont = 0;
-					this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+					this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData);
 				})
 				.catch((error) => {
 					console.log(error);
@@ -170,7 +174,7 @@ export class ParseData extends React.Component {
 				});
 			}
 			else{
-				this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert);
+				this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData);
 			}
 		}
 		else{
@@ -190,10 +194,12 @@ export class ParseData extends React.Component {
 				.then((response) => {
 					console.log(response);
 					console.log("Tiempo Final " + Date.now());
+					wholeData += dataToInsert;
 					this.setState({
 						dataInserted: true,
 				        insertingData: false,
 						insertState: "",
+						fileContent: wholeData,
 					})
 				})
 				.catch((error) => {
@@ -204,13 +210,16 @@ export class ParseData extends React.Component {
 	}
 
 	handleDownload(){
-		const file = this.state.file;
+		const fileContent = this.state.fileContent;
 		const filename = this.state.fileName;
 
 		let indexOfDot = filename.indexOf('.');
 		let sensorIndicator = filename.substring(0, indexOfDot);
 		let sensorName = 'sensor' + sensorIndicator;
 
+		let prefixes = this.getTurtlePrefixes();
+
+		let file = new Blob([prefixes + fileContent], {type: "text/plain"});
 		let outputFileName = sensorName + '.ttl'
 
 		if (window.navigator.msSaveOrOpenBlob) // IE10+

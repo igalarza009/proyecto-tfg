@@ -431,7 +431,8 @@ export class SensorsInfo extends React.Component {
 										sensorsDir,
 										sensorValues,
 										sensorDatetimes,
-										parMotor
+										parMotor,
+										this.props.infoSensores
 									);
 					allChartData = DataFunctions.prepareGoogleChartsData(
 										anomResults['anomValues'],

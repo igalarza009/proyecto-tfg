@@ -71,12 +71,14 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 	}
 
     if (groupBy['groupByDate']) {
-    	where += 'bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate) ';
+    	where += 'bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate) ' +
+				'filter(?resultValue > "-1"^^xsd:double)';
     }
     else if(groupBy['groupByHour']){
     	where += 'bind(xsd:time(xsd:dateTime(?resultTime)) as ?time) . ' +
     		'bind(substr(str(?time), 1, 2) as ?hour) . ' +
-    		'bind(concat(?hour, ":00:00") as ?resultHour) . ';
+    		'bind(concat(?hour, ":00:00") as ?resultHour) . ' +
+			'filter(?resultValue > "-1"^^xsd:double)';
     }
 
     if (filter['filter']){

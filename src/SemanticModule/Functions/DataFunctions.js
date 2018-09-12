@@ -9,9 +9,9 @@ const _ = require('lodash');
 const propertyNames = {
 	temperature: 'Temperatura',
 	operationState: 'Estado del sensor',
-	power: 'Energía',
-	rotationalSpeed: 'velocidad de rotación',
-	pressure: 'Presión'
+	Power: 'Energía',
+	AngularVelocity: 'Velocidad angular',
+	Pressure: 'Presión'
 }
 
 const unitSymbols = {
@@ -292,18 +292,19 @@ export function prepareGoogleChartsData(sensorValues, sensorDatetimes, selectedS
 //  sensorDatetimes: Array
 //  parMotor: Collection
 // ----------
-export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sensorDatetimes, parMotor){
+export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sensorDatetimes, parMotor, infoSensores){
 	let anomDatetimes = [];
 	let anomValues = {}
 
 	const datetimes = sensorDatetimes[selectedSensors[0]];
 
 	selectedSensors.forEach((sensorId) => {
+		var sensor = _.find(infoSensores, ['indicatorId', sensorId]);
 		if (parMotor['parMotorId'] && parMotor['parMotorId'] === sensorId && parMotor['calParMotor'] === true){
-			anomValues[sensorId] = [sensorId + " (Par Motor)"];
+			anomValues[sensorId] = [sensor.name + " (Par Motor)"];
 		}
 		else{
-			anomValues[sensorId] = [sensorId];
+			anomValues[sensorId] = [sensor.name];
 		}
 	});
 
