@@ -498,7 +498,7 @@ function parseSensorValues(sensorResponse, sensorId, selectValues, selectDateTim
 			}
 			else{
 				var aux = parseFloat(result[selectValues[0]]["value"]);
-				if (aux === -50){
+				if (aux === -50){ // Añadido puesto que Virtuoso no admite el valor "NaN"^^xsd:double
 					sensorValues.push(NaN);
 				}
 				else{

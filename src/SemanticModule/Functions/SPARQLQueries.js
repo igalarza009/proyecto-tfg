@@ -72,13 +72,15 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 
     if (groupBy['groupByDate']) {
     	where += 'bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate) ' +
-				'filter(?resultValue > "-1"^^xsd:double)';
+				'filter(?resultValue > "-1"^^xsd:double)'; // Añadido puesto que Virtuoso no admite el valor "NaN"^^xsd:double
+															// Para evitar así que los valores "-50" afecten a los valores agrupados
     }
     else if(groupBy['groupByHour']){
     	where += 'bind(xsd:time(xsd:dateTime(?resultTime)) as ?time) . ' +
     		'bind(substr(str(?time), 1, 2) as ?hour) . ' +
     		'bind(concat(?hour, ":00:00") as ?resultHour) . ' +
-			'filter(?resultValue > "-1"^^xsd:double)';
+			'filter(?resultValue > "-1"^^xsd:double)'; // Añadido puesto que Virtuoso no admite el valor "NaN"^^xsd:double
+														// Para evitar así que los valores "-50" afecten a los valores agrupados
     }
 
     if (filter['filter']){

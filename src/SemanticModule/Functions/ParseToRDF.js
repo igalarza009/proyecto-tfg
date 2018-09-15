@@ -55,7 +55,8 @@ export function parseDataRecursive(index, values, timestamps, prefixes, sensorNa
 	let fixedValue = value;
 	if (value === 'NA'){
 		// fixedValue = 'NaN';
-		fixedValue = -50;
+		fixedValue = -50; // Añadido puesto que Virtuoso no admite el valor "NaN"^^xsd:double.
+						 // De esta manera se diferencian la falta de valores con los valores nulos.
 	}
 
 	let dataToInsert = ':' + observationName + ' rdf:type owl:NamedIndividual , ' +
