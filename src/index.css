@@ -202,6 +202,30 @@ circle {
 	height: 8%;
 }
 
+/* ------- Columna Zona 1 ------- */
+
+.zone1{
+    left: 48%;
+}
+
+/* ------- Columna Zona 2 ------- */
+
+.zone2{
+    left: 62.5%;
+}
+
+/* ------- Columna Zona 3 ------- */
+
+.zone3{
+    left: 77%;
+}
+
+/* ------- Columna Zona 4 ------- */
+
+.zone4{
+    left: 91%;
+}
+
 /*------ Temperatura por zonas -------*/
 
 .tempIcon{
@@ -209,33 +233,9 @@ circle {
 	left: 38%;
 }
 
-/* Zona 1 */
-.sensor2F1KT7{
-	top: 19%;
-	left: 48%;
-	background-color: rgba(236, 13, 13, 0.8);
-	/*border-color: red;*/
-}
-
-/* Zona 2 */
-.sensor649NNJ{
-	top: 19%;
-	left: 62.5%;
-	background-color: rgba(236, 13, 13, 0.8);
-}
-
-/* Zona 3 */
-.sensorREMSDB{
-	top: 19%;
-	left: 77%;
-	background-color: rgba(236, 13, 13, 0.8);
-}
-
-/* Zona 4 */
-.sensorXYY72L{
-	top: 19%;
-	left: 91%;
-	background-color: rgba(236, 13, 13, 0.8);
+.TemperatureSensor{
+    background-color: rgba(236, 13, 13, 0.8);
+    top: 19%;
 }
 
 /*------ Resistencia por zonas -------*/
@@ -245,32 +245,9 @@ circle {
 	left: 37%;
 }
 
-/* Zona 1 */
-.sensorUnknownResist1{
-	top: 32%;
-	left: 48%;
-	background-color: rgba(236, 99, 13, 0.8);
-}
-
-/* Zona 2 */
-.sensorUnknownResist2{
-	top: 32%;
-	left: 62.5%;
-	background-color: rgba(236, 99, 13, 0.8);
-}
-
-/* Zona 3 */
-.sensorUnknownResist3{
-	top: 32%;
-	left: 77%;
-	background-color: rgba(236, 99, 13, 0.8);
-}
-
-/* Zona 4 */
-.sensorUnknownResist4{
-	top: 32%;
-	left: 91%;
-	background-color: rgba(236, 99, 13, 0.8);
+.ResistanceSensor{
+    top: 32%;
+    background-color: rgba(236, 99, 13, 0.8);
 }
 
 /*------ Ventilación por zonas -------*/
@@ -280,32 +257,9 @@ circle {
 	left: 37%;
 }
 
-/* Zona 1 */
-.sensorUnknownVent1{
-	top: 44%;
-	left: 48%;
-	background-color: rgba(225, 236, 13, 0.8);
-}
-
-/* Zona 2 */
-.sensorUnknownVent2{
-	top: 44%;
-	left: 62.5%;
-	background-color: rgba(225, 236, 13, 0.8);
-}
-
-/* Zona 3 */
-.sensorUnknownVent3{
-	top: 44%;
-	left: 77%;
-	background-color: rgba(225, 236, 13, 0.8);
-}
-
-/* Zona 4 */
-.sensorUnknownVent4{
-	top: 44%;
-	left: 91%;
-	background-color: rgba(225, 236, 13, 0.8);
+.VentilationSensor{
+    background-color: rgba(225, 236, 13, 0.8);
+    top: 44%;
 }
 
 /*------ RPM del motor -------*/
@@ -315,7 +269,7 @@ circle {
 	left: 7%;
 }
 
-.sensorT4C3B9{
+.EngineRPMSensor{
 	top: 85%;
 	left: 17%;
 	background-color: rgba(28, 180, 35, 0.8);
@@ -328,7 +282,7 @@ circle {
 	left: 25%;
 }
 
-.sensor79PWN7{
+.EngineConsumptionSensor{
 	top: 85%;
 	left: 35%;
 	background-color: rgba(70, 135, 199, 0.8);
@@ -341,7 +295,7 @@ circle {
 	left: 42%;
 }
 
-.sensor84RATS{
+.PressureSensor{
 	top: 85%;
 	left: 51%;
 	background-color: rgba(181, 27, 201, 0.8);
@@ -354,7 +308,7 @@ circle {
 	left: 59%;
 }
 
-.sensorVMTKD6{
+.MeltingTemperatureSensor{
 	top: 85%;
 	left: 68%;
 	background-color: rgba(246, 105, 215, 0.8);

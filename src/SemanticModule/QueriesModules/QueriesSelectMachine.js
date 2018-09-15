@@ -21,17 +21,12 @@ const imgPath = './img/';
 // ----------------------------------------------------
 
 const virtuosoLocalURL = 'http://localhost:8890/sparql';
-const virtuosoDebianURL = 'http://35.237.115.247:8890/sparql';
+const virtuosoDebianURL = 'http://35.237.115.247:8890/sparql'; // Cambia cada vez que se inicia la máquina
 const usedURL = virtuosoLocalURL;
 
-// const graphURI = "<http://www.sensores.com/ontology/prueba08/extrusoras#>";
-// const graphURI = "<http://www.sensores.com/ontology/pruebas_insert/extrusoras#>";
-// const graphURI = "<http://www.sensores.com/ontology/datos_reduc/extrusoras#>";
 const graphURI = "<http://bdi.si.ehu.es/bdi/ontologies/extrusion/sensors#>";
 
-// ------- COMENTAR AL HACER LA UNIÓN CON I4TSPS -------
-const machineId = "1086_WWN_BGY3MW_3";
-// -----------------------------------------------------
+const machineId = "1086_WWN_BGY3MW_3";  // La única máquina contemplada en el sistema
 
 export class QueriesSelectMachine extends React.Component {
 	constructor(props){

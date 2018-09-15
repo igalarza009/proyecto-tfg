@@ -102,13 +102,14 @@ export class SensorsInfo extends React.Component {
 
 		const sensorDivs = sensors.map((value) => {
 			const sensorId = value.indicatorId;
-			const sensorClass = "sensor" + value.indicatorId;
+			const typeClass = value.sensorType;
+			const zoneClass = (isNaN(value.zone)) ? ("") : ("zone" + value.zone);
 			const sensorIndex = selectedSensors.indexOf(sensorId);
 			let classes;
 			if (sensorIndex < 0)
-				classes = 'sensorDiv z-depth-1 ' + sensorClass;
+				classes = 'sensorDiv z-depth-1 ' + typeClass + ' ' + zoneClass;
 			else
-				classes = 'sensorDivSelected z-depth-1 ' + sensorClass;
+				classes = 'sensorDivSelected z-depth-1 ' + typeClass + ' ' + zoneClass;
 
 			return(
 				<div key={sensorId} className={classes}
