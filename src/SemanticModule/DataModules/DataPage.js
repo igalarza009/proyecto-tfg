@@ -24,6 +24,9 @@ const _ = require('lodash');
 
 const maxReqLength = 250000;
 
+const maxReqSize = 260;
+const simultReq = 6;
+
 export class ParseData extends React.Component {
 	constructor(props) {
 	    super(props);
@@ -122,7 +125,10 @@ export class ParseData extends React.Component {
 			}
 		})
 		.catch((error) => {
-			alert("Ha ocurrido un error. Mirar en la consola para más información.");
+			this.setState({
+				error: 'errorFixing',
+			});
+			// alert("Ha ocurrido un error. Mirar en la consola para más información.");
 			console.log(error);
 		});
 	}
@@ -134,78 +140,192 @@ export class ParseData extends React.Component {
 
 		let infoForParsing = Parser.getInfoToParseData(fileName, this.props.infoSensores, this.props.graphURI);
 
-		let dataToInsert = '';
-		let cont = 0;
+		// let dataToInsert = '';
+		// let cont = 0;
 		let i = 0;
 		let wholeData = '';
 
-		console.log("Tiempo inicio " + Date.now());
-		this.insertDataRecursive(i, cont, parsedValues, parsedTimestamps, infoForParsing['virtPrefixes'], infoForParsing['sensorName'], infoForParsing['observationType'], infoForParsing['valueType'], dataToInsert, wholeData);
+		let tiempo = new Date();
+		console.log("Tiempo inicio " + tiempo);
+		// this.insertDataRecursive(i, cont, parsedValues, parsedTimestamps, infoForParsing['virtPrefixes'], infoForParsing['sensorName'], infoForParsing['observationType'], infoForParsing['valueType'], dataToInsert, wholeData);
+		this.insertDataRecursiveList(i, parsedValues, parsedTimestamps, infoForParsing['virtPrefixes'], infoForParsing['sensorName'], infoForParsing['observationType'], infoForParsing['valueType'], wholeData);
 	}
 
-	insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData){
-		dataToInsert += Parser.parseDataRecursive(index, values, timestamps, prefixes, sensorName, observationType, valueType);
+	// insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData){
+	// 	dataToInsert += Parser.parseDataRecursive(index, values, timestamps, prefixes, sensorName, observationType, valueType);
+	//
+	// 	index++;
+	// 	cont++;
+	//
+	// 	if(index < values.length){
+	// 		if (cont === 21){
+	// 			// -------------------- CAMBIAR PARA LA UNIÓN DE I4TSPS --------------------
+	// 			// Comentar esto:
+	// 			var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
+	// 			// console.log(query);
+	// 			// Descomentar esto:
+	// 			// var query = Queries.getInsertQueryDebian(prefixes, dataToInsert, this.props.graphURI);
+	// 			// -------------------------------------------------------------------------
+	// 			axios.post(this.props.usedURL,
+	// 				querystring.stringify({'query': query})
+	// 			)
+	// 			.then((response) => {
+	// 				wholeData += dataToInsert;
+	// 				dataToInsert = '';
+	// 				cont = 0;
+	// 				this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData);
+	// 			})
+	// 			.catch((error) => {
+	// 				this.setState({
+	// 					error: 'errorInserting',
+	// 				});
+	// 				console.log(error);
+	// 				console.log(index);
+	// 				console.log(query);
+	// 			});
+	// 		}
+	// 		else{
+	// 			this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData);
+	// 		}
+	// 	}
+	// 	else{
+	// 		if (cont > 0) {
+	// 			console.log('Ultima petición');
+	//
+	// 			// -------------------- CAMBIAR PARA LA UNIÓN DE I4TSPS --------------------
+	// 			// Comentar esto:
+	// 			var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
+	// 			// Descomentar esto:
+	// 			// var query = Queries.getInsertQueryDebian(prefixes, dataToInsert, this.props.graphURI);
+	// 			// -------------------------------------------------------------------------
+	//
+	// 			axios.post(this.props.usedURL,
+	// 				querystring.stringify({'query': query})
+	// 			)
+	// 			.then((response) => {
+	// 				console.log(response);
+	// 				let tiempo = new Date();
+	// 				console.log("Tiempo Final " + tiempo);
+	// 				wholeData += dataToInsert;
+	// 				this.setState({
+	// 					dataInserted: true,
+	// 			        insertingData: false,
+	// 					insertState: "",
+	// 					fileContent: wholeData,
+	// 				})
+	// 			})
+	// 			.catch((error) => {
+	// 				console.log(error);
+	// 			});
+	// 		}
+	// 	}
+	// }
 
-		index++;
-		cont++;
+	insertDataRecursiveList(index, values, timestamps, prefixes, sensorName, observationType, valueType, wholeData){
+		// console.log('Índice base: ' + index);
+		let i;
+		let dataToInsert = '';
+		let firstResponse = true;
+		for (i = 0; i < simultReq; i++){
+			let iActual = index + (maxReqSize * i) ;
+			// console.log('Índice actual: ' + iActual);
+			let valuesToInsert = values.slice(iActual, iActual + maxReqSize);
+			// console.log(valuesToInsert);
+			let timestampsToInsert = timestamps.slice(iActual, iActual + maxReqSize);
+			// console.log(timestampsToInsert);
+			dataToInsert = Parser.parseDataRecursiveList(valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
 
-		if(index < values.length){
-			if (cont === 21){
-				// -------------------- CAMBIAR PARA LA UNIÓN DE I4TSPS --------------------
-				// Comentar esto:
-				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
-				// console.log(query);
-				// Descomentar esto:
-				// var query = Queries.getInsertQueryDebian(prefixes, dataToInsert, this.props.graphURI);
-				// -------------------------------------------------------------------------
-				axios.post(this.props.usedURL,
-					querystring.stringify({'query': query})
-				)
-				.then((response) => {
-					wholeData += dataToInsert;
-					dataToInsert = '';
-					cont = 0;
-					this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData);
-				})
-				.catch((error) => {
-					console.log(error);
-					console.log(index);
-					console.log(query);
+			var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
+			axios.post(this.props.usedURL,
+				querystring.stringify({'query': query})
+			)
+			.then((response) => {
+				wholeData += dataToInsert;
+				// console.log('Respuesta del índice base ' + index + ' y del bucle ' + i);
+				if (firstResponse){
+					firstResponse = false;
+					// console.log('Primera respuesta de la recursividad');
+					if(index + (maxReqSize * simultReq * 2) < values.length){
+						// let iLog = index + (maxReqSize * simultReq * 2);
+						// console.log('Podemos seguir la recursividad: ' + iLog + ' < ' + values.length);
+						index = index + (maxReqSize * simultReq);
+						this.insertDataRecursiveList(index, values, timestamps, prefixes, sensorName, observationType, valueType, wholeData);
+					}
+					else{
+						let iLog = index + (maxReqSize * simultReq * 2);
+						// console.log('No podemos seguir la recursividad: ' + iLog + ' >= ' + values.length);
+						let finished = false;
+						let contReq = 0;
+						let contResp = 0;
+						while (!finished){
+							if (index + maxReqSize < values.length){
+								// let iLog2 = index + maxReqSize;
+								// console.log(contReq);
+								// console.log('Trozo completo, porque ' + iLog2 + ' < ' + values.length);
+								// console.log('Indice actual: ' + index);
+								let valuesToInsert = values.slice(index, index + maxReqSize);
+								// console.log(valuesToInsert);
+								let timestampsToInsert = timestamps.slice(index, index + maxReqSize)
+								// console.log(timestampsToInsert);
+								dataToInsert = Parser.parseDataRecursiveList(valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
+								// contReq++;
+							}
+							else{
+								// let iLog3 = index + maxReqSize;
+								// console.log('Última petición');
+								// console.log('Indice actual: ' + index);
+								let valuesToInsert = values.slice(index);
+								// console.log(valuesToInsert);
+								let timestampsToInsert = timestamps.slice(index);
+								// console.log(timestampsToInsert);
+								dataToInsert = Parser.parseDataRecursiveList(valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
+								// contReq++;
+								finished = true;
+							}
+							index = index + maxReqSize;
+							contReq++;
+							var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
+							console.log("Últimas peticiones: " + contReq);
+							axios.post(this.props.usedURL,
+								querystring.stringify({'query': query})
+							)
+							.then((response) => {
+								contResp++;
+								console.log("Últimas respuestas: " + contResp);
+								wholeData += dataToInsert;
+								if (contResp !== 0 && contResp === contReq){
+									let tiempo = new Date();
+									console.log("Tiempo Final " + tiempo);
+									wholeData += dataToInsert;
+									this.setState({
+										dataInserted: true,
+								        insertingData: false,
+										insertState: "",
+										fileContent: wholeData,
+									})
+								}
+							})
+							.catch((error) => {
+								this.setState({
+									error: 'errorInserting',
+								});
+								console.log(error);
+								console.log(index);
+								console.log(query);
+							});
+						}
+
+					}
+				}
+			})
+			.catch((error) => {
+				this.setState({
+					error: 'errorInserting',
 				});
-			}
-			else{
-				this.insertDataRecursive(index, cont, values, timestamps, prefixes, sensorName, observationType, valueType, dataToInsert, wholeData);
-			}
-		}
-		else{
-			if (cont > 0) {
-				console.log('Ultima petición');
-
-				// -------------------- CAMBIAR PARA LA UNIÓN DE I4TSPS --------------------
-				// Comentar esto:
-				var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
-				// Descomentar esto:
-				// var query = Queries.getInsertQueryDebian(prefixes, dataToInsert, this.props.graphURI);
-				// -------------------------------------------------------------------------
-
-				axios.post(this.props.usedURL,
-					querystring.stringify({'query': query})
-				)
-				.then((response) => {
-					console.log(response);
-					console.log("Tiempo Final " + Date.now());
-					wholeData += dataToInsert;
-					this.setState({
-						dataInserted: true,
-				        insertingData: false,
-						insertState: "",
-						fileContent: wholeData,
-					})
-				})
-				.catch((error) => {
-					console.log(error);
-				});
-			}
+				console.log(error);
+				console.log(index);
+				console.log(query);
+			});
 		}
 	}
 
@@ -351,7 +471,7 @@ export class ParseData extends React.Component {
 			loadingMessage = (<p> Insertando los datos corregidos del fichero <span className="bold">{fileName}</span> en el respositorio de datos. </p>)
 		}
 
-		const loadingInsertData = (insertingData) &&
+		const loadingInsertData = (error !== 'errorParsing' && error !== 'errorInserting' && insertingData) &&
 			(<div className="card">
 			 	<div className="card-content center">
 			    	<span className="card-title blue-text text-darken-3">Insertando datos... </span>
@@ -361,7 +481,7 @@ export class ParseData extends React.Component {
 				</div>
 			</div>);
 
-			const dataInsertedCard = (dataInserted) &&
+			const dataInsertedCard = (error !== 'errorParsing' && error !== 'errorInserting' && dataInserted) &&
 				(<div className="card">
 					<div className="card-content center">
 						<span className="card-title green-text green-darken-3"><Icon>done</Icon> Datos correctamente insertados.</span>
@@ -385,6 +505,30 @@ export class ParseData extends React.Component {
 					</div>
 				</div>);
 
+		let errorTitle = '';
+		let errorDesc = '';
+		if (error === 'errorParsing'){
+			errorTitle = 'Error preprocesando'
+			errorDesc = 'Ha ocurrido un error preprocesando los datos.'
+		}
+		else if(error === 'errorInserting'){
+			errorTitle = 'Error insertando'
+			errorDesc = 'Ha ocurrido un error insertando los datos.'
+		}
+
+		const errorReqCard = (error === 'errorParsing' || error === 'errorInserting') &&
+		(<div className="card">
+            <div className="card-content center">
+              <span className="card-title red-text text-darken-3">{errorTitle}</span>
+			  <p>{errorDesc} </p>
+			  <Row className='margin-top'>
+				  <Button className="blue darken-3" onClick={() => this.hanldeNewFile()}>
+					  Volver a intentar
+				  </Button>
+			  </Row>
+            </div>
+		</div>);
+
 		const offsetMainCard = (showLeyenda && selectFile)
 			? "m1"
 			: "m1 l2";
@@ -397,6 +541,7 @@ export class ParseData extends React.Component {
 							{selectFileOption}
 							{loadingInsertData}
 							{dataInsertedCard}
+							{errorReqCard}
 						</Row>
 					</Col>
 					<Col s={12} m={10} l={4} offset="m1">

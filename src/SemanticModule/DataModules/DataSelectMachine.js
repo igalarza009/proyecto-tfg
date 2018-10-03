@@ -20,8 +20,8 @@ const imgPath = './img/';
 const _ = require('lodash');
 
 const virtuosoLocalURL = 'http://localhost:8890/sparql';
-const virtuosoDebianURL = 'http://35.237.115.247:8890/sparql'; // Cambia cada vez que se inicia la máquina
-const usedURL = virtuosoLocalURL;
+const virtuosoDebianURL = 'http://35.237.96.154:8890/sparql'; // Cambia cada vez que se inicia la máquina
+const usedURL = virtuosoDebianURL;
 
 const graphURI = "<http://bdi.si.ehu.es/bdi/ontologies/extrusion/sensors#>";
 

@@ -277,8 +277,7 @@ export function getInfoSensoresQuery(graphURI){
 							':indicatorId ?sensorId ; ' +
 							':sensorName ?name . ' +
 				'optional { ?sensorName :zone ?zone . } ' +
-			'} ' +
-			'order by asc(?name)';
+			'} ';
 	return query;
 }
 
