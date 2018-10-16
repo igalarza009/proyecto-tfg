@@ -40,6 +40,7 @@ where {
     optional {
         ?sensorName :zone ?zone .
     }
+    filter(?sensorType != "VentilationSensor" && ?zone != "3")
 }
 order by asc(?name)
 

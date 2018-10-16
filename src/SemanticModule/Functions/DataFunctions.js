@@ -331,7 +331,7 @@ export function getAnomaliasValues(selectedSensors, sensorDir, sensorValues, sen
 				else if (prevValues[sensorId] !== sensorValues[sensorId][i])
 					booleans.push(false);
 			});
-			if (!(booleans.every(allTrue) || booleans.every(allFalse))) {
+			if (! (booleans.every(allTrue) || booleans.every(allFalse)) ) {
 				anomValues[primSensor].push(value);
 				restoSensores.forEach((sensorId) => {
 					anomValues[sensorId].push(sensorValues[sensorId][i]);

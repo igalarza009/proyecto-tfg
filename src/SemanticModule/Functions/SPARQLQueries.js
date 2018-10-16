@@ -277,6 +277,9 @@ export function getInfoSensoresQuery(graphURI){
 							':indicatorId ?sensorId ; ' +
 							':sensorName ?name . ' +
 				'optional { ?sensorName :zone ?zone . } ' +
+				// 'filter(?sensorId != "UnknownVent3"^^<http://www.w3.org/2001/XMLSchema#string> && ' +
+				// 		'?sensorId != "T4C3B9"^^<http://www.w3.org/2001/XMLSchema#string> && ' +
+				// 		'?sensorId != "2F1KT7"^^<http://www.w3.org/2001/XMLSchema#string>) ' +
 			'} ';
 	return query;
 }

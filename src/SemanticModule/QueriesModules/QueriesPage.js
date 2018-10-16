@@ -219,6 +219,23 @@ export class SensorsInfo extends React.Component {
 			const sensorId = selectedSensors[nResponses];
 			if (response.data["results"]["bindings"].length > 0){
 				// Sustituir y tratar aquí los datos, ponerlos en el formato adecuado y reducirlos
+				// let file = new Blob([JSON.stringify(response)], {type: "application/json"});
+				// let outputFileName = 'responseVirtuoso' + nResponses + '.ttl'
+				//
+				// if (window.navigator.msSaveOrOpenBlob) // IE10+
+				// 	window.navigator.msSaveOrOpenBlob(file, outputFileName);
+				// else { // Others
+				// 	var a = document.createElement("a"),
+				// 			url = URL.createObjectURL(file);
+				// 	a.href = url;
+				// 	a.download = outputFileName;
+				// 	document.body.appendChild(a);
+				// 	a.click();
+				// 	setTimeout(function() {
+				// 		document.body.removeChild(a);
+				// 		window.URL.revokeObjectURL(url);
+				// 	}, 0);
+				// }
 				var result = DataFunctions.parseResponseData(
 					response.data["results"]["bindings"],
 					selectedValues,

@@ -22,10 +22,12 @@ const imgPath = './img/';
 const querystring = require('querystring');
 const _ = require('lodash');
 
+// Para el servicio fixTimestamps
 const maxReqLength = 250000;
 
+// Para la inserción a Virtuoso
 const maxReqSize = 260;
-const simultReq = 6;
+const simultReq = 8;
 
 export class ParseData extends React.Component {
 	constructor(props) {

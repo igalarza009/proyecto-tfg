@@ -21,9 +21,9 @@ const imgPath = './img/';
 // ----------------------------------------------------
 
 const virtuosoLocalURL = 'http://localhost:8890/sparql';
-const virtuosoDebianURL = 'http://35.237.168.6:8890/sparql'; // Cambia cada vez que se inicia la máquina 
+const virtuosoDebianURL = 'http://35.237.96.154:8890/sparql'; // Cambia cada vez que se inicia la máquina
 const virtuosoDebianBorjaURL = 'http://35.224.159.30:8890/sparql'; // --> No la hace
-const usedURL = virtuosoDebianURL;
+const usedURL = virtuosoDebianBorjaURL;
 
 const graphURI = "<http://bdi.si.ehu.es/bdi/ontologies/extrusion/sensors#>";
 
@@ -77,6 +77,7 @@ export class QueriesSelectMachine extends React.Component {
 		if (id === machineId){
 			let query = Queries.getInfoSensoresQuery(graphURI);
 			const querystring = require('querystring');
+			// console.log(query);
 			axios.post(usedURL,
 				querystring.stringify({'query': query})
 			)
@@ -85,6 +86,7 @@ export class QueriesSelectMachine extends React.Component {
 				let results = response.data["results"]["bindings"];
 				if (results.length > 0) {
 					let infoSensores = DataFunctions.getInfoSensores(results);
+					console.log(infoSensores);
 					this.setState({
 						infoSensores: infoSensores,
 						state: 'showQueries',
