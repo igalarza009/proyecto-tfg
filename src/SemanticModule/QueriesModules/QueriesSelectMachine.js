@@ -23,7 +23,7 @@ const imgPath = './img/';
 const virtuosoLocalURL = 'http://localhost:8890/sparql';
 const virtuosoDebianURL = 'http://35.237.96.154:8890/sparql'; // Cambia cada vez que se inicia la máquina
 const virtuosoDebianBorjaURL = 'http://35.224.159.30:8890/sparql'; // --> No la hace
-const usedURL = virtuosoDebianBorjaURL;
+const usedURL = virtuosoDebianURL;
 
 const graphURI = "<http://bdi.si.ehu.es/bdi/ontologies/extrusion/sensors#>";
 

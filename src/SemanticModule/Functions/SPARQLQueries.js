@@ -49,7 +49,7 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 
 	let where = 'where { ';
 
-	where += '?sensorName sosa:madeObservation ?obsName . ' +
+	where += '<#sensor'+ sensorId +'> sosa:madeObservation ?obsName . ' +
 			'?obsName sosa:hasSimpleResult ?resultValue . ' +
 			'?obsName sosa:resultTime ?resultTime . ';
 
@@ -64,11 +64,11 @@ export function getInformationQueryIndividual(sensorId, groupBy, filter, filterV
 				where += '>= "' + sensorFilterValues[0] + '"^^xsd:double && ' +
 						'?resultValue <= "' + sensorFilterValues[1] + '"^^xsd:double ';
 			}
-			where += '&& ?sensorName = <#sensor'+ sensorId +'> ) .';
+			where += ' ) .';
 	}
-	else{
-		where += 'filter( ?sensorName = <#sensor'+ sensorId +'> ) .';
-	}
+	// else{
+	// 	where += 'filter( ?sensorName = <#sensor'+ sensorId +'> ) .';
+	// }
 
     if (groupBy['groupByDate']) {
     	where += 'bind(xsd:date(xsd:dateTime(?resultTime)) as ?resultDate) ' +

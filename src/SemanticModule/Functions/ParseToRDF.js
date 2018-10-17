@@ -42,7 +42,7 @@ export function getInfoToParseData(filename, infoSensores, graphURI){
 //  observationType: String
 //  valueType: String
 // ----------
-export function parseDataRecursiveList(values, timestamps, prefixes, sensorName, observationType, valueType){
+export function parseDataRecursiveList(index, values, timestamps, prefixes, sensorName, observationType, valueType){
 
 	let dataToInsert = '';
 
@@ -50,7 +50,8 @@ export function parseDataRecursiveList(values, timestamps, prefixes, sensorName,
 		let dateTime = timestamps[i];
 		let posGuion = dateTime.indexOf('-');
 		let date = dateTime.substring(0, posGuion) + dateTime.substring(posGuion+1, posGuion+3) + dateTime.substring(posGuion+4, posGuion+6);
-		let observationName = sensorName + "date" + date + "obs" + i;
+		let obsNum = index + i;
+		let observationName = sensorName + "date" + date + "obs" + obsNum;
 
 		let fixedValue = value;
 		if (value === 'NA'){

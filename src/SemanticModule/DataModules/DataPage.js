@@ -123,6 +123,8 @@ export class ParseData extends React.Component {
 					fixedTimestampsISOFormat.push(date.toISOString());
 				});
 				console.log("Data converted to ISO");
+				// console.log(newFixedValues);
+				// console.log(newFixedTimestamps);
 				this.fixingCompleted(fileName, newFixedValues, fixedTimestampsISOFormat)
 			}
 		})
@@ -158,7 +160,13 @@ export class ParseData extends React.Component {
 			let iActual = index + (maxReqSize * i) ;
 			let valuesToInsert = values.slice(iActual, iActual + maxReqSize);
 			let timestampsToInsert = timestamps.slice(iActual, iActual + maxReqSize);
-			dataToInsert = Parser.parseDataRecursiveList(valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
+			// if (iActual <= maxReqSize ){
+				// console.log(values);
+				// console.log(timestamps);
+				// console.log(valuesToInsert);
+				// console.log(timestampsToInsert);
+			// }
+			dataToInsert = Parser.parseDataRecursiveList(iActual, valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
 
 			var query = Queries.getInsertQueryLocal(prefixes, dataToInsert, this.props.graphURI);
 			axios.post(this.props.usedURL,
@@ -181,12 +189,12 @@ export class ParseData extends React.Component {
 							if (index + maxReqSize < values.length){
 								let valuesToInsert = values.slice(index, index + maxReqSize);
 								let timestampsToInsert = timestamps.slice(index, index + maxReqSize)
-								dataToInsert = Parser.parseDataRecursiveList(valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
+								dataToInsert = Parser.parseDataRecursiveList(index, valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
 							}
 							else{
 								let valuesToInsert = values.slice(index);
 								let timestampsToInsert = timestamps.slice(index);
-								dataToInsert = Parser.parseDataRecursiveList(valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
+								dataToInsert = Parser.parseDataRecursiveList(index, valuesToInsert, timestampsToInsert, prefixes, sensorName, observationType, valueType);
 								finished = true;
 							}
 							index = index + maxReqSize;
